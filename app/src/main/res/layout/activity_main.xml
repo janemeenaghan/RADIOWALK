@@ -15,9 +15,38 @@
         android:layout_height="match_parent"
         android:orientation="horizontal"
         android:gravity="center">
+        
+        <androidx.constraintlayout.widget.Guideline
+            android:id="@+id/guidelineVertForButton"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:orientation="vertical"
+            app:layout_constraintGuide_percent="0.80" />
 
+        <androidx.constraintlayout.widget.Guideline
+            android:id="@+id/guidelineHorizForButton"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:orientation="horizontal"
+            app:layout_constraintGuide_percent="0.80" />
 
+        <com.google.android.material.floatingactionbutton.FloatingActionButton
+            android:id="@+id/createButton"
+            android:layout_width="100dp"
+            android:layout_height="100dp"
+            android:layout_weight="0"
+            android:clickable="true"
+            app:layout_constraintLeft_toRightOf="@id/guidelineVertForButton"
+            app:layout_constraintTop_toBottomOf="@id/guidelineHorizForButton"
+            android:contentDescription="createButton"
+            android:visibility="visible" />
 
+        <com.google.android.gms.maps.MapView
+            android:id="@+id/mapView"
+            android:layout_width="match_parent"
+            android:layout_height="match_parent"
+            android:contentDescription="@string/app_name"
+            android:gravity="center" />
     </LinearLayout>
 
     <LinearLayout
@@ -25,10 +54,5 @@
         android:layout_height="match_parent"
         android:orientation="horizontal"
         android:gravity="center|top" >
-
-
     </LinearLayout>
-
-
-
 </com.sothree.slidinguppanel.SlidingUpPanelLayout>

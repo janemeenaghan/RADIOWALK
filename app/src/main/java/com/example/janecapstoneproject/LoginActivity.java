@@ -6,19 +6,19 @@ import android.util.Log;
 import android.view.View;
 import android.widget.Button;
 import android.widget.EditText;
+import android.widget.TextView;
 import android.widget.Toast;
-import com.parse.FindCallback;
+
 import com.parse.LogInCallback;
 import com.parse.ParseException;
-import com.parse.ParseObject;
-import com.parse.ParseQuery;
 import com.parse.ParseUser;
-import java.util.List;
+
 public class LoginActivity extends AppCompatActivity {
     public static final String TAG = "LoginActivity";
     private EditText etUsername;
     private EditText etPassword;
     private Button login;
+    private TextView createAccount;
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -28,7 +28,7 @@ public class LoginActivity extends AppCompatActivity {
         }
         etUsername = findViewById(R.id.username);
         etPassword = findViewById(R.id.password);
-        login = findViewById(R.id.login);
+        login = findViewById(R.id.signup);
         login.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
@@ -37,6 +37,16 @@ public class LoginActivity extends AppCompatActivity {
                 loginUser(username, password);
             }
         });
+
+
+        createAccount = findViewById(R.id.createAccount);
+        createAccount.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                goSignUpActivity();
+            }
+        });
+
     }
     private void loginUser(String username, String password) {
         ParseUser.logInInBackground(username, password, new LogInCallback(){
@@ -56,5 +66,10 @@ public class LoginActivity extends AppCompatActivity {
         Intent i = new Intent(LoginActivity.this, MainActivity.class);
         startActivity(i);
         finish();
+    }
+
+    private void goSignUpActivity() {
+        Intent i = new Intent(LoginActivity.this, SignUpActivity.class);
+        startActivity(i);
     }
 }

@@ -8,7 +8,6 @@ import android.widget.Button;
 import android.widget.EditText;
 import android.widget.TextView;
 import android.widget.Toast;
-
 import com.parse.LogInCallback;
 import com.parse.ParseException;
 import com.parse.ParseUser;
@@ -37,8 +36,6 @@ public class LoginActivity extends AppCompatActivity {
                 loginUser(username, password);
             }
         });
-
-
         createAccount = findViewById(R.id.createAccount);
         createAccount.setOnClickListener(new View.OnClickListener() {
             @Override
@@ -46,7 +43,6 @@ public class LoginActivity extends AppCompatActivity {
                 goSignUpActivity();
             }
         });
-
     }
     private void loginUser(String username, String password) {
         ParseUser.logInInBackground(username, password, new LogInCallback(){
@@ -67,7 +63,6 @@ public class LoginActivity extends AppCompatActivity {
         startActivity(i);
         finish();
     }
-
     private void goSignUpActivity() {
         Intent i = new Intent(LoginActivity.this, SignUpActivity.class);
         startActivity(i);

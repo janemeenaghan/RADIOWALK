@@ -1,0 +1,8 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <dimen name="wrapperWidth">404dp</dimen>
+    <dimen name="wrapperHeight">63dp</dimen>
+    <dimen name="editTextWidth">327dp</dimen>
+    <dimen name="editTextHeight">44dp</dimen>
+
+</resources>

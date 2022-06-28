@@ -1,15 +1,15 @@
 <?xml version="1.0" encoding="utf-8"?>
-<androidx.constraintlayout.widget.ConstraintLayout xmlns:android="http://schemas.android.com/apk/res/android"
+<androidx.constraintlayout.widget.ConstraintLayout
+    xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto"
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
     tools:context=".LoginActivity">
-
     <com.google.android.material.textfield.TextInputLayout
         android:id="@+id/tilWrapper1"
-        android:layout_width="404dp"
-        android:layout_height="65dp"
+        android:layout_width="@dimen/wrapperWidth"
+        android:layout_height="@dimen/wrapperHeight"
         android:layout_alignParentStart="true"
         android:layout_alignParentTop="true"
         android:layout_centerInParent="true"
@@ -19,11 +19,10 @@
         app:layout_constraintHorizontal_bias="0.428"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toTopOf="parent">
-
         <EditText
             android:id="@+id/email"
-            android:layout_width="327dp"
-            android:layout_height="44dp"
+            android:layout_width="@dimen/editTextWidth"
+            android:layout_height="@dimen/editTextHeight"
             android:layout_marginLeft="40dp"
             android:layout_marginTop="0dp"
             android:layout_weight="1"
@@ -36,12 +35,10 @@
             app:layout_constraintStart_toStartOf="parent"
             app:layout_constraintTop_toTopOf="@+id/tilWrapper1" />
     </com.google.android.material.textfield.TextInputLayout>
-
-
     <com.google.android.material.textfield.TextInputLayout
         android:id="@+id/tilWrapper2"
-        android:layout_width="404dp"
-        android:layout_height="63dp"
+        android:layout_width="@dimen/wrapperWidth"
+        android:layout_height="@dimen/wrapperHeight"
         android:layout_alignParentStart="true"
         android:layout_alignParentTop="true"
         android:layout_centerInParent="true"
@@ -50,12 +47,11 @@
         app:layout_constraintHorizontal_bias="0.428"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toBottomOf="@+id/tilWrapper1">
-
         <EditText
             android:id="@+id/username"
-            android:layout_width="327dp"
-            android:layout_height="44dp"
-            android:layout_marginLeft="40dp"
+            android:layout_width="@dimen/editTextWidth"
+            android:layout_height="@dimen/editTextHeight"
+            android:layout_marginStart="40dp"
             android:layout_marginTop="0dp"
             android:layout_weight="1"
             android:ems="10"
@@ -67,11 +63,10 @@
             app:layout_constraintStart_toStartOf="parent"
             app:layout_constraintTop_toTopOf="@+id/tilWrapper2" />
     </com.google.android.material.textfield.TextInputLayout>
-
     <com.google.android.material.textfield.TextInputLayout
         android:id="@+id/tilWrapper3"
-        android:layout_width="404dp"
-        android:layout_height="63dp"
+        android:layout_width="@dimen/wrapperWidth"
+        android:layout_height="@dimen/wrapperHeight"
         android:layout_alignParentStart="true"
         android:layout_alignParentTop="true"
         android:layout_centerInParent="true"
@@ -81,11 +76,10 @@
         app:layout_constraintHorizontal_bias="0.428"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toBottomOf="@+id/tilWrapper2">
-
         <EditText
             android:id="@+id/password"
-            android:layout_width="327dp"
-            android:layout_height="44dp"
+            android:layout_width="@dimen/editTextWidth"
+            android:layout_height="@dimen/editTextHeight"
             android:layout_marginLeft="40dp"
             android:layout_marginTop="0dp"
             android:layout_weight="1"
@@ -98,11 +92,10 @@
             app:layout_constraintStart_toStartOf="parent"
             app:layout_constraintTop_toTopOf="@+id/tilWrapper3" />
     </com.google.android.material.textfield.TextInputLayout>
-
     <com.google.android.material.textfield.TextInputLayout
         android:id="@+id/tilWrapper4"
-        android:layout_width="404dp"
-        android:layout_height="63dp"
+        android:layout_width="@dimen/wrapperWidth"
+        android:layout_height="@dimen/wrapperHeight"
         android:layout_alignParentStart="true"
         android:layout_alignParentTop="true"
         android:layout_centerInParent="true"
@@ -111,12 +104,11 @@
         app:layout_constraintHorizontal_bias="0.428"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toBottomOf="@+id/tilWrapper3">
-
         <EditText
             android:id="@+id/passwordConfirm"
-            android:layout_width="327dp"
-            android:layout_height="44dp"
-            android:layout_marginLeft="40dp"
+            android:layout_width="@dimen/editTextWidth"
+            android:layout_height="@dimen/editTextHeight"
+            android:layout_marginStart="40dp"
             android:layout_marginTop="0dp"
             android:layout_weight="1"
             android:ems="10"
@@ -128,7 +120,6 @@
             app:layout_constraintStart_toStartOf="parent"
             app:layout_constraintTop_toTopOf="@+id/tilWrapper4" />
     </com.google.android.material.textfield.TextInputLayout>
-
     <Button
         android:id="@+id/signup"
         android:layout_width="316dp"
@@ -140,6 +131,4 @@
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toBottomOf="@+id/tilWrapper3"
         app:layout_constraintVertical_bias="0.231" />
-
-
 </androidx.constraintlayout.widget.ConstraintLayout>

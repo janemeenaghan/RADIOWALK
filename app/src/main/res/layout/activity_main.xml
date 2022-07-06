@@ -74,6 +74,15 @@
             tools:layout_editor_absoluteX="16dp"
             tools:layout_editor_absoluteY="28dp"
             tools:srcCompat="@tools:sample/avatars" />
+        <SeekBar
+            android:layout_width="fill_parent"
+            android:layout_height="wrap_content"
+            android:id="@+id/volumebar"
+            android:max="100"
+            android:paddingBottom="10dip"
+            app:layout_constraintBottom_toBottomOf="@+id/musicInformation"
+            app:layout_constraintStart_toEndOf="@+id/musicInformation"
+            app:layout_constraintTop_toTopOf="@+id/musicInformation" />
 
         <androidx.constraintlayout.widget.Guideline
             android:id="@+id/guidelineVertForImage"

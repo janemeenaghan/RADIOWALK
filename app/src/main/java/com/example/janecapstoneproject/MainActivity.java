@@ -7,6 +7,7 @@ import androidx.appcompat.app.AppCompatActivity;
 import androidx.core.app.ActivityCompat;
 
 import android.Manifest;
+import android.content.Context;
 import android.content.DialogInterface;
 import android.content.pm.PackageManager;
 import android.location.Location;
@@ -19,6 +20,7 @@ import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.widget.EditText;
+import android.widget.SeekBar;
 import android.widget.Toast;
 
 import com.google.android.gms.common.internal.Constants;
@@ -47,7 +49,7 @@ public class MainActivity extends AppCompatActivity implements OnMapReadyCallbac
     private MapView mMapView;
     public FloatingActionButton addStationButton;
     public int REQUEST_CODE = 1001;
-    public static final int DEFAULT_ZOOM = 10;
+    public static final int DEFAULT_ZOOM = 20;
 
     public static final String TAG = "MainActivity";
     public static final String MAPVIEW_BUNDLE_KEY = "MapViewBundleKey";
@@ -89,12 +91,36 @@ public class MainActivity extends AppCompatActivity implements OnMapReadyCallbac
             }
         });
 
-        setupMap();
+        /*
         try {
-            setupMusic(Uri.parse("https://onlineradiobox.com/ch/uritamil/?cs=ch.uritamil"));
+            setupMusic(Uri.parse("http://demo.unified-streaming.com/video/tears-of-steel/tears-of-steel.ism/.m3u8"));
         } catch (IOException e) {
             e.printStackTrace();
-        }
+        }*/
+
+        AudioManager leftAm = (AudioManager)getSystemService(Context.AUDIO_SERVICE);
+        int maxVolume = leftAm.getStreamMaxVolume(AudioManager.STREAM_MUSIC);
+        int curVolume = leftAm.getStreamVolume(AudioManager.STREAM_MUSIC);
+        SeekBar volControl = (SeekBar)findViewById(R.id.volumebar);
+        volControl.setMax(maxVolume);
+        volControl.setProgress(curVolume);
+        volControl.setOnSeekBarChangeListener(new SeekBar.OnSeekBarChangeListener() {
+            @Override
+            public void onProgressChanged(SeekBar arg0, int arg1, boolean arg2) {
+                // TODO Auto-generated method stub
+                leftAm.setStreamVolume(AudioManager.STREAM_MUSIC, arg1, 0);
+            }
+
+            @Override
+            public void onStartTrackingTouch(SeekBar seekBar) {
+
+            }
+
+            @Override
+            public void onStopTrackingTouch(SeekBar seekBar) {
+
+            }
+        });
     }
 
     public void setupMap() {
@@ -110,18 +136,15 @@ public class MainActivity extends AppCompatActivity implements OnMapReadyCallbac
         }
     }
 
-
     public void setupMusic(Uri myUri) throws IOException {
         mediaPlayer = new MediaPlayer();
         mediaPlayer.setAudioStreamType(AudioManager.STREAM_MUSIC);
         mediaPlayer.setDataSource(getApplicationContext(), myUri);
         mediaPlayer.prepare();
         mediaPlayer.start();
-
-
     }
-    public void addStation(String title, String snippet) {
 
+    public void addStation(String title, String snippet) {
         BitmapDescriptor defaultMarker = BitmapDescriptorFactory.defaultMarker(BitmapDescriptorFactory.HUE_RED);
         // listingPosition is a LatLng point
         // Create the marker on the fragment
@@ -135,17 +158,14 @@ public class MainActivity extends AppCompatActivity implements OnMapReadyCallbac
         //TODO: fail
     }
 
-
     @Override
     public void onSaveInstanceState(Bundle outState) {
         super.onSaveInstanceState(outState);
-
         Bundle mapViewBundle = outState.getBundle(MAPVIEW_BUNDLE_KEY);
         if (mapViewBundle == null) {
             mapViewBundle = new Bundle();
             outState.putBundle(MAPVIEW_BUNDLE_KEY, mapViewBundle);
         }
-
         mMapView.onSaveInstanceState(mapViewBundle);
     }
 
@@ -240,7 +260,7 @@ public class MainActivity extends AppCompatActivity implements OnMapReadyCallbac
                                 globalMap.getUiSettings().setMyLocationButtonEnabled(true);
                                 globalMap.moveCamera(CameraUpdateFactory.newLatLngZoom(
                                         new LatLng(location.getLatitude(),
-                                                location.getLongitude()), 20));
+                                                location.getLongitude()), DEFAULT_ZOOM));
                                 //Log.e("Exception: %s", e.getMessage(), e);
                             }
                             else{

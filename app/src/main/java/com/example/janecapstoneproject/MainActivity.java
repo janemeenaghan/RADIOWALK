@@ -133,10 +133,10 @@ public class MainActivity extends AppCompatActivity implements OnMapReadyCallbac
         List<Station> ListOfStations = retrieveListOfStations(location);
         for(List<Station> station : ListOfStations){
             if (station.type == public){
-            globalMap.addMarker(new MarkerOptions()
-                    .position(station.getPosition)
-                    .title(station.getTitle))
-                    .icon(BitmapDescriptorFactory.fromResource(R.drawable.publicStation)));
+                globalMap.addMarker(new MarkerOptions()
+                                .position(station.getPosition)
+                                .title(station.getTitle))
+                        .icon(BitmapDescriptorFactory.fromResource(R.drawable.publicStation)));
             }
             else{
 
@@ -147,6 +147,7 @@ public class MainActivity extends AppCompatActivity implements OnMapReadyCallbac
     public List<Station> retrieveListOfStations(LatLng coords){
 
     }
+
     public void addStation(String title, String snippet) {
         BitmapDescriptor defaultMarker = BitmapDescriptorFactory.defaultMarker(BitmapDescriptorFactory.HUE_RED);
         // listingPosition is a LatLng point
@@ -233,7 +234,7 @@ public class MainActivity extends AppCompatActivity implements OnMapReadyCallbac
          */
         try {
             if (checkForLocationPermission()) {
-                 whatDoesThisMean = new CancellationToken() {
+                whatDoesThisMean = new CancellationToken() {
                     @NonNull
                     @Override
                     public CancellationToken onCanceledRequested(@NonNull OnTokenCanceledListener onTokenCanceledListener) {
@@ -258,7 +259,6 @@ public class MainActivity extends AppCompatActivity implements OnMapReadyCallbac
                                 globalMap.moveCamera(CameraUpdateFactory.newLatLngZoom(
                                         new LatLng(location.getLatitude(),
                                                 location.getLongitude()), DEFAULT_ZOOM));
-                                //Log.e("Exception: %s", e.getMessage(), e);
                                 updateStationMarkers();
                             }
                             else{

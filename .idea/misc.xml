@@ -5,10 +5,15 @@
       <map>
         <entry key="app/src/main/res/drawable-v24/ic_launcher_foreground.xml" value="0.2005" />
         <entry key="app/src/main/res/drawable/ic_baseline_add_circle_outline_24.xml" value="0.2005" />
-        <entry key="app/src/main/res/layout/activity_launch.xml" value="0.1" />
-        <entry key="app/src/main/res/layout/activity_login.xml" value="0.1" />
+        <entry key="app/src/main/res/layout/aaa.xml" value="0.3494791666666667" />
+        <entry key="app/src/main/res/layout/activity_launch.xml" value="0.24866180419921874" />
+        <entry key="app/src/main/res/layout/activity_login.xml" value="0.26650390625" />
         <entry key="app/src/main/res/layout/activity_main.xml" value="0.24913177490234373" />
         <entry key="app/src/main/res/layout/activity_main2.xml" value="0.35052083333333334" />
+        <entry key="app/src/main/res/layout/activity_signup.xml" value="0.3255355834960938" />
+        <entry key="app/src/main/res/layout/fragment_user_list.xml" value="0.3494791666666667" />
+        <entry key="app/src/main/res/layout/message_item.xml" value="0.34359902406350157" />
+        <entry key="app/src/main/res/layout/panel_contents.xml" value="0.35052083333333334" />
       </map>
     </option>
   </component>

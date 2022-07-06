@@ -79,13 +79,12 @@ public class MainActivity extends AppCompatActivity implements OnMapReadyCallbac
                 //showAlertDialogForPoint(myLocation);
             }
         });
-        // Attempting to stream m3u8 here. It is not working.
-        /*
+        // streaming m3u8 here
         try {
-            setupMusic(Uri.parse("http://demo.unified-streaming.com/video/tears-of-steel/tears-of-steel.ism/.m3u8"));
+            setupMusic(Uri.parse("https://tunein.streamguys1.com/secure-cnn?DIST=TuneIn&TGT=TuneIn&maxServers=2&key=f41788a295248352af3348f20d3dde91ab2deb3a75186bf16bbaafdc40645944&partnertok=eyJhbGciOiJIUzI1NiIsImtpZCI6InR1bmVpbiIsInR5cCI6IkpXVCJ9.eyJ0cnVzdGVkX3BhcnRuZXIiOnRydWUsImlhdCI6MTY1NzEzNzI2NiwiaXNzIjoidGlzcnYifQ.OQE37wSw28bVWWrK9nns8pIYyVIlWSkKT-QInm6Zc9Y&aw_0_1st.playerid=ydvgH5BP&aw_0_1st.skey=1657137266&lat=39.0469&lon=-77.4903&aw_0_1st.premium=false&source=TuneIn&aw_0_1st.platform=tunein&aw_0_1st.genre_id=g3124&aw_0_1st.class=talk&aw_0_1st.ads_partner_alias=ydvgH5BP"));
         } catch (IOException e) {
             e.printStackTrace();
-        }*/
+        }
         AudioManager leftAm = (AudioManager)getSystemService(Context.AUDIO_SERVICE);
         int maxVolume = leftAm.getStreamMaxVolume(AudioManager.STREAM_MUSIC);
         int curVolume = leftAm.getStreamVolume(AudioManager.STREAM_MUSIC);

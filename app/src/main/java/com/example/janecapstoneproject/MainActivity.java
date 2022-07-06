@@ -43,45 +43,34 @@ import com.google.android.gms.tasks.Task;
 import com.google.android.material.floatingactionbutton.FloatingActionButton;
 
 import java.io.IOException;
-
-
 public class MainActivity extends AppCompatActivity implements OnMapReadyCallback {
     private MapView mMapView;
     public FloatingActionButton addStationButton;
     public int REQUEST_CODE = 1001;
     public static final int DEFAULT_ZOOM = 20;
-
     public static final String TAG = "MainActivity";
     public static final String MAPVIEW_BUNDLE_KEY = "MapViewBundleKey";
     MediaPlayer mediaPlayer;
-
     FusedLocationProviderClient fusedLocationProviderClient;
     Location location;
     GoogleMap globalMap;
     Uri myUri;
-
     @RequiresApi(api = Build.VERSION_CODES.M)
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-
         setContentView(R.layout.activity_main);
-
         fusedLocationProviderClient = LocationServices.getFusedLocationProviderClient(this);
-
-
         Bundle mapViewBundle = null;
         if (savedInstanceState != null) {
             mapViewBundle = savedInstanceState.getBundle(MAPVIEW_BUNDLE_KEY);
         }
         mMapView = (MapView) findViewById(R.id.mapView);
         mMapView.onCreate(mapViewBundle);
-
         mMapView.getMapAsync(this);
-
+        setupMap();
         //only visible when there is no nearby station - hide when not
         addStationButton = findViewById(R.id.createButton);
-
         addStationButton.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
@@ -90,14 +79,13 @@ public class MainActivity extends AppCompatActivity implements OnMapReadyCallbac
                 //showAlertDialogForPoint(myLocation);
             }
         });
-
+        // Attempting to stream m3u8 here. It is not working.
         /*
         try {
             setupMusic(Uri.parse("http://demo.unified-streaming.com/video/tears-of-steel/tears-of-steel.ism/.m3u8"));
         } catch (IOException e) {
             e.printStackTrace();
         }*/
-
         AudioManager leftAm = (AudioManager)getSystemService(Context.AUDIO_SERVICE);
         int maxVolume = leftAm.getStreamMaxVolume(AudioManager.STREAM_MUSIC);
         int curVolume = leftAm.getStreamVolume(AudioManager.STREAM_MUSIC);
@@ -110,12 +98,10 @@ public class MainActivity extends AppCompatActivity implements OnMapReadyCallbac
                 // TODO Auto-generated method stub
                 leftAm.setStreamVolume(AudioManager.STREAM_MUSIC, arg1, 0);
             }
-
             @Override
             public void onStartTrackingTouch(SeekBar seekBar) {
 
             }
-
             @Override
             public void onStopTrackingTouch(SeekBar seekBar) {
 
@@ -210,7 +196,6 @@ public class MainActivity extends AppCompatActivity implements OnMapReadyCallbac
         mMapView.onLowMemory();
     }
 
-
     @RequiresApi(api = Build.VERSION_CODES.M)
     private void centerOnMyLocation() {
         if (!checkForLocationPermission()) {
@@ -219,10 +204,8 @@ public class MainActivity extends AppCompatActivity implements OnMapReadyCallbac
         }
         else{
             getDeviceLocationAndUpdateMap();
-
         }
     }
-
 
     private void getDeviceLocationAndUpdateMap() {
         CancellationToken whatDoesThisMean;
@@ -239,15 +222,12 @@ public class MainActivity extends AppCompatActivity implements OnMapReadyCallbac
                     public CancellationToken onCanceledRequested(@NonNull OnTokenCanceledListener onTokenCanceledListener) {
                         return null;
                     }
-
                     @Override
                     public boolean isCancellationRequested() {
                         return false;
                     }
                 };
-
                 Task<Location> locationResult = fusedLocationProviderClient.getLastLocation();
-
                 locationResult.addOnCompleteListener(this, new OnCompleteListener<Location>() {
                     @Override
                     public void onComplete(@NonNull Task<Location> task) {
@@ -308,10 +288,8 @@ public class MainActivity extends AppCompatActivity implements OnMapReadyCallbac
         AlertDialog.Builder alertDialogBuilder = new AlertDialog.Builder(this);
         // set message_item.xml to AlertDialog builder
         alertDialogBuilder.setView(messageView);
-
         // Create alert dialog
         final AlertDialog alertDialog = alertDialogBuilder.create();
-
         // Configure dialog button (OK)
         alertDialog.setButton(DialogInterface.BUTTON_POSITIVE, "OK",
                 new DialogInterface.OnClickListener() {
@@ -329,13 +307,11 @@ public class MainActivity extends AppCompatActivity implements OnMapReadyCallbac
                         addStation(title, snippet);
                     }
                 });
-
         // Configure dialog button (Cancel)
         alertDialog.setButton(DialogInterface.BUTTON_NEGATIVE, "Cancel",
                 new DialogInterface.OnClickListener() {
                     public void onClick(DialogInterface dialog, int id) { dialog.cancel(); }
                 });
-
         // Display the dialog
         alertDialog.show();
     }

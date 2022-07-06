@@ -130,6 +130,24 @@ public class MainActivity extends AppCompatActivity implements OnMapReadyCallbac
         mediaPlayer.start();
     }
 
+    public void updateStationMarkers(){
+        List<Station> ListOfStations = retrieveListOfStations(location);
+        for(List<Station> station : ListOfStations){
+            if (station.type == public){
+            globalMap.addMarker(new MarkerOptions()
+                    .position(station.getPosition)
+                    .title(station.getTitle))
+                    .icon(BitmapDescriptorFactory.fromResource(R.drawable.publicStation)));
+            }
+            else{
+
+            }
+            globalMap.moveCamera(CameraUpdateFactory.newLatLng(sydney));
+        }
+    }
+    public List<Station> retrieveListOfStations(LatLng coords){
+
+    }
     public void addStation(String title, String snippet) {
         BitmapDescriptor defaultMarker = BitmapDescriptorFactory.defaultMarker(BitmapDescriptorFactory.HUE_RED);
         // listingPosition is a LatLng point
@@ -242,6 +260,7 @@ public class MainActivity extends AppCompatActivity implements OnMapReadyCallbac
                                         new LatLng(location.getLatitude(),
                                                 location.getLongitude()), DEFAULT_ZOOM));
                                 //Log.e("Exception: %s", e.getMessage(), e);
+                                updateStationMarkers();
                             }
                             else{
                                 Log.d(TAG, "Current location is null. Using defaults.");

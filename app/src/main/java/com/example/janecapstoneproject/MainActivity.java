@@ -10,6 +10,9 @@ import android.Manifest;
 import android.content.DialogInterface;
 import android.content.pm.PackageManager;
 import android.location.Location;
+import android.media.AudioManager;
+import android.media.MediaPlayer;
+import android.net.Uri;
 import android.os.Build;
 import android.os.Bundle;
 import android.util.Log;
@@ -37,6 +40,8 @@ import com.google.android.gms.tasks.OnTokenCanceledListener;
 import com.google.android.gms.tasks.Task;
 import com.google.android.material.floatingactionbutton.FloatingActionButton;
 
+import java.io.IOException;
+
 
 public class MainActivity extends AppCompatActivity implements OnMapReadyCallback {
     private MapView mMapView;
@@ -46,10 +51,12 @@ public class MainActivity extends AppCompatActivity implements OnMapReadyCallbac
 
     public static final String TAG = "MainActivity";
     public static final String MAPVIEW_BUNDLE_KEY = "MapViewBundleKey";
+    MediaPlayer mediaPlayer;
 
     FusedLocationProviderClient fusedLocationProviderClient;
     Location location;
     GoogleMap globalMap;
+    Uri myUri;
 
     @RequiresApi(api = Build.VERSION_CODES.M)
     @Override
@@ -83,6 +90,11 @@ public class MainActivity extends AppCompatActivity implements OnMapReadyCallbac
         });
 
         setupMap();
+        try {
+            setupMusic(Uri.parse("https://onlineradiobox.com/ch/uritamil/?cs=ch.uritamil"));
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
     }
 
     public void setupMap() {
@@ -96,10 +108,18 @@ public class MainActivity extends AppCompatActivity implements OnMapReadyCallbac
                 }
             });
         }
-
     }
 
 
+    public void setupMusic(Uri myUri) throws IOException {
+        mediaPlayer = new MediaPlayer();
+        mediaPlayer.setAudioStreamType(AudioManager.STREAM_MUSIC);
+        mediaPlayer.setDataSource(getApplicationContext(), myUri);
+        mediaPlayer.prepare();
+        mediaPlayer.start();
+
+
+    }
     public void addStation(String title, String snippet) {
 
         BitmapDescriptor defaultMarker = BitmapDescriptorFactory.defaultMarker(BitmapDescriptorFactory.HUE_RED);
@@ -220,7 +240,7 @@ public class MainActivity extends AppCompatActivity implements OnMapReadyCallbac
                                 globalMap.getUiSettings().setMyLocationButtonEnabled(true);
                                 globalMap.moveCamera(CameraUpdateFactory.newLatLngZoom(
                                         new LatLng(location.getLatitude(),
-                                                location.getLongitude()), DEFAULT_ZOOM));
+                                                location.getLongitude()), 20));
                                 //Log.e("Exception: %s", e.getMessage(), e);
                             }
                             else{

@@ -151,6 +151,7 @@ public class MainActivity extends AppCompatActivity implements OnMapReadyCallbac
         mediaPlayer.prepare();
         mediaPlayer.start();
     }
+
     public void renderAllStations() {
         // specify what type of data we want to query - Station.class
         ParseQuery<Station> query = ParseQuery.getQuery(Station.class);

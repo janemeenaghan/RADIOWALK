@@ -20,9 +20,10 @@ import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.widget.EditText;
+import android.widget.ProgressBar;
 import android.widget.SeekBar;
+import android.widget.Switch;
 import android.widget.Toast;
-
 import com.google.android.gms.common.internal.Constants;
 import com.google.android.gms.location.CurrentLocationRequest;
 import com.google.android.gms.location.FusedLocationProviderClient;
@@ -41,13 +42,29 @@ import com.google.android.gms.tasks.OnCompleteListener;
 import com.google.android.gms.tasks.OnTokenCanceledListener;
 import com.google.android.gms.tasks.Task;
 import com.google.android.material.floatingactionbutton.FloatingActionButton;
+import com.parse.FindCallback;
+import com.parse.ParseException;
+import com.parse.ParseFile;
+import com.parse.ParseObject;
+import com.parse.ParseQuery;
+import com.parse.ParseUser;
+import com.parse.SaveCallback;
 
+import org.json.JSONArray;
+import org.json.JSONException;
+
+import java.io.File;
 import java.io.IOException;
+import java.util.ArrayList;
+import java.util.List;
+
 public class MainActivity extends AppCompatActivity implements OnMapReadyCallback {
     private MapView mMapView;
     public FloatingActionButton addStationButton;
     public int REQUEST_CODE = 1001;
     public static final int DEFAULT_ZOOM = 20;
+    public static final int PUBLIC_TYPE = 0;
+    public static final int PRIVATE_TYPE = 1;
     public static final String TAG = "MainActivity";
     public static final String MAPVIEW_BUNDLE_KEY = "MapViewBundleKey";
     MediaPlayer mediaPlayer;
@@ -69,19 +86,21 @@ public class MainActivity extends AppCompatActivity implements OnMapReadyCallbac
         mMapView.onCreate(mapViewBundle);
         mMapView.getMapAsync(this);
         setupMap();
+        renderAllStations();
         //only visible when there is no nearby station - hide when not
         addStationButton = findViewById(R.id.createButton);
         addStationButton.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                //final LatLng point = getCoordinates();
-                //showAlertDialogForPoint(point);
-                //showAlertDialogForPoint(myLocation);
+                if (noStationisNearby()){
+                    LatLng point = new LatLng(location.getLatitude(),location.getLongitude());
+                    showAlertDialogForPoint(point);
+                }
             }
         });
         // streaming m3u8 here
         try {
-            setupMusic(Uri.parse("https://tunein.streamguys1.com/secure-cnn?DIST=TuneIn&TGT=TuneIn&maxServers=2&key=f41788a295248352af3348f20d3dde91ab2deb3a75186bf16bbaafdc40645944&partnertok=eyJhbGciOiJIUzI1NiIsImtpZCI6InR1bmVpbiIsInR5cCI6IkpXVCJ9.eyJ0cnVzdGVkX3BhcnRuZXIiOnRydWUsImlhdCI6MTY1NzEzNzI2NiwiaXNzIjoidGlzcnYifQ.OQE37wSw28bVWWrK9nns8pIYyVIlWSkKT-QInm6Zc9Y&aw_0_1st.playerid=ydvgH5BP&aw_0_1st.skey=1657137266&lat=39.0469&lon=-77.4903&aw_0_1st.premium=false&source=TuneIn&aw_0_1st.platform=tunein&aw_0_1st.genre_id=g3124&aw_0_1st.class=talk&aw_0_1st.ads_partner_alias=ydvgH5BP"));
+            setupMusic(Uri.parse("https://tunein.streamguys1.com/secure-cnn?DIST=TuneIn&TGT=TuneIn&maxServers=2&key=86b5d0be2518b55f18f3b4b8983b13e1f1d93f79fd8cfabbcad60c5db115fac1&partnertok=eyJhbGciOiJIUzI1NiIsImtpZCI6InR1bmVpbiIsInR5cCI6IkpXVCJ9.eyJ0cnVzdGVkX3BhcnRuZXIiOnRydWUsImlhdCI6MTY1NzE2Njk1NiwiaXNzIjoidGlzcnYifQ.dDZpnageeieHAKQPg0F3s4AcWr2XK-devjmobH5m9iI&aw_0_1st.playerid=ydvgH5BP&aw_0_1st.skey=1657166956&lat=39.0469&lon=-77.4903&aw_0_1st.premium=false&source=TuneIn&aw_0_1st.platform=tunein&aw_0_1st.genre_id=g3124&aw_0_1st.class=talk&aw_0_1st.ads_partner_alias=ydvgH5BP"));
         } catch (IOException e) {
             e.printStackTrace();
         }
@@ -121,6 +140,10 @@ public class MainActivity extends AppCompatActivity implements OnMapReadyCallbac
         }
     }
 
+    public boolean noStationisNearby(){
+        return true;
+    }
+
     public void setupMusic(Uri myUri) throws IOException {
         mediaPlayer = new MediaPlayer();
         mediaPlayer.setAudioStreamType(AudioManager.STREAM_MUSIC);
@@ -129,20 +152,42 @@ public class MainActivity extends AppCompatActivity implements OnMapReadyCallbac
         mediaPlayer.start();
     }
 
-    public void addStation(String title, String snippet) {
-        BitmapDescriptor defaultMarker = BitmapDescriptorFactory.defaultMarker(BitmapDescriptorFactory.HUE_RED);
-        // listingPosition is a LatLng point
-        // Create the marker on the fragment
-        if (location != null) {
-            Marker mapMarker = globalMap.addMarker(new MarkerOptions()
-                    .position(new LatLng(location.getLatitude(), location.getLongitude()))
-                    .title(title)
-                    .snippet(snippet)
-                    .icon(defaultMarker));
-        }
-        //TODO: fail
+    public void renderAllStations() {
+        // specify what type of data we want to query - Station.class
+        ParseQuery<Station> query = ParseQuery.getQuery(Station.class);
+        // start an asynchronous call for posts
+        query.findInBackground(new FindCallback<Station>() {
+            @Override
+            public void done(List<Station> stations, ParseException e) {
+                if (e != null) {
+                    Log.e(TAG, "Issue with getting stations", e);
+                    return;
+                }
+                for (Station station : stations){
+                    renderStation(station);
+                }
+            }
+        });
     }
-
+    public void renderStation(Station station){
+        Log.d(TAG, station.getName());
+        if (station != null && station.getCoords() != null) {
+            if (station.isPublic()) {
+                globalMap.addMarker(new MarkerOptions()
+                        .position(station.getCoords())
+                        .title(station.getName())
+                        .icon(BitmapDescriptorFactory.fromResource(R.drawable.tempmusicicon))
+                        );
+            } else {
+                globalMap.addMarker(new MarkerOptions()
+                        .position(station.getCoords())
+                        .title(station.getName())
+                        .icon(BitmapDescriptorFactory.fromResource(R.drawable.ic_baseline_add_24)));
+            }
+            return;
+        }
+        //TODO: fail*/
+    }
     @Override
     public void onSaveInstanceState(Bundle outState) {
         super.onSaveInstanceState(outState);
@@ -215,7 +260,7 @@ public class MainActivity extends AppCompatActivity implements OnMapReadyCallbac
          */
         try {
             if (checkForLocationPermission()) {
-                 whatDoesThisMean = new CancellationToken() {
+                whatDoesThisMean = new CancellationToken() {
                     @NonNull
                     @Override
                     public CancellationToken onCanceledRequested(@NonNull OnTokenCanceledListener onTokenCanceledListener) {
@@ -240,7 +285,6 @@ public class MainActivity extends AppCompatActivity implements OnMapReadyCallbac
                                 globalMap.moveCamera(CameraUpdateFactory.newLatLngZoom(
                                         new LatLng(location.getLatitude(),
                                                 location.getLongitude()), DEFAULT_ZOOM));
-                                //Log.e("Exception: %s", e.getMessage(), e);
                             }
                             else{
                                 Log.d(TAG, "Current location is null. Using defaults.");
@@ -279,6 +323,38 @@ public class MainActivity extends AppCompatActivity implements OnMapReadyCallbac
         return ActivityCompat.checkSelfPermission(this, Manifest.permission.ACCESS_FINE_LOCATION) == PackageManager.PERMISSION_GRANTED && ActivityCompat.checkSelfPermission(this, Manifest.permission.ACCESS_COARSE_LOCATION) == PackageManager.PERMISSION_GRANTED;
     }
 
+    public void addStation(String name, boolean type, LatLng coords, ParseUser user, String streamLink){
+        try {
+            saveStation(name, type, coords, user, streamLink);
+        } catch (JSONException e) {
+            e.printStackTrace();
+        }
+    }
+    private void saveStation(String name, boolean type, LatLng coords, ParseUser user, String streamLink) throws JSONException {
+        Station station = new Station();
+        station.setName(name);
+        station.setCoords(coords);
+        station.setStreamLink(streamLink);
+        if (type){
+            station.setType(PRIVATE_TYPE);
+            station.setUser(user);
+        }
+        else{
+            station.setType(PUBLIC_TYPE);
+        }
+        station.saveInBackground(new SaveCallback() {
+            @Override
+            public void done(ParseException e) {
+                if (e != null) {
+                    Log.e(TAG, "Error while saving", e);
+                    Toast.makeText(MainActivity.this, "Error while saving", Toast.LENGTH_SHORT).show();
+                    return;
+                }
+                Log.i(TAG, "Station save was successful!!");
+            }
+        });
+    }
+
     private void showAlertDialogForPoint(final LatLng point) {
         // inflate message_item.xml view
         View  messageView = LayoutInflater.from(MainActivity.this).
@@ -298,12 +374,13 @@ public class MainActivity extends AppCompatActivity implements OnMapReadyCallbac
                         BitmapDescriptor defaultMarker =
                                 BitmapDescriptorFactory.defaultMarker(BitmapDescriptorFactory.HUE_GREEN);
                         // Extract content from alert dialog
-                        String title = ((EditText) alertDialog.findViewById(R.id.etTitle)).
+                        String name = ((EditText) alertDialog.findViewById(R.id.etTitle)).
                                 getText().toString();
-                        String snippet = ((EditText) alertDialog.findViewById(R.id.etSnippet)).
+                        String streamLink = ((EditText) alertDialog.findViewById(R.id.etStreamLink)).
                                 getText().toString();
+                        boolean typeBoolean = ((Switch)(alertDialog.findViewById(R.id.typeSwitch))).isChecked();
                         // Creates and adds marker to the map
-                        addStation(title, snippet);
+                        addStation(name,typeBoolean,new LatLng(location.getLatitude(),location.getLongitude()),ParseUser.getCurrentUser(), streamLink);
                     }
                 });
         // Configure dialog button (Cancel)

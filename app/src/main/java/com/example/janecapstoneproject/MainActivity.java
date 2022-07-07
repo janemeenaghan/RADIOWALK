@@ -20,9 +20,10 @@ import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.widget.EditText;
+import android.widget.ProgressBar;
 import android.widget.SeekBar;
+import android.widget.Switch;
 import android.widget.Toast;
-
 import com.google.android.gms.common.internal.Constants;
 import com.google.android.gms.location.CurrentLocationRequest;
 import com.google.android.gms.location.FusedLocationProviderClient;
@@ -43,9 +44,16 @@ import com.google.android.gms.tasks.Task;
 import com.google.android.material.floatingactionbutton.FloatingActionButton;
 import com.parse.FindCallback;
 import com.parse.ParseException;
+import com.parse.ParseFile;
 import com.parse.ParseObject;
 import com.parse.ParseQuery;
+import com.parse.ParseUser;
+import com.parse.SaveCallback;
 
+import org.json.JSONArray;
+import org.json.JSONException;
+
+import java.io.File;
 import java.io.IOException;
 import java.util.ArrayList;
 import java.util.List;
@@ -55,6 +63,8 @@ public class MainActivity extends AppCompatActivity implements OnMapReadyCallbac
     public FloatingActionButton addStationButton;
     public int REQUEST_CODE = 1001;
     public static final int DEFAULT_ZOOM = 20;
+    public static final int PUBLIC_TYPE = 0;
+    public static final int PRIVATE_TYPE = 1;
     public static final String TAG = "MainActivity";
     public static final String MAPVIEW_BUNDLE_KEY = "MapViewBundleKey";
     MediaPlayer mediaPlayer;
@@ -82,9 +92,10 @@ public class MainActivity extends AppCompatActivity implements OnMapReadyCallbac
         addStationButton.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                //final LatLng point = getCoordinates();
-                //showAlertDialogForPoint(point);
-                //showAlertDialogForPoint(myLocation);
+                if (noStationisNearby()){
+                    LatLng point = new LatLng(location.getLatitude(),location.getLongitude());
+                    showAlertDialogForPoint(point);
+                }
             }
         });
         // streaming m3u8 here
@@ -127,6 +138,10 @@ public class MainActivity extends AppCompatActivity implements OnMapReadyCallbac
                 }
             });
         }
+    }
+
+    public boolean noStationisNearby(){
+        return true;
     }
 
     public void setupMusic(Uri myUri) throws IOException {
@@ -307,6 +322,38 @@ public class MainActivity extends AppCompatActivity implements OnMapReadyCallbac
         return ActivityCompat.checkSelfPermission(this, Manifest.permission.ACCESS_FINE_LOCATION) == PackageManager.PERMISSION_GRANTED && ActivityCompat.checkSelfPermission(this, Manifest.permission.ACCESS_COARSE_LOCATION) == PackageManager.PERMISSION_GRANTED;
     }
 
+    public void addStation(String name, boolean type, LatLng coords, ParseUser user, String streamLink){
+        try {
+            saveStation(name, type, coords, user, streamLink);
+        } catch (JSONException e) {
+            e.printStackTrace();
+        }
+    }
+    private void saveStation(String name, boolean type, LatLng coords, ParseUser user, String streamLink) throws JSONException {
+        Station station = new Station();
+        station.setName(name);
+        station.setCoords(coords);
+        station.setStreamLink(streamLink);
+        if (type){
+            station.setType(PRIVATE_TYPE);
+            station.setUser(user);
+        }
+        else{
+            station.setType(PUBLIC_TYPE);
+        }
+        station.saveInBackground(new SaveCallback() {
+            @Override
+            public void done(ParseException e) {
+                if (e != null) {
+                    Log.e(TAG, "Error while saving", e);
+                    Toast.makeText(MainActivity.this, "Error while saving", Toast.LENGTH_SHORT).show();
+                    return;
+                }
+                Log.i(TAG, "Station save was successful!!");
+            }
+        });
+    }
+
     private void showAlertDialogForPoint(final LatLng point) {
         // inflate message_item.xml view
         View  messageView = LayoutInflater.from(MainActivity.this).
@@ -326,12 +373,13 @@ public class MainActivity extends AppCompatActivity implements OnMapReadyCallbac
                         BitmapDescriptor defaultMarker =
                                 BitmapDescriptorFactory.defaultMarker(BitmapDescriptorFactory.HUE_GREEN);
                         // Extract content from alert dialog
-                        String title = ((EditText) alertDialog.findViewById(R.id.etTitle)).
+                        String name = ((EditText) alertDialog.findViewById(R.id.etTitle)).
                                 getText().toString();
-                        String snippet = ((EditText) alertDialog.findViewById(R.id.etSnippet)).
+                        String streamLink = ((EditText) alertDialog.findViewById(R.id.etStreamLink)).
                                 getText().toString();
+                        boolean typeBoolean = ((Switch)(alertDialog.findViewById(R.id.typeSwitch))).isChecked();
                         // Creates and adds marker to the map
-                        //addStation(title, snippet);
+                        addStation(name,typeBoolean,new LatLng(location.getLatitude(),location.getLongitude()),ParseUser.getCurrentUser(), streamLink);
                     }
                 });
         // Configure dialog button (Cancel)

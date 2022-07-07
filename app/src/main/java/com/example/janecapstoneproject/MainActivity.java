@@ -41,8 +41,15 @@ import com.google.android.gms.tasks.OnCompleteListener;
 import com.google.android.gms.tasks.OnTokenCanceledListener;
 import com.google.android.gms.tasks.Task;
 import com.google.android.material.floatingactionbutton.FloatingActionButton;
+import com.parse.FindCallback;
+import com.parse.ParseException;
+import com.parse.ParseObject;
+import com.parse.ParseQuery;
 
 import java.io.IOException;
+import java.util.ArrayList;
+import java.util.List;
+
 public class MainActivity extends AppCompatActivity implements OnMapReadyCallback {
     private MapView mMapView;
     public FloatingActionButton addStationButton;
@@ -69,6 +76,7 @@ public class MainActivity extends AppCompatActivity implements OnMapReadyCallbac
         mMapView.onCreate(mapViewBundle);
         mMapView.getMapAsync(this);
         setupMap();
+        renderAllStations();
         //only visible when there is no nearby station - hide when not
         addStationButton = findViewById(R.id.createButton);
         addStationButton.setOnClickListener(new View.OnClickListener() {
@@ -81,7 +89,7 @@ public class MainActivity extends AppCompatActivity implements OnMapReadyCallbac
         });
         // streaming m3u8 here
         try {
-            setupMusic(Uri.parse("https://tunein.streamguys1.com/secure-cnn?DIST=TuneIn&TGT=TuneIn&maxServers=2&key=f41788a295248352af3348f20d3dde91ab2deb3a75186bf16bbaafdc40645944&partnertok=eyJhbGciOiJIUzI1NiIsImtpZCI6InR1bmVpbiIsInR5cCI6IkpXVCJ9.eyJ0cnVzdGVkX3BhcnRuZXIiOnRydWUsImlhdCI6MTY1NzEzNzI2NiwiaXNzIjoidGlzcnYifQ.OQE37wSw28bVWWrK9nns8pIYyVIlWSkKT-QInm6Zc9Y&aw_0_1st.playerid=ydvgH5BP&aw_0_1st.skey=1657137266&lat=39.0469&lon=-77.4903&aw_0_1st.premium=false&source=TuneIn&aw_0_1st.platform=tunein&aw_0_1st.genre_id=g3124&aw_0_1st.class=talk&aw_0_1st.ads_partner_alias=ydvgH5BP"));
+            setupMusic(Uri.parse("https://tunein.streamguys1.com/secure-cnn?DIST=TuneIn&TGT=TuneIn&maxServers=2&key=86b5d0be2518b55f18f3b4b8983b13e1f1d93f79fd8cfabbcad60c5db115fac1&partnertok=eyJhbGciOiJIUzI1NiIsImtpZCI6InR1bmVpbiIsInR5cCI6IkpXVCJ9.eyJ0cnVzdGVkX3BhcnRuZXIiOnRydWUsImlhdCI6MTY1NzE2Njk1NiwiaXNzIjoidGlzcnYifQ.dDZpnageeieHAKQPg0F3s4AcWr2XK-devjmobH5m9iI&aw_0_1st.playerid=ydvgH5BP&aw_0_1st.skey=1657166956&lat=39.0469&lon=-77.4903&aw_0_1st.premium=false&source=TuneIn&aw_0_1st.platform=tunein&aw_0_1st.genre_id=g3124&aw_0_1st.class=talk&aw_0_1st.ads_partner_alias=ydvgH5BP"));
         } catch (IOException e) {
             e.printStackTrace();
         }
@@ -128,40 +136,42 @@ public class MainActivity extends AppCompatActivity implements OnMapReadyCallbac
         mediaPlayer.prepare();
         mediaPlayer.start();
     }
-
-    public void updateStationMarkers(){
-        List<Station> ListOfStations = retrieveListOfStations(location);
-        for(List<Station> station : ListOfStations){
-            if (station.type == public){
+    public void renderAllStations() {
+        // specify what type of data we want to query - Station.class
+        ParseQuery<Station> query = ParseQuery.getQuery(Station.class);
+        // start an asynchronous call for posts
+        query.findInBackground(new FindCallback<Station>() {
+            @Override
+            public void done(List<Station> stations, ParseException e) {
+                if (e != null) {
+                    Log.e(TAG, "Issue with getting stations", e);
+                    return;
+                }
+                for (Station station : stations){
+                    renderStation(station);
+                }
+            }
+        });
+    }
+    public void renderStation(Station station){
+        Log.d(TAG, station.getName());
+        if (station != null && station.getCoords() != null) {
+            if (station.isPublic()) {
                 globalMap.addMarker(new MarkerOptions()
-                                .position(station.getPosition)
-                                .title(station.getTitle))
-                        .icon(BitmapDescriptorFactory.fromResource(R.drawable.publicStation)));
+                        .position(station.getCoords())
+                        .title(station.getName())
+                        .icon(BitmapDescriptorFactory.fromResource(R.drawable.tempmusicicon))
+                        );
+            } else {
+                globalMap.addMarker(new MarkerOptions()
+                        .position(station.getCoords())
+                        .title(station.getName())
+                        .icon(BitmapDescriptorFactory.fromResource(R.drawable.ic_baseline_add_24)));
             }
-            else{
-
-            }
-            globalMap.moveCamera(CameraUpdateFactory.newLatLng(sydney));
+            return;
         }
+        //TODO: fail*/
     }
-    public List<Station> retrieveListOfStations(LatLng coords){
-
-    }
-
-    public void addStation(String title, String snippet) {
-        BitmapDescriptor defaultMarker = BitmapDescriptorFactory.defaultMarker(BitmapDescriptorFactory.HUE_RED);
-        // listingPosition is a LatLng point
-        // Create the marker on the fragment
-        if (location != null) {
-            Marker mapMarker = globalMap.addMarker(new MarkerOptions()
-                    .position(new LatLng(location.getLatitude(), location.getLongitude()))
-                    .title(title)
-                    .snippet(snippet)
-                    .icon(defaultMarker));
-        }
-        //TODO: fail
-    }
-
     @Override
     public void onSaveInstanceState(Bundle outState) {
         super.onSaveInstanceState(outState);
@@ -259,7 +269,6 @@ public class MainActivity extends AppCompatActivity implements OnMapReadyCallbac
                                 globalMap.moveCamera(CameraUpdateFactory.newLatLngZoom(
                                         new LatLng(location.getLatitude(),
                                                 location.getLongitude()), DEFAULT_ZOOM));
-                                updateStationMarkers();
                             }
                             else{
                                 Log.d(TAG, "Current location is null. Using defaults.");
@@ -322,7 +331,7 @@ public class MainActivity extends AppCompatActivity implements OnMapReadyCallbac
                         String snippet = ((EditText) alertDialog.findViewById(R.id.etSnippet)).
                                 getText().toString();
                         // Creates and adds marker to the map
-                        addStation(title, snippet);
+                        //addStation(title, snippet);
                     }
                 });
         // Configure dialog button (Cancel)

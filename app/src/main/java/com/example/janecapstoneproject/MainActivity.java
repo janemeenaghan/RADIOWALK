@@ -9,6 +9,7 @@ import androidx.core.app.ActivityCompat;
 import android.Manifest;
 import android.content.Context;
 import android.content.DialogInterface;
+import android.content.Intent;
 import android.content.pm.PackageManager;
 import android.location.Location;
 import android.media.AudioManager;
@@ -60,7 +61,7 @@ import java.util.List;
 
 public class MainActivity extends AppCompatActivity implements OnMapReadyCallback {
     private MapView mMapView;
-    public FloatingActionButton addStationButton;
+    public FloatingActionButton addStationButton, logout;
     public int REQUEST_CODE = 1001;
     public static final int DEFAULT_ZOOM = 20;
     public static final int PUBLIC_TYPE = 0;
@@ -125,6 +126,14 @@ public class MainActivity extends AppCompatActivity implements OnMapReadyCallbac
 
             }
         });
+        logout = findViewById(R.id.logoutButton);
+        logout.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                Log.i(TAG, "onClick logout button");
+                logoutUser();
+            }
+        });
     }
 
     public void setupMap() {
@@ -138,6 +147,18 @@ public class MainActivity extends AppCompatActivity implements OnMapReadyCallbac
                 }
             });
         }
+    }
+    private void logoutUser() {
+        ParseUser.logOut();
+        ParseUser currentUser = ParseUser.getCurrentUser(); // this will now be null
+
+        Toast.makeText(MainActivity.this, "Success!", Toast.LENGTH_SHORT);
+
+
+        Intent i = new Intent(MainActivity.this, LoginActivity.class);
+        startActivity(i);
+        // finish() fixes the problem discussed with Naga about users going back to activities they aren't supposed to
+        //finish();
     }
 
     public boolean noStationisNearby(){
@@ -391,4 +412,5 @@ public class MainActivity extends AppCompatActivity implements OnMapReadyCallbac
         // Display the dialog
         alertDialog.show();
     }
+
 }

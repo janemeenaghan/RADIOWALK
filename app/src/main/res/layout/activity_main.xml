@@ -30,6 +30,21 @@
             android:visibility="visible"
             sothree:fabCustomSize="70dp"
             sothree:fabSize="auto" />
+
+        <com.google.android.material.floatingactionbutton.FloatingActionButton
+            android:id="@+id/logoutButton"
+            android:layout_width="70dp"
+            android:layout_height="70dp"
+            android:layout_marginStart="280dp"
+            android:layout_marginTop="500dp"
+            android:layout_weight="0"
+            android:clickable="true"
+            android:contentDescription="logoutButton"
+            android:src="@drawable/ic_signout"
+            android:visibility="visible"
+            sothree:fabCustomSize="70dp"
+            sothree:fabSize="auto" />
+
         <com.google.android.gms.maps.MapView
             android:id="@+id/mapView"
             android:layout_width="match_parent"

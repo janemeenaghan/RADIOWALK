@@ -1,11 +1,12 @@
 package com.example.janecapstoneproject;
-
 import androidx.annotation.NonNull;
 import androidx.annotation.RequiresApi;
 import androidx.appcompat.app.AlertDialog;
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.core.app.ActivityCompat;
-
+import com.google.android.gms.maps.model.Circle;
+import com.google.android.gms.maps.model.CircleOptions;
+import android.graphics.Color;
 import android.Manifest;
 import android.content.Context;
 import android.content.DialogInterface;
@@ -50,10 +51,8 @@ import com.parse.ParseObject;
 import com.parse.ParseQuery;
 import com.parse.ParseUser;
 import com.parse.SaveCallback;
-
 import org.json.JSONArray;
 import org.json.JSONException;
-
 import java.io.File;
 import java.io.IOException;
 import java.util.ArrayList;
@@ -66,6 +65,7 @@ public class MainActivity extends AppCompatActivity implements OnMapReadyCallbac
     public static final int DEFAULT_ZOOM = 20;
     public static final int PUBLIC_TYPE = 0;
     public static final int PRIVATE_TYPE = 1;
+    public static final int STATION_RADIUS = 20;
     public static final String TAG = "MainActivity";
     public static final String MAPVIEW_BUNDLE_KEY = "MapViewBundleKey";
     MediaPlayer mediaPlayer;
@@ -148,17 +148,14 @@ public class MainActivity extends AppCompatActivity implements OnMapReadyCallbac
             });
         }
     }
+
     private void logoutUser() {
         ParseUser.logOut();
         ParseUser currentUser = ParseUser.getCurrentUser(); // this will now be null
-
         Toast.makeText(MainActivity.this, "Success!", Toast.LENGTH_SHORT);
-
-
         Intent i = new Intent(MainActivity.this, LoginActivity.class);
         startActivity(i);
-        // finish() fixes the problem discussed with Naga about users going back to activities they aren't supposed to
-        //finish();
+        finish();
     }
 
     public boolean noStationisNearby(){
@@ -190,6 +187,7 @@ public class MainActivity extends AppCompatActivity implements OnMapReadyCallbac
             }
         });
     }
+
     public void renderStation(Station station){
         Log.d(TAG, station.getName());
         if (station != null && station.getCoords() != null) {
@@ -204,10 +202,12 @@ public class MainActivity extends AppCompatActivity implements OnMapReadyCallbac
                         .title(station.getName())
                         .icon(BitmapDescriptorFactory.fromResource(R.drawable.threedblackstation)));
             }
+            addCircle(station, station.getCoords());
             return;
         }
         //TODO: fail*/
     }
+
     @Override
     public void onSaveInstanceState(Bundle outState) {
         super.onSaveInstanceState(outState);
@@ -219,6 +219,13 @@ public class MainActivity extends AppCompatActivity implements OnMapReadyCallbac
         mMapView.onSaveInstanceState(mapViewBundle);
     }
 
+    public void addCircle(Station station, LatLng coords){
+        globalMap.addCircle(new CircleOptions()
+                .center(coords)
+                .radius(STATION_RADIUS)
+                .strokeColor(Color.RED)
+                .fillColor(Color.BLUE));
+    }
     @Override
     protected void onResume() {
         super.onResume();

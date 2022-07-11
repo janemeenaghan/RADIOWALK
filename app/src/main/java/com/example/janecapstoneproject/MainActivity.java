@@ -197,13 +197,12 @@ public class MainActivity extends AppCompatActivity implements OnMapReadyCallbac
                 globalMap.addMarker(new MarkerOptions()
                         .position(station.getCoords())
                         .title(station.getName())
-                        .icon(BitmapDescriptorFactory.fromResource(R.drawable.tempmusicicon))
-                        );
+                        .icon(BitmapDescriptorFactory.fromResource(R.drawable.threedredstation)));
             } else {
                 globalMap.addMarker(new MarkerOptions()
                         .position(station.getCoords())
                         .title(station.getName())
-                        .icon(BitmapDescriptorFactory.fromResource(R.drawable.ic_signout)));
+                        .icon(BitmapDescriptorFactory.fromResource(R.drawable.threedblackstation)));
             }
             return;
         }

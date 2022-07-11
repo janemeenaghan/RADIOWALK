@@ -14,7 +14,6 @@ import android.content.Intent;
 import android.content.pm.PackageManager;
 import android.location.Location;
 import android.media.AudioManager;
-import android.media.MediaPlayer;
 import android.net.Uri;
 import android.os.Build;
 import android.os.Bundle;
@@ -71,10 +70,11 @@ public class MainActivity extends AppCompatActivity implements OnMapReadyCallbac
     public static final String KEY_GEOPOINT = "geopoint";
     public static final String TAG = "MainActivity";
     public static final String MAPVIEW_BUNDLE_KEY = "MapViewBundleKey";
-    MediaPlayer mediaPlayer;
+
     FusedLocationProviderClient fusedLocationProviderClient;
     Location location;
     GoogleMap globalMap;
+    MediaPlayerController mediaPlayerController;
     Uri myUri;
     @RequiresApi(api = Build.VERSION_CODES.M)
     @Override
@@ -102,33 +102,7 @@ public class MainActivity extends AppCompatActivity implements OnMapReadyCallbac
                 }
             }
         });
-        // streaming m3u8 here
-        try {
-            setupMusic(Uri.parse("https://tunein.streamguys1.com/secure-cnn?DIST=TuneIn&TGT=TuneIn&maxServers=2&key=86b5d0be2518b55f18f3b4b8983b13e1f1d93f79fd8cfabbcad60c5db115fac1&partnertok=eyJhbGciOiJIUzI1NiIsImtpZCI6InR1bmVpbiIsInR5cCI6IkpXVCJ9.eyJ0cnVzdGVkX3BhcnRuZXIiOnRydWUsImlhdCI6MTY1NzE2Njk1NiwiaXNzIjoidGlzcnYifQ.dDZpnageeieHAKQPg0F3s4AcWr2XK-devjmobH5m9iI&aw_0_1st.playerid=ydvgH5BP&aw_0_1st.skey=1657166956&lat=39.0469&lon=-77.4903&aw_0_1st.premium=false&source=TuneIn&aw_0_1st.platform=tunein&aw_0_1st.genre_id=g3124&aw_0_1st.class=talk&aw_0_1st.ads_partner_alias=ydvgH5BP"));
-        } catch (IOException e) {
-            e.printStackTrace();
-        }
-        AudioManager leftAm = (AudioManager)getSystemService(Context.AUDIO_SERVICE);
-        int maxVolume = leftAm.getStreamMaxVolume(AudioManager.STREAM_MUSIC);
-        int curVolume = leftAm.getStreamVolume(AudioManager.STREAM_MUSIC);
-        SeekBar volControl = (SeekBar)findViewById(R.id.volumebar);
-        volControl.setMax(maxVolume);
-        volControl.setProgress(curVolume);
-        volControl.setOnSeekBarChangeListener(new SeekBar.OnSeekBarChangeListener() {
-            @Override
-            public void onProgressChanged(SeekBar arg0, int arg1, boolean arg2) {
-                // TODO Auto-generated method stub
-                leftAm.setStreamVolume(AudioManager.STREAM_MUSIC, arg1, 0);
-            }
-            @Override
-            public void onStartTrackingTouch(SeekBar seekBar) {
 
-            }
-            @Override
-            public void onStopTrackingTouch(SeekBar seekBar) {
-
-            }
-        });
         logout = findViewById(R.id.logoutButton);
         logout.setOnClickListener(new View.OnClickListener() {
             @Override
@@ -137,6 +111,9 @@ public class MainActivity extends AppCompatActivity implements OnMapReadyCallbac
                 logoutUser();
             }
         });
+
+        mediaPlayerController = new MediaPlayerController(this,(SeekBar)findViewById(R.id.volumebar));
+        mediaPlayerController.setupVolumeControl();
     }
 
     public void setupMap() {
@@ -165,13 +142,7 @@ public class MainActivity extends AppCompatActivity implements OnMapReadyCallbac
         return true;
     }
 
-    public void setupMusic(Uri myUri) throws IOException {
-        mediaPlayer = new MediaPlayer();
-        mediaPlayer.setAudioStreamType(AudioManager.STREAM_MUSIC);
-        mediaPlayer.setDataSource(getApplicationContext(), myUri);
-        mediaPlayer.prepare();
-        mediaPlayer.start();
-    }
+
 
     public void renderAllStations() {
         // specify what type of data we want to query - Station.class
@@ -191,7 +162,7 @@ public class MainActivity extends AppCompatActivity implements OnMapReadyCallbac
         });
     }
 
-    public void renderNearbyStations() {
+    public void renderNearbyStations() throws IOException {
         // specify what type of data we want to query - Station.class
         ParseQuery<Station> query = ParseQuery.getQuery(Station.class);
         query.setLimit(20);
@@ -200,7 +171,6 @@ public class MainActivity extends AppCompatActivity implements OnMapReadyCallbac
         // start an asynchronous call for posts
         final Station[] nearestStation = new Station[1];
         final double[] shortestDistance = {Integer.MAX_VALUE};
-
         query.findInBackground(new FindCallback<Station>() {
             @Override
             public void done(List<Station> stations, ParseException e) {
@@ -220,7 +190,9 @@ public class MainActivity extends AppCompatActivity implements OnMapReadyCallbac
             }
         });
         Log.d(TAG, "nearest station: "+nearestStation[0].getName());
-        //TODO: startPlaying(nearestStation);
+        //TODO: mediaPlayerController.newPlayer(nearestStation[0].getStreamLink());
+        mediaPlayerController.newPlayer("https://tunein.streamguys1.com/secure-cnn?DIST=TuneIn&TGT=TuneIn&maxServers=2&key=86b5d0be2518b55f18f3b4b8983b13e1f1d93f79fd8cfabbcad60c5db115fac1&partnertok=eyJhbGciOiJIUzI1NiIsImtpZCI6InR1bmVpbiIsInR5cCI6IkpXVCJ9.eyJ0cnVzdGVkX3BhcnRuZXIiOnRydWUsImlhdCI6MTY1NzE2Njk1NiwiaXNzIjoidGlzcnYifQ.dDZpnageeieHAKQPg0F3s4AcWr2XK-devjmobH5m9iI&aw_0_1st.playerid=ydvgH5BP&aw_0_1st.skey=1657166956&lat=39.0469&lon=-77.4903&aw_0_1st.premium=false&source=TuneIn&aw_0_1st.platform=tunein&aw_0_1st.genre_id=g3124&aw_0_1st.class=talk&aw_0_1st.ads_partner_alias=ydvgH5BP");
+        mediaPlayerController.startPlaying();
     }
 
     public void renderStation(Station station){

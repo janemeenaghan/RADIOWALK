@@ -47,6 +47,7 @@ import com.google.android.material.floatingactionbutton.FloatingActionButton;
 import com.parse.FindCallback;
 import com.parse.ParseException;
 import com.parse.ParseFile;
+import com.parse.ParseGeoPoint;
 import com.parse.ParseObject;
 import com.parse.ParseQuery;
 import com.parse.ParseUser;
@@ -65,7 +66,9 @@ public class MainActivity extends AppCompatActivity implements OnMapReadyCallbac
     public static final int DEFAULT_ZOOM = 20;
     public static final int PUBLIC_TYPE = 0;
     public static final int PRIVATE_TYPE = 1;
-    public static final int STATION_RADIUS = 20;
+    public static final double STATION_RADIUS_METERS = 20;
+    public static final double STATION_RADIUS_KILOMETERS = STATION_RADIUS_METERS * .001;
+    public static final String KEY_GEOPOINT = "geopoint";
     public static final String TAG = "MainActivity";
     public static final String MAPVIEW_BUNDLE_KEY = "MapViewBundleKey";
     MediaPlayer mediaPlayer;
@@ -188,6 +191,38 @@ public class MainActivity extends AppCompatActivity implements OnMapReadyCallbac
         });
     }
 
+    public void renderNearbyStations() {
+        // specify what type of data we want to query - Station.class
+        ParseQuery<Station> query = ParseQuery.getQuery(Station.class);
+        query.setLimit(20);
+        //query.whereWithinKilometers(KEY_GEOPOINT,new ParseGeoPoint(location.getLatitude(),location.getLongitude()), STATION_RADIUS_KILOMETERS, true);
+        query.whereWithinKilometers(KEY_GEOPOINT,new ParseGeoPoint(location.getLatitude(),location.getLongitude()), STATION_RADIUS_KILOMETERS);
+        // start an asynchronous call for posts
+        final Station[] nearestStation = new Station[1];
+        final double[] shortestDistance = {Integer.MAX_VALUE};
+
+        query.findInBackground(new FindCallback<Station>() {
+            @Override
+            public void done(List<Station> stations, ParseException e) {
+                if (e != null) {
+                    Log.e(TAG, "Issue with getting stations", e);
+                    return;
+                }
+                for (Station station : stations){
+                    renderStation(station);
+                    float[] result = new float[1];
+                    android.location.Location.distanceBetween(location.getLatitude(),location.getLongitude(),station.getLatitude(),station.getLongitude(),result);
+                    if (result[0] < shortestDistance[0]){
+                        shortestDistance[0] = result[0];
+                        nearestStation[0] = station;
+                    }
+                }
+            }
+        });
+        Log.d(TAG, "nearest station: "+nearestStation[0].getName());
+        //TODO: startPlaying(nearestStation);
+    }
+
     public void renderStation(Station station){
         Log.d(TAG, station.getName());
         if (station != null && station.getCoords() != null) {
@@ -222,7 +257,7 @@ public class MainActivity extends AppCompatActivity implements OnMapReadyCallbac
     public void addCircle(Station station, LatLng coords){
         globalMap.addCircle(new CircleOptions()
                 .center(coords)
-                .radius(STATION_RADIUS)
+                .radius(STATION_RADIUS_METERS)
                 .strokeColor(Color.RED)
                 .fillColor(Color.BLUE));
     }
@@ -314,12 +349,12 @@ public class MainActivity extends AppCompatActivity implements OnMapReadyCallbac
                                                 location.getLongitude()), DEFAULT_ZOOM));
                             }
                             else{
-                                Log.d(TAG, "Current location is null. Using defaults.");
+                                Log.d(TAG, "Current location is null.");
                                 Log.e(TAG, "Exception: %s", task.getException());
                                 //TODO: fail
                             }
                         } else {
-                            Log.d(TAG, "Current location is null. Using defaults.");
+                            Log.d(TAG, "Current location is null.");
                             Log.e(TAG, "Exception: %s", task.getException());
                             //TODO: fail
                         }
@@ -360,7 +395,7 @@ public class MainActivity extends AppCompatActivity implements OnMapReadyCallbac
     private void saveStation(String name, boolean type, LatLng coords, ParseUser user, String streamLink) throws JSONException {
         Station station = new Station();
         station.setName(name);
-        station.setCoords(coords);
+        station.setGeoPoint(coords);
         station.setStreamLink(streamLink);
         if (type){
             station.setType(PRIVATE_TYPE);
@@ -418,5 +453,4 @@ public class MainActivity extends AppCompatActivity implements OnMapReadyCallbac
         // Display the dialog
         alertDialog.show();
     }
-
 }

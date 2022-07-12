@@ -4,16 +4,14 @@ import androidx.annotation.RequiresApi;
 import androidx.appcompat.app.AlertDialog;
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.core.app.ActivityCompat;
-import com.google.android.gms.maps.model.Circle;
+
 import com.google.android.gms.maps.model.CircleOptions;
 import android.graphics.Color;
 import android.Manifest;
-import android.content.Context;
 import android.content.DialogInterface;
 import android.content.Intent;
 import android.content.pm.PackageManager;
 import android.location.Location;
-import android.media.AudioManager;
 import android.net.Uri;
 import android.os.Build;
 import android.os.Bundle;
@@ -21,12 +19,10 @@ import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.widget.EditText;
-import android.widget.ProgressBar;
 import android.widget.SeekBar;
 import android.widget.Switch;
 import android.widget.Toast;
-import com.google.android.gms.common.internal.Constants;
-import com.google.android.gms.location.CurrentLocationRequest;
+
 import com.google.android.gms.location.FusedLocationProviderClient;
 import com.google.android.gms.location.LocationServices;
 import com.google.android.gms.maps.CameraUpdateFactory;
@@ -36,7 +32,6 @@ import com.google.android.gms.maps.OnMapReadyCallback;
 import com.google.android.gms.maps.model.BitmapDescriptor;
 import com.google.android.gms.maps.model.BitmapDescriptorFactory;
 import com.google.android.gms.maps.model.LatLng;
-import com.google.android.gms.maps.model.Marker;
 import com.google.android.gms.maps.model.MarkerOptions;
 import com.google.android.gms.tasks.CancellationToken;
 import com.google.android.gms.tasks.OnCompleteListener;
@@ -45,20 +40,17 @@ import com.google.android.gms.tasks.Task;
 import com.google.android.material.floatingactionbutton.FloatingActionButton;
 import com.parse.FindCallback;
 import com.parse.ParseException;
-import com.parse.ParseFile;
 import com.parse.ParseGeoPoint;
-import com.parse.ParseObject;
 import com.parse.ParseQuery;
 import com.parse.ParseUser;
 import com.parse.SaveCallback;
-import org.json.JSONArray;
+
 import org.json.JSONException;
-import java.io.File;
+
 import java.io.IOException;
-import java.util.ArrayList;
 import java.util.List;
 
-public class MainActivity extends AppCompatActivity implements OnMapReadyCallback {
+public class MainActivity extends AppCompatActivity implements OnMapReadyCallback, VolumeController.VolumeCallback {
     private MapView mMapView;
     public FloatingActionButton addStationButton, logout;
     public int REQUEST_CODE = 1001;
@@ -71,9 +63,11 @@ public class MainActivity extends AppCompatActivity implements OnMapReadyCallbac
     public static final String TAG = "MainActivity";
     public static final String MAPVIEW_BUNDLE_KEY = "MapViewBundleKey";
 
+    VolumeController volumeController;
     FusedLocationProviderClient fusedLocationProviderClient;
     Location location;
     GoogleMap globalMap;
+    SeekBar volControl;
     MediaPlayerController mediaPlayerController;
     Uri myUri;
     @RequiresApi(api = Build.VERSION_CODES.M)
@@ -90,7 +84,7 @@ public class MainActivity extends AppCompatActivity implements OnMapReadyCallbac
         mMapView.onCreate(mapViewBundle);
         mMapView.getMapAsync(this);
         setupMap();
-        renderAllStations();
+
         //only visible when there is no nearby station - hide when not
         addStationButton = findViewById(R.id.createButton);
         addStationButton.setOnClickListener(new View.OnClickListener() {
@@ -111,9 +105,38 @@ public class MainActivity extends AppCompatActivity implements OnMapReadyCallbac
                 logoutUser();
             }
         });
+        initVolume();
+        initMediaPlayer();
+        try {
+            renderNearbyStations();
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
 
-        mediaPlayerController = new MediaPlayerController(this,(SeekBar)findViewById(R.id.volumebar));
-        mediaPlayerController.setupVolumeControl();
+    }
+
+    private void initVolume(){
+        volControl = (SeekBar)findViewById(R.id.volumebar);
+        volumeController = new VolumeController(this, this);
+
+        volControl.setOnSeekBarChangeListener(new SeekBar.OnSeekBarChangeListener() {
+            @Override
+            public void onProgressChanged(SeekBar arg0, int arg1, boolean arg2) {
+                // TODO Auto-generated method stub
+                volumeController.setVolume(arg1);
+            }
+            @Override
+            public void onStartTrackingTouch(SeekBar seekBar) {
+
+            }
+            @Override
+            public void onStopTrackingTouch(SeekBar seekBar) {
+
+            }
+        });
+    }
+    private void initMediaPlayer(){
+        mediaPlayerController = new MediaPlayerController(this);
     }
 
     public void setupMap() {
@@ -140,9 +163,8 @@ public class MainActivity extends AppCompatActivity implements OnMapReadyCallbac
 
     public boolean noStationisNearby(){
         return true;
+        //TODO: implement
     }
-
-
 
     public void renderAllStations() {
         // specify what type of data we want to query - Station.class
@@ -190,9 +212,8 @@ public class MainActivity extends AppCompatActivity implements OnMapReadyCallbac
             }
         });
         Log.d(TAG, "nearest station: "+nearestStation[0].getName());
-        //TODO: mediaPlayerController.newPlayer(nearestStation[0].getStreamLink());
-        mediaPlayerController.newPlayer("https://tunein.streamguys1.com/secure-cnn?DIST=TuneIn&TGT=TuneIn&maxServers=2&key=86b5d0be2518b55f18f3b4b8983b13e1f1d93f79fd8cfabbcad60c5db115fac1&partnertok=eyJhbGciOiJIUzI1NiIsImtpZCI6InR1bmVpbiIsInR5cCI6IkpXVCJ9.eyJ0cnVzdGVkX3BhcnRuZXIiOnRydWUsImlhdCI6MTY1NzE2Njk1NiwiaXNzIjoidGlzcnYifQ.dDZpnageeieHAKQPg0F3s4AcWr2XK-devjmobH5m9iI&aw_0_1st.playerid=ydvgH5BP&aw_0_1st.skey=1657166956&lat=39.0469&lon=-77.4903&aw_0_1st.premium=false&source=TuneIn&aw_0_1st.platform=tunein&aw_0_1st.genre_id=g3124&aw_0_1st.class=talk&aw_0_1st.ads_partner_alias=ydvgH5BP");
-        mediaPlayerController.startPlaying();
+        mediaPlayerController.setURLAndPrepare(nearestStation[0].getStreamLink());
+        //mediaPlayerController.newPlayer("https://tunein.streamguys1.com/secure-cnn?DIST=TuneIn&TGT=TuneIn&maxServers=2&key=86b5d0be2518b55f18f3b4b8983b13e1f1d93f79fd8cfabbcad60c5db115fac1&partnertok=eyJhbGciOiJIUzI1NiIsImtpZCI6InR1bmVpbiIsInR5cCI6IkpXVCJ9.eyJ0cnVzdGVkX3BhcnRuZXIiOnRydWUsImlhdCI6MTY1NzE2Njk1NiwiaXNzIjoidGlzcnYifQ.dDZpnageeieHAKQPg0F3s4AcWr2XK-devjmobH5m9iI&aw_0_1st.playerid=ydvgH5BP&aw_0_1st.skey=1657166956&lat=39.0469&lon=-77.4903&aw_0_1st.premium=false&source=TuneIn&aw_0_1st.platform=tunein&aw_0_1st.genre_id=g3124&aw_0_1st.class=talk&aw_0_1st.ads_partner_alias=ydvgH5BP");
     }
 
     public void renderStation(Station station){
@@ -345,7 +366,9 @@ public class MainActivity extends AppCompatActivity implements OnMapReadyCallbac
             if (grantResults.length > 0){
                 if (grantResults[0] == PackageManager.PERMISSION_GRANTED){
                     if (checkForLocationPermission()) {
+                        //locationcontroller.retrievelocation
                         getDeviceLocationAndUpdateMap();
+                        //wahtever you've broken it up into
                     }
                 }
             }
@@ -424,5 +447,15 @@ public class MainActivity extends AppCompatActivity implements OnMapReadyCallbac
                 });
         // Display the dialog
         alertDialog.show();
+    }
+
+    @Override
+    public void onVolumeChanged(int volume) {
+        volControl.setProgress(volume);
+    }
+
+    @Override
+    public void onMaxVolumeChanged(int maxVolume) {
+        volControl.setMax(maxVolume);
     }
 }

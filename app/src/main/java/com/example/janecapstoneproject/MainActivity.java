@@ -40,6 +40,12 @@ import org.json.JSONException;
 import java.io.IOException;
 import java.util.List;
 
+
+import de.sfuhrm.radiobrowser4j.FieldName;
+import de.sfuhrm.radiobrowser4j.ListParameter;
+import de.sfuhrm.radiobrowser4j.RadioBrowser;
+
+
 public class MainActivity extends AppCompatActivity implements OnMapReadyCallback, VolumeController.VolumeCallback, LocationController.LocationCallback {
     private MapView mMapView;
     public FloatingActionButton addStationButton, logout;
@@ -72,6 +78,9 @@ public class MainActivity extends AppCompatActivity implements OnMapReadyCallbac
         initVolume();
         initMediaPlayer();
         initNowPlayingText();
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.N) {
+            initRadioBrowser();
+        }
     }
 
     //LIFECYCLE EVENTS
@@ -116,6 +125,17 @@ public class MainActivity extends AppCompatActivity implements OnMapReadyCallbac
     public void onLowMemory() {
         super.onLowMemory();
         mMapView.onLowMemory();
+    }
+
+    //RADIO BROWSER CODE
+    @RequiresApi(api = Build.VERSION_CODES.N)
+    public void initRadioBrowser(){
+        // 5000ms timeout, user agent is Demo agent/1.0
+        RadioBrowser browser = new RadioBrowser(5000, "Demo agent/1.0");
+        // print the first 64 stations in station name order
+        browser.listStations(ListParameter.create().order(FieldName.NAME))
+                .limit(64)
+                .forEach(s -> Log.d("HHH",""+s.getName()+": "+ s.getUrl()));
     }
 
     //NOW PLAYING TEXT CODE

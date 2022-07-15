@@ -3,18 +3,13 @@ import androidx.annotation.NonNull;
 import androidx.annotation.RequiresApi;
 import androidx.appcompat.app.AlertDialog;
 import androidx.appcompat.app.AppCompatActivity;
-import androidx.core.app.ActivityCompat;
-import com.google.android.gms.maps.model.Circle;
 import com.google.android.gms.maps.model.CircleOptions;
+import android.annotation.SuppressLint;
 import android.graphics.Color;
-import android.Manifest;
-import android.content.Context;
 import android.content.DialogInterface;
 import android.content.Intent;
 import android.content.pm.PackageManager;
 import android.location.Location;
-import android.media.AudioManager;
-import android.media.MediaPlayer;
 import android.net.Uri;
 import android.os.Build;
 import android.os.Bundle;
@@ -22,14 +17,10 @@ import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.widget.EditText;
-import android.widget.ProgressBar;
 import android.widget.SeekBar;
 import android.widget.Switch;
+import android.widget.TextView;
 import android.widget.Toast;
-import com.google.android.gms.common.internal.Constants;
-import com.google.android.gms.location.CurrentLocationRequest;
-import com.google.android.gms.location.FusedLocationProviderClient;
-import com.google.android.gms.location.LocationServices;
 import com.google.android.gms.maps.CameraUpdateFactory;
 import com.google.android.gms.maps.GoogleMap;
 import com.google.android.gms.maps.MapView;
@@ -37,29 +28,19 @@ import com.google.android.gms.maps.OnMapReadyCallback;
 import com.google.android.gms.maps.model.BitmapDescriptor;
 import com.google.android.gms.maps.model.BitmapDescriptorFactory;
 import com.google.android.gms.maps.model.LatLng;
-import com.google.android.gms.maps.model.Marker;
 import com.google.android.gms.maps.model.MarkerOptions;
-import com.google.android.gms.tasks.CancellationToken;
-import com.google.android.gms.tasks.OnCompleteListener;
-import com.google.android.gms.tasks.OnTokenCanceledListener;
-import com.google.android.gms.tasks.Task;
 import com.google.android.material.floatingactionbutton.FloatingActionButton;
 import com.parse.FindCallback;
 import com.parse.ParseException;
-import com.parse.ParseFile;
 import com.parse.ParseGeoPoint;
-import com.parse.ParseObject;
 import com.parse.ParseQuery;
 import com.parse.ParseUser;
 import com.parse.SaveCallback;
-import org.json.JSONArray;
 import org.json.JSONException;
-import java.io.File;
 import java.io.IOException;
-import java.util.ArrayList;
 import java.util.List;
 
-public class MainActivity extends AppCompatActivity implements OnMapReadyCallback {
+public class MainActivity extends AppCompatActivity implements OnMapReadyCallback, VolumeController.VolumeCallback, LocationController.LocationCallback {
     private MapView mMapView;
     public FloatingActionButton addStationButton, logout;
     public int REQUEST_CODE = 1001;
@@ -71,87 +52,118 @@ public class MainActivity extends AppCompatActivity implements OnMapReadyCallbac
     public static final String KEY_GEOPOINT = "geopoint";
     public static final String TAG = "MainActivity";
     public static final String MAPVIEW_BUNDLE_KEY = "MapViewBundleKey";
-    MediaPlayer mediaPlayer;
-    FusedLocationProviderClient fusedLocationProviderClient;
-    Location location;
+    public TextView nowPlayingText;
+    LocationController locationController;
+    VolumeController volumeController;
     GoogleMap globalMap;
+    SeekBar volControl;
+    MediaPlayerController mediaPlayerController;
+    Location globalLocation;
     Uri myUri;
     @RequiresApi(api = Build.VERSION_CODES.M)
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
-        fusedLocationProviderClient = LocationServices.getFusedLocationProviderClient(this);
-        Bundle mapViewBundle = null;
-        if (savedInstanceState != null) {
-            mapViewBundle = savedInstanceState.getBundle(MAPVIEW_BUNDLE_KEY);
+        initLocation();
+        initMap(savedInstanceState);
+        initLogoutButton();
+        initStationButton();
+        initVolume();
+        initMediaPlayer();
+        initNowPlayingText();
+    }
+
+    //LIFECYCLE EVENTS
+    //TODO: add Location or station related info here?
+    @Override
+    public void onSaveInstanceState(Bundle outState) {
+        super.onSaveInstanceState(outState);
+        Bundle mapViewBundle = outState.getBundle(MAPVIEW_BUNDLE_KEY);
+        if (mapViewBundle == null) {
+            mapViewBundle = new Bundle();
+            outState.putBundle(MAPVIEW_BUNDLE_KEY, mapViewBundle);
         }
-        mMapView = (MapView) findViewById(R.id.mapView);
-        mMapView.onCreate(mapViewBundle);
-        mMapView.getMapAsync(this);
-        setupMap();
-        renderAllStations();
-        //only visible when there is no nearby station - hide when not
-        addStationButton = findViewById(R.id.createButton);
-        addStationButton.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-                if (noStationisNearby()){
-                    LatLng point = new LatLng(location.getLatitude(),location.getLongitude());
-                    showAlertDialogForPoint(point);
-                }
-            }
-        });
-        // streaming m3u8 here
-        try {
-            setupMusic(Uri.parse("https://tunein.streamguys1.com/secure-cnn?DIST=TuneIn&TGT=TuneIn&maxServers=2&key=86b5d0be2518b55f18f3b4b8983b13e1f1d93f79fd8cfabbcad60c5db115fac1&partnertok=eyJhbGciOiJIUzI1NiIsImtpZCI6InR1bmVpbiIsInR5cCI6IkpXVCJ9.eyJ0cnVzdGVkX3BhcnRuZXIiOnRydWUsImlhdCI6MTY1NzE2Njk1NiwiaXNzIjoidGlzcnYifQ.dDZpnageeieHAKQPg0F3s4AcWr2XK-devjmobH5m9iI&aw_0_1st.playerid=ydvgH5BP&aw_0_1st.skey=1657166956&lat=39.0469&lon=-77.4903&aw_0_1st.premium=false&source=TuneIn&aw_0_1st.platform=tunein&aw_0_1st.genre_id=g3124&aw_0_1st.class=talk&aw_0_1st.ads_partner_alias=ydvgH5BP"));
-        } catch (IOException e) {
-            e.printStackTrace();
-        }
-        AudioManager leftAm = (AudioManager)getSystemService(Context.AUDIO_SERVICE);
-        int maxVolume = leftAm.getStreamMaxVolume(AudioManager.STREAM_MUSIC);
-        int curVolume = leftAm.getStreamVolume(AudioManager.STREAM_MUSIC);
-        SeekBar volControl = (SeekBar)findViewById(R.id.volumebar);
-        volControl.setMax(maxVolume);
-        volControl.setProgress(curVolume);
+        mMapView.onSaveInstanceState(mapViewBundle);
+    }
+    @Override
+    protected void onResume() {
+        super.onResume();
+        mMapView.onResume();
+    }
+    @Override
+    protected void onStart() {
+        super.onStart();
+        mMapView.onStart();
+    }
+    @Override
+    protected void onStop() {
+        super.onStop();
+        mMapView.onStop();
+        locationController.stopLiveUpdates();
+    }
+    @Override
+    protected void onPause() {
+        mMapView.onPause();
+        super.onPause();
+    }
+    @Override
+    protected void onDestroy() {
+        mMapView.onDestroy();
+        super.onDestroy();
+    }
+    @Override
+    public void onLowMemory() {
+        super.onLowMemory();
+        mMapView.onLowMemory();
+    }
+
+    //NOW PLAYING TEXT CODE
+    public void initNowPlayingText(){
+        nowPlayingText = findViewById(R.id.nowPlayingText);
+    }
+    public void setNowPlayingText(String text){
+        nowPlayingText.setText(text);
+    }
+
+    //MEDIA CONTROLLER
+    private void initMediaPlayer(){
+        mediaPlayerController = new MediaPlayerController(this);
+    }
+
+    //VOLUME CONTROLLER
+    private void initVolume(){
+        volControl = (SeekBar)findViewById(R.id.volumebar);
+        volumeController = new VolumeController(this, this);
         volControl.setOnSeekBarChangeListener(new SeekBar.OnSeekBarChangeListener() {
             @Override
             public void onProgressChanged(SeekBar arg0, int arg1, boolean arg2) {
                 // TODO Auto-generated method stub
-                leftAm.setStreamVolume(AudioManager.STREAM_MUSIC, arg1, 0);
+                volumeController.setVolume(arg1);
             }
             @Override
-            public void onStartTrackingTouch(SeekBar seekBar) {
-
-            }
+            public void onStartTrackingTouch(SeekBar seekBar) {}
             @Override
-            public void onStopTrackingTouch(SeekBar seekBar) {
-
-            }
+            public void onStopTrackingTouch(SeekBar seekBar) {}
         });
+    }
+    @Override
+    public void onVolumeChanged(int volume) {
+        volControl.setProgress(volume);
+    }
+    @Override
+    public void onMaxVolumeChanged(int maxVolume) {
+        volControl.setMax(maxVolume);
+    }
+
+    //LOGOUT CODE
+    public void initLogoutButton(){
         logout = findViewById(R.id.logoutButton);
-        logout.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-                Log.i(TAG, "onClick logout button");
-                logoutUser();
-            }
+        logout.setOnClickListener(v -> {
+            Log.i(TAG, "onClick logout button");
+            logoutUser();
         });
     }
-
-    public void setupMap() {
-        if (mMapView != null) {
-            mMapView.getMapAsync(new OnMapReadyCallback() {
-                @RequiresApi(api = Build.VERSION_CODES.M)
-                @Override
-                public void onMapReady(GoogleMap map) {
-                    globalMap = map;
-                    centerOnMyLocation();
-                }
-            });
-        }
-    }
-
     private void logoutUser() {
         ParseUser.logOut();
         ParseUser currentUser = ParseUser.getCurrentUser(); // this will now be null
@@ -161,46 +173,99 @@ public class MainActivity extends AppCompatActivity implements OnMapReadyCallbac
         finish();
     }
 
-    public boolean noStationisNearby(){
-        return true;
+    //LOCATION CONTROLLER
+    private void initLocation(){
+        locationController = new LocationController(this);
+        locationController.registerCallback(this);
     }
-
-    public void setupMusic(Uri myUri) throws IOException {
-        mediaPlayer = new MediaPlayer();
-        mediaPlayer.setAudioStreamType(AudioManager.STREAM_MUSIC);
-        mediaPlayer.setDataSource(getApplicationContext(), myUri);
-        mediaPlayer.prepare();
-        mediaPlayer.start();
-    }
-
-    public void renderAllStations() {
-        // specify what type of data we want to query - Station.class
-        ParseQuery<Station> query = ParseQuery.getQuery(Station.class);
-        // start an asynchronous call for posts
-        query.findInBackground(new FindCallback<Station>() {
-            @Override
-            public void done(List<Station> stations, ParseException e) {
-                if (e != null) {
-                    Log.e(TAG, "Issue with getting stations", e);
-                    return;
-                }
-                for (Station station : stations){
-                    renderStation(station);
+    //I think I no longer need this, commenting in case I change mind though
+    /*@RequiresApi(api = Build.VERSION_CODES.M)
+    private void requestLocation() {
+        if (!locationController.checkForLocationPermission(this)) {
+            locationController.requestPermission(this);
+            return;
+        }
+        else{
+            locationController.retrieveLocation();
+        }
+    }*/
+    @Override
+    public void onRequestPermissionsResult(int requestCode, @NonNull String[] permissions, @NonNull int[] grantResults) {
+        super.onRequestPermissionsResult(requestCode, permissions, grantResults);
+        if (requestCode == REQUEST_CODE) {
+            if (grantResults.length > 0) {
+                if (grantResults[0] == PackageManager.PERMISSION_GRANTED) {
+                    if (locationController.checkForLocationPermission(this)) {
+                        locationController.retrieveLocation(this);
+                        return;
+                    }
                 }
             }
-        });
+        }
+        locationController.requestPermission(this);
+    }
+    @Override
+    public void onPermissionsNeeded() {
+        //TODO: spam user
+        locationController.requestPermission(this);
+    }
+    @SuppressLint("MissingPermission")
+    @Override
+    public void onLocationResult(Location location) throws IOException {
+        globalLocation = location;
+        //maps, update stations
+        if (globalMap != null) {
+            globalMap.setMyLocationEnabled(true);
+            globalMap.getUiSettings().setMyLocationButtonEnabled(true);
+            globalMap.moveCamera(CameraUpdateFactory.newLatLngZoom(
+                    new LatLng(location.getLatitude(),
+                            location.getLongitude()), DEFAULT_ZOOM));
+        }
+        renderNearbyStations(location);
+        //TODO: something about if there is a nearby station (playing its stream link, greying out button)
+        //         //only visible when there is no nearby station - hide when not
+        //
+        //
     }
 
-    public void renderNearbyStations() {
+    //MAP CODE
+    public void initMap(Bundle savedInstanceState){
+        Bundle mapViewBundle = null;
+        if (savedInstanceState != null) {
+            mapViewBundle = savedInstanceState.getBundle(MAPVIEW_BUNDLE_KEY);
+        }
+        mMapView = (MapView) findViewById(R.id.mapView);
+        mMapView.onCreate(mapViewBundle);
+        mMapView.getMapAsync(this);
+    }
+    @RequiresApi(api = Build.VERSION_CODES.M)
+    @Override
+    public void onMapReady(GoogleMap map) {
+        globalMap = map;
+        locationController.retrieveLocation(this);
+        locationController.startLiveUpdates(this);
+        //map.addMarker(new MarkerOptions().position(new LatLng(0, 0)).title("Marker"));
+    }
+
+    //STATION CODE
+    public void initStationButton(){
+        addStationButton = findViewById(R.id.createButton);
+        addStationButton.setVisibility(View.INVISIBLE);
+        addStationButton.setOnClickListener(v -> {
+            showAlertDialogForPoint();
+        });
+    }
+    Station nearestStation;
+    float shortestDistance;
+    private void renderNearbyStations(Location location) throws IOException {
         // specify what type of data we want to query - Station.class
         ParseQuery<Station> query = ParseQuery.getQuery(Station.class);
         query.setLimit(20);
         //query.whereWithinKilometers(KEY_GEOPOINT,new ParseGeoPoint(location.getLatitude(),location.getLongitude()), STATION_RADIUS_KILOMETERS, true);
         query.whereWithinKilometers(KEY_GEOPOINT,new ParseGeoPoint(location.getLatitude(),location.getLongitude()), STATION_RADIUS_KILOMETERS);
         // start an asynchronous call for posts
-        final Station[] nearestStation = new Station[1];
-        final double[] shortestDistance = {Integer.MAX_VALUE};
-
+        nearestStation = null;
+        shortestDistance = Integer.MAX_VALUE;
         query.findInBackground(new FindCallback<Station>() {
             @Override
             public void done(List<Station> stations, ParseException e) {
@@ -212,17 +277,33 @@ public class MainActivity extends AppCompatActivity implements OnMapReadyCallbac
                     renderStation(station);
                     float[] result = new float[1];
                     android.location.Location.distanceBetween(location.getLatitude(),location.getLongitude(),station.getLatitude(),station.getLongitude(),result);
-                    if (result[0] < shortestDistance[0]){
-                        shortestDistance[0] = result[0];
-                        nearestStation[0] = station;
+                    if (result != null) {
+                        if (result[0] <= shortestDistance){
+                            shortestDistance = result[0];
+                            nearestStation = station;
+                        }
+                    }
+                    else{
+                        Log.e(TAG, "Result is null", e);
                     }
                 }
+                if (nearestStation!=null) {
+                    Log.d(TAG, "nearest station: " + nearestStation.getName());
+                    if (shortestDistance <= 20) {
+                        handleValidNearestStation(nearestStation);
+                        return;
+                    }
+                    else{
+                        Log.d(TAG, "Nearest station is too far!");
+                    }
+                }
+                else{
+                    Log.e(TAG, "Nearest station is null", e);
+                }
+                handleNoNearbyStation(location);
             }
         });
-        Log.d(TAG, "nearest station: "+nearestStation[0].getName());
-        //TODO: startPlaying(nearestStation);
     }
-
     public void renderStation(Station station){
         Log.d(TAG, station.getName());
         if (station != null && station.getCoords() != null) {
@@ -242,18 +323,19 @@ public class MainActivity extends AppCompatActivity implements OnMapReadyCallbac
         }
         //TODO: fail*/
     }
-
-    @Override
-    public void onSaveInstanceState(Bundle outState) {
-        super.onSaveInstanceState(outState);
-        Bundle mapViewBundle = outState.getBundle(MAPVIEW_BUNDLE_KEY);
-        if (mapViewBundle == null) {
-            mapViewBundle = new Bundle();
-            outState.putBundle(MAPVIEW_BUNDLE_KEY, mapViewBundle);
+    public void handleValidNearestStation(Station station){
+        addStationButton.setVisibility(View.INVISIBLE);
+        setNowPlayingText("Now Playing: "+station.getName());
+        if(!station.getStreamLink().isEmpty()) {
+            mediaPlayerController.setURLAndPrepare(station.getStreamLink());
         }
-        mMapView.onSaveInstanceState(mapViewBundle);
     }
+    public void handleNoNearbyStation(Location location){
+        setNowPlayingText("No nearby station detected");
+        addStationButton.setVisibility(View.VISIBLE);
 
+        //TODO: other stuff probably
+    }
     public void addCircle(Station station, LatLng coords){
         globalMap.addCircle(new CircleOptions()
                 .center(coords)
@@ -261,130 +343,6 @@ public class MainActivity extends AppCompatActivity implements OnMapReadyCallbac
                 .strokeColor(Color.RED)
                 .fillColor(Color.BLUE));
     }
-    @Override
-    protected void onResume() {
-        super.onResume();
-        mMapView.onResume();
-    }
-
-    @Override
-    protected void onStart() {
-        super.onStart();
-        mMapView.onStart();
-    }
-
-    @Override
-    protected void onStop() {
-        super.onStop();
-        mMapView.onStop();
-    }
-
-    @Override
-    public void onMapReady(GoogleMap map) {
-        //map.addMarker(new MarkerOptions().position(new LatLng(0, 0)).title("Marker"));
-    }
-
-    @Override
-    protected void onPause() {
-        mMapView.onPause();
-        super.onPause();
-    }
-
-    @Override
-    protected void onDestroy() {
-        mMapView.onDestroy();
-        super.onDestroy();
-    }
-
-    @Override
-    public void onLowMemory() {
-        super.onLowMemory();
-        mMapView.onLowMemory();
-    }
-
-    @RequiresApi(api = Build.VERSION_CODES.M)
-    private void centerOnMyLocation() {
-        if (!checkForLocationPermission()) {
-            requestPermissions(new String[]{Manifest.permission.ACCESS_COARSE_LOCATION, Manifest.permission.ACCESS_FINE_LOCATION}, REQUEST_CODE);
-            return;
-        }
-        else{
-            getDeviceLocationAndUpdateMap();
-        }
-    }
-
-    private void getDeviceLocationAndUpdateMap() {
-        CancellationToken whatDoesThisMean;
-        Log.d(TAG, "top");
-        /*
-         * Get the best and most recent location of the device, which may be null in rare
-         * cases when a location is not available.
-         */
-        try {
-            if (checkForLocationPermission()) {
-                whatDoesThisMean = new CancellationToken() {
-                    @NonNull
-                    @Override
-                    public CancellationToken onCanceledRequested(@NonNull OnTokenCanceledListener onTokenCanceledListener) {
-                        return null;
-                    }
-                    @Override
-                    public boolean isCancellationRequested() {
-                        return false;
-                    }
-                };
-                Task<Location> locationResult = fusedLocationProviderClient.getLastLocation();
-                locationResult.addOnCompleteListener(this, new OnCompleteListener<Location>() {
-                    @Override
-                    public void onComplete(@NonNull Task<Location> task) {
-                        globalMap.setMyLocationEnabled(true);
-                        if (task.isSuccessful()) {
-                            // Set the map's camera position to the current location of the device.
-                            location = task.getResult();
-                            if (location != null) {
-                                globalMap.setMyLocationEnabled(true);
-                                globalMap.getUiSettings().setMyLocationButtonEnabled(true);
-                                globalMap.moveCamera(CameraUpdateFactory.newLatLngZoom(
-                                        new LatLng(location.getLatitude(),
-                                                location.getLongitude()), DEFAULT_ZOOM));
-                            }
-                            else{
-                                Log.d(TAG, "Current location is null.");
-                                Log.e(TAG, "Exception: %s", task.getException());
-                                //TODO: fail
-                            }
-                        } else {
-                            Log.d(TAG, "Current location is null.");
-                            Log.e(TAG, "Exception: %s", task.getException());
-                            //TODO: fail
-                        }
-                    }
-                });
-            }
-        } catch (SecurityException e)  {
-            Log.e("Exception: %s", e.getMessage(), e);
-        }
-    }
-
-    @Override
-    public void onRequestPermissionsResult(int requestCode, @NonNull String[] permissions, @NonNull int[] grantResults) {
-        super.onRequestPermissionsResult(requestCode, permissions, grantResults);
-        if (requestCode == REQUEST_CODE){
-            if (grantResults.length > 0){
-                if (grantResults[0] == PackageManager.PERMISSION_GRANTED){
-                    if (checkForLocationPermission()) {
-                        getDeviceLocationAndUpdateMap();
-                    }
-                }
-            }
-        }
-        //TODO: pop ups keep asking for permission continuously or send user to settings
-    }
-
-    public boolean checkForLocationPermission(){
-        return ActivityCompat.checkSelfPermission(this, Manifest.permission.ACCESS_FINE_LOCATION) == PackageManager.PERMISSION_GRANTED && ActivityCompat.checkSelfPermission(this, Manifest.permission.ACCESS_COARSE_LOCATION) == PackageManager.PERMISSION_GRANTED;
-    }
-
     public void addStation(String name, boolean type, LatLng coords, ParseUser user, String streamLink){
         try {
             saveStation(name, type, coords, user, streamLink);
@@ -416,8 +374,7 @@ public class MainActivity extends AppCompatActivity implements OnMapReadyCallbac
             }
         });
     }
-
-    private void showAlertDialogForPoint(final LatLng point) {
+    private void showAlertDialogForPoint() {
         // inflate message_item.xml view
         View  messageView = LayoutInflater.from(MainActivity.this).
                 inflate(R.layout.message_item, null);
@@ -442,7 +399,12 @@ public class MainActivity extends AppCompatActivity implements OnMapReadyCallbac
                                 getText().toString();
                         boolean typeBoolean = ((Switch)(alertDialog.findViewById(R.id.typeSwitch))).isChecked();
                         // Creates and adds marker to the map
-                        addStation(name,typeBoolean,new LatLng(location.getLatitude(),location.getLongitude()),ParseUser.getCurrentUser(), streamLink);
+                        double lat = globalLocation.getLatitude();
+                        double lon = globalLocation.getLongitude();
+                        //TODO: fix if statement if needed
+                        if (!globalLocation.equals(null)) {
+                            addStation(name, typeBoolean, new LatLng(globalLocation.getLatitude(), globalLocation.getLongitude()), ParseUser.getCurrentUser(), streamLink);
+                        }
                     }
                 });
         // Configure dialog button (Cancel)

@@ -18,11 +18,9 @@ public class LoginActivity extends AppCompatActivity {
     private EditText etPassword;
     private Button login;
     private TextView createAccount;
-    MediaPlayerController mediaPlayerController;
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        initMediaPlayer();
         setContentView(R.layout.activity_login);
         if (ParseUser.getCurrentUser() != null){
             goMainActivity();
@@ -45,9 +43,6 @@ public class LoginActivity extends AppCompatActivity {
                 goSignUpActivity();
             }
         });
-    }
-    private void initMediaPlayer(){
-        mediaPlayerController = new MediaPlayerController(this);
     }
     private void loginUser(String username, String password) {
         ParseUser.logInInBackground(username, password, new LogInCallback(){

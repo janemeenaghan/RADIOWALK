@@ -4,6 +4,8 @@ import static com.example.janecapstoneproject.LoginActivity.TAG;
 import android.util.Log;
 import android.widget.RatingBar;
 
+import androidx.annotation.Nullable;
+
 import com.google.android.gms.maps.model.LatLng;
 import com.parse.ParseFile;
 import com.parse.ParseGeoPoint;
@@ -24,6 +26,7 @@ public class Station extends ParseObject {
     public static final String KEY_TYPE = "type";
     public static final String KEY_NAME = "name";
     public static final String KEY_STREAMLINK = "streamLink";
+    public static final String KEY_OBJECTID = "objectId";
     public static final String KEY_USER = "user";
     public static final int PUBLIC_TYPE = 0;
     public static final int PRIVATE_TYPE = 1;
@@ -48,6 +51,16 @@ public class Station extends ParseObject {
     public void setName(String name){ put(KEY_NAME, name); }
     public void setStreamLink(String streamLink){ put(KEY_STREAMLINK, streamLink); }
     public void setUser(ParseUser user){ put(KEY_USER, user); }
+
+    @Override
+    public boolean equals(@Nullable Object obj) {
+        if (obj instanceof Station) {
+            return getObjectId().equals(((Station) obj).getObjectId());
+        }
+        return false;
+        //return super.equals(obj);
+    }
+
     public static String calculateTimeAgo(Date createdAt) {
         int SECOND_MILLIS = 1000;
         int MINUTE_MILLIS = 60 * SECOND_MILLIS;

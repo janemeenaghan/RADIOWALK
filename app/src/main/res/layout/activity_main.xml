@@ -53,10 +53,6 @@
             android:gravity="center" />
     </FrameLayout>
     <androidx.constraintlayout.widget.ConstraintLayout
-        xmlns:android="http://schemas.android.com/apk/res/android"
-        xmlns:sothree="http://schemas.android.com/apk/res-auto"
-        xmlns:app="http://schemas.android.com/apk/res-auto"
-        xmlns:tools="http://schemas.android.com/tools"
         android:layout_width="match_parent"
         android:layout_height="match_parent"
         android:orientation="horizontal"
@@ -66,9 +62,9 @@
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:orientation="horizontal"
-            app:layout_constraintGuide_percent="0.04" />
+            sothree:layout_constraintGuide_percent="0.04" />
         <TextView
-            android:id="@+id/musicInformation"
+            android:id="@+id/nowPlayingText"
             android:layout_width="237dp"
             android:layout_height="20dp"
             android:layout_weight="1"
@@ -76,15 +72,17 @@
             android:focusable="true"
             android:focusableInTouchMode="true"
             android:scrollHorizontally="true"
-            android:text="TextViewawiorhgioahgoirhdanoivneo9awfnrgoahwefldnksgaeefoidbsngearwofiagrenboiagwensoihagwneoiqntgw"
+            android:text="No nearby station detected"
             android:textSize="12sp"
-            app:layout_constraintBottom_toBottomOf="@+id/musicIcon"
-            app:layout_constraintStart_toEndOf="@+id/musicIcon"
-            app:layout_constraintTop_toTopOf="@+id/musicIcon" />
+            sothree:layout_constraintBottom_toBottomOf="@+id/musicIcon"
+            sothree:layout_constraintStart_toEndOf="@+id/musicIcon"
+            sothree:layout_constraintTop_toTopOf="@+id/musicIcon" />
+
         <ImageView
             android:id="@+id/musicIcon"
             android:layout_width="67dp"
             android:layout_height="76dp"
+            android:visibility="invisible"
             sothree:srcCompat="@drawable/tempmusicicon"
             tools:layout_editor_absoluteX="16dp"
             tools:layout_editor_absoluteY="28dp"
@@ -95,15 +93,15 @@
             android:id="@+id/volumebar"
             android:max="100"
             android:paddingBottom="10dip"
-            app:layout_constraintBottom_toBottomOf="@+id/musicInformation"
-            app:layout_constraintStart_toEndOf="@+id/musicInformation"
-            app:layout_constraintTop_toTopOf="@+id/musicInformation" />
+            sothree:layout_constraintBottom_toBottomOf="@+id/musicInformation"
+            sothree:layout_constraintStart_toEndOf="@+id/musicInformation"
+            sothree:layout_constraintTop_toTopOf="@+id/musicInformation" />
 
         <androidx.constraintlayout.widget.Guideline
             android:id="@+id/guidelineVertForImage"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:orientation="vertical"
-            app:layout_constraintGuide_percent="0.04" />
+            sothree:layout_constraintGuide_percent="0.04" />
     </androidx.constraintlayout.widget.ConstraintLayout>
 </com.sothree.slidinguppanel.SlidingUpPanelLayout>

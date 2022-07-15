@@ -23,9 +23,9 @@ public class MediaPlayerController {
             @Override
             public boolean onError(MediaPlayer mp, int what, int extra) {
                 for (MediaPlayerCallback callback : callbacks){
-                    callback.onError();
+                    callback.onMediaPlayerError();
                 }
-                Log.e(TAG, "Error getting URL");
+                Log.e(TAG, "Error with URL");
                 return false;
             }
         });
@@ -60,6 +60,7 @@ public class MediaPlayerController {
             e.printStackTrace();
         }
     }
+
     public void startPlaying(){
         mediaPlayer.start();
         for (MediaPlayerCallback callback : callbacks){
@@ -73,6 +74,6 @@ public class MediaPlayerController {
 
     public interface MediaPlayerCallback{
         void onPlayingChanged(boolean isPlaying);
-        void onError();
+        void onMediaPlayerError();
     }
 }

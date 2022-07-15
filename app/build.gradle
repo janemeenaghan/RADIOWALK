@@ -52,4 +52,5 @@ dependencies {
     implementation 'org.parceler:parceler-api:1.1.12'
     annotationProcessor 'org.parceler:parceler:1.1.12'
     implementation 'de.sfuhrm:radiobrowser4j:2.2.3';
+    implementation 'uk.co.chrisjenx:calligraphy:2.3.0'
 }

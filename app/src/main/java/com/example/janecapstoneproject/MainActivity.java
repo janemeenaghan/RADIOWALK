@@ -331,12 +331,12 @@ public class MainActivity extends AppCompatActivity implements OnMapReadyCallbac
                 globalMap.addMarker(new MarkerOptions()
                         .position(station.getCoords())
                         .title(station.getName())
-                        .icon(BitmapDescriptorFactory.fromResource(R.drawable.threedredstation)));
+                        .icon(BitmapDescriptorFactory.fromResource(R.drawable.newiconred)));
             } else {
                 globalMap.addMarker(new MarkerOptions()
                         .position(station.getCoords())
                         .title(station.getName())
-                        .icon(BitmapDescriptorFactory.fromResource(R.drawable.threedblackstation)));
+                        .icon(BitmapDescriptorFactory.fromResource(R.drawable.newiconblack)));
             }
             addCircle(station, station.getCoords());
             return;

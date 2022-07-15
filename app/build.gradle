@@ -4,17 +4,19 @@ plugins {
 
 android {
     compileSdk 32
-
+    packagingOptions {
+        exclude 'META-INF/NOTICE.md'
+        exclude 'META-INF/LICENSE.md'
+        exclude 'META-INF/NOTICE.markdown'
+    }
     defaultConfig {
         applicationId "com.example.janecapstoneproject"
         minSdk 21
         targetSdk 32
         versionCode 1
         versionName "1.0"
-
         testInstrumentationRunner "androidx.test.runner.AndroidJUnitRunner"
     }
-
     buildTypes {
         release {
             minifyEnabled false
@@ -49,6 +51,5 @@ dependencies {
     androidTestImplementation 'androidx.test.espresso:espresso-core:3.4.0'
     implementation 'org.parceler:parceler-api:1.1.12'
     annotationProcessor 'org.parceler:parceler:1.1.12'
-
-
+    implementation 'de.sfuhrm:radiobrowser4j:2.2.3';
 }

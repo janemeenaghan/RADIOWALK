@@ -19,3 +19,4 @@
 # If you keep the line number information, uncomment this to
 # hide the original source file name.
 #-renamesourcefileattribute SourceFile
+-keep class org.glassfish.hk2.utilities.** { *; } -keep class org.glassfish.jersey.** { *; } -keep class org.jvnet.hk2.internal.** { *; } -keep class de.sfuhrm.radiobrowser4j.** { *; }

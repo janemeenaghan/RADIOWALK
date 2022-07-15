@@ -40,11 +40,12 @@ import org.json.JSONException;
 import java.io.IOException;
 import java.util.List;
 
+
 public class MainActivity extends AppCompatActivity implements OnMapReadyCallback, VolumeController.VolumeCallback, LocationController.LocationCallback {
     private MapView mMapView;
     public FloatingActionButton addStationButton, logout;
     public int REQUEST_CODE = 1001;
-    public static final int DEFAULT_ZOOM = 20;
+    public static final int DEFAULT_ZOOM = 15;
     public static final int PUBLIC_TYPE = 0;
     public static final int PRIVATE_TYPE = 1;
     public static final double STATION_RADIUS_METERS = 20;
@@ -58,6 +59,7 @@ public class MainActivity extends AppCompatActivity implements OnMapReadyCallbac
     GoogleMap globalMap;
     SeekBar volControl;
     MediaPlayerController mediaPlayerController;
+    Station previousStation;
     Location globalLocation;
     Uri myUri;
     @RequiresApi(api = Build.VERSION_CODES.M)
@@ -324,10 +326,14 @@ public class MainActivity extends AppCompatActivity implements OnMapReadyCallbac
         //TODO: fail*/
     }
     public void handleValidNearestStation(Station station){
-        addStationButton.setVisibility(View.INVISIBLE);
-        setNowPlayingText("Now Playing: "+station.getName());
-        if(!station.getStreamLink().isEmpty()) {
-            mediaPlayerController.setURLAndPrepare(station.getStreamLink());
+        if (!station.equals(previousStation)) {
+            addStationButton.setVisibility(View.INVISIBLE);
+            setNowPlayingText("Now Playing: " + station.getName());
+            if (!station.getStreamLink().isEmpty()) {
+                mediaPlayerController.setURLAndPrepare(station.getStreamLink());
+            }
+            previousStation = station;
+            //TODO: fix this so that stations still update while on the same one (in case the radio link changes)
         }
     }
     public void handleNoNearbyStation(Location location){
@@ -337,11 +343,20 @@ public class MainActivity extends AppCompatActivity implements OnMapReadyCallbac
         //TODO: other stuff probably
     }
     public void addCircle(Station station, LatLng coords){
-        globalMap.addCircle(new CircleOptions()
-                .center(coords)
-                .radius(STATION_RADIUS_METERS)
-                .strokeColor(Color.RED)
-                .fillColor(Color.BLUE));
+        if (station.isPublic()) {
+            globalMap.addCircle(new CircleOptions()
+                    .center(coords)
+                    .radius(STATION_RADIUS_METERS)
+                    .strokeColor(Color.RED)
+                    .fillColor(Color.TRANSPARENT).strokeWidth(5.0F));
+        }
+        else{
+            globalMap.addCircle(new CircleOptions()
+                    .center(coords)
+                    .radius(STATION_RADIUS_METERS)
+                    .strokeColor(Color.BLACK)
+                    .fillColor(Color.TRANSPARENT));
+        }
     }
     public void addStation(String name, boolean type, LatLng coords, ParseUser user, String streamLink){
         try {
@@ -404,6 +419,7 @@ public class MainActivity extends AppCompatActivity implements OnMapReadyCallbac
                         //TODO: fix if statement if needed
                         if (!globalLocation.equals(null)) {
                             addStation(name, typeBoolean, new LatLng(globalLocation.getLatitude(), globalLocation.getLongitude()), ParseUser.getCurrentUser(), streamLink);
+                            locationController.retrieveLocation(MainActivity.this);
                         }
                     }
                 });

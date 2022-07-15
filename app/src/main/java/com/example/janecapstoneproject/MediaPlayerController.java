@@ -15,20 +15,6 @@ public class MediaPlayerController {
 
     public MediaPlayerController(Context context){
         this.context = context;
-        mediaPlayer = new MediaPlayer();
-        mediaPlayer.setAudioStreamType(AudioManager.STREAM_MUSIC);
-        // If breaks, try Context.AUDIO_SERVICE or context.AUDIO_SERVICE here instead of just AUDIO_SERVICE
-        mediaPlayer.setOnPreparedListener(mp -> startPlaying());
-        mediaPlayer.setOnErrorListener(new MediaPlayer.OnErrorListener() {
-            @Override
-            public boolean onError(MediaPlayer mp, int what, int extra) {
-                for (MediaPlayerCallback callback : callbacks){
-                    callback.onMediaPlayerError();
-                }
-                Log.e(TAG, "Error with URL");
-                return false;
-            }
-        });
     }
 
     public void registerCallback(MediaPlayerCallback mediaPlayerCallback){
@@ -45,8 +31,14 @@ public class MediaPlayerController {
 
     public void setURLAndPrepare(String uriString) {
         try {
-            mediaPlayer.setDataSource(context, Uri.parse(uriString));
-            mediaPlayer.prepareAsync();
+            Log.e("EEJ",uriString);
+            Log.e("EEJ2",""+context);
+            if (mediaPlayer != null) {
+                mediaPlayer.stop();
+                mediaPlayer.reset();
+                mediaPlayer.release();
+            }
+            initNewMediaPlayer(context, uriString);
         } catch (IOException e) {
             e.printStackTrace();
         }
@@ -75,5 +67,24 @@ public class MediaPlayerController {
     public interface MediaPlayerCallback{
         void onPlayingChanged(boolean isPlaying);
         void onMediaPlayerError();
+    }
+
+    private void initNewMediaPlayer(Context context, String uriString) throws IOException {
+        mediaPlayer = new MediaPlayer();
+        mediaPlayer.setAudioStreamType(AudioManager.STREAM_MUSIC);
+        // If breaks, try Context.AUDIO_SERVICE or context.AUDIO_SERVICE here instead of just AUDIO_SERVICE
+        mediaPlayer.setOnPreparedListener(mp -> startPlaying());
+        mediaPlayer.setOnErrorListener(new MediaPlayer.OnErrorListener() {
+            @Override
+            public boolean onError(MediaPlayer mp, int what, int extra) {
+                for (MediaPlayerCallback callback : callbacks){
+                    callback.onMediaPlayerError();
+                }
+                Log.e(TAG, "Error with URL");
+                return false;
+            }
+        });
+        mediaPlayer.setDataSource(context, Uri.parse(uriString));
+        mediaPlayer.prepareAsync();
     }
 }

@@ -1,0 +1,24 @@
+<?xml version="1.0" encoding="utf-8"?>
+<menu xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto">
+
+    <group
+        android:id="@+id/tb_group_main">
+
+
+        <item
+            android:id="@+id/tb_theme"
+            android:icon="@drawable/daythemeicon_white"
+            android:title="Change Theme"
+            app:showAsAction="always" />
+
+    </group>
+
+    <item
+        android:id="@+id/tb_signout"
+        android:icon="@drawable/ic_signout_white"
+        android:title="Log Out"
+        app:showAsAction="always" />
+
+
+</menu>

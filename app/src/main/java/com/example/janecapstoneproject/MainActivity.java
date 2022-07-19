@@ -1,24 +1,33 @@
 package com.example.janecapstoneproject;
+import static com.example.janecapstoneproject.Station.KEY_USERSSHAREDSTATIONS;
 import androidx.annotation.NonNull;
+import androidx.annotation.Nullable;
 import androidx.annotation.RequiresApi;
 import androidx.appcompat.app.AlertDialog;
 import androidx.appcompat.app.AppCompatActivity;
+import androidx.appcompat.content.res.AppCompatResources;
+import androidx.appcompat.widget.Toolbar;
 import com.google.android.gms.maps.model.CircleOptions;
 import android.annotation.SuppressLint;
+import android.content.Context;
+import android.content.res.Resources;
 import android.graphics.Color;
 import android.content.DialogInterface;
 import android.content.Intent;
 import android.content.pm.PackageManager;
+import android.graphics.drawable.Drawable;
 import android.location.Location;
-import android.net.Uri;
+import android.os.AsyncTask;
 import android.os.Build;
 import android.os.Bundle;
 import android.util.Log;
 import android.view.LayoutInflater;
+import android.view.Menu;
+import android.view.MenuItem;
 import android.view.View;
+import android.widget.Button;
 import android.widget.EditText;
-import android.widget.SeekBar;
-import android.widget.Switch;
+import android.widget.ImageView;
 import android.widget.TextView;
 import android.widget.Toast;
 import com.google.android.gms.maps.CameraUpdateFactory;
@@ -28,52 +37,89 @@ import com.google.android.gms.maps.OnMapReadyCallback;
 import com.google.android.gms.maps.model.BitmapDescriptor;
 import com.google.android.gms.maps.model.BitmapDescriptorFactory;
 import com.google.android.gms.maps.model.LatLng;
+import com.google.android.gms.maps.model.MapStyleOptions;
 import com.google.android.gms.maps.model.MarkerOptions;
-import com.google.android.material.floatingactionbutton.FloatingActionButton;
 import com.parse.FindCallback;
 import com.parse.ParseException;
 import com.parse.ParseGeoPoint;
 import com.parse.ParseQuery;
 import com.parse.ParseUser;
-import com.parse.SaveCallback;
-import org.json.JSONException;
-import java.io.IOException;
-import java.util.List;
+import com.rey.material.app.ThemeManager;
+import com.rey.material.app.ToolbarManager;
+import com.rey.material.drawable.ThemeDrawable;
+import com.rey.material.util.ViewUtil;
+import com.rey.material.widget.Slider;
+import com.squareup.picasso.Callback;
+import com.squareup.picasso.Picasso;
 
+import org.json.JSONArray;
+import org.json.JSONException;
+import org.parceler.Parcels;
+
+import java.io.IOException;
+import java.net.InetAddress;
+import java.net.UnknownHostException;
+import java.util.List;
+import java.util.Vector;
+
+import de.sfuhrm.radiobrowser4j.RadioBrowser;
 
 public class MainActivity extends AppCompatActivity implements OnMapReadyCallback, VolumeController.VolumeCallback, LocationController.LocationCallback {
     private MapView mMapView;
-    public FloatingActionButton addStationButton, logout;
+    public com.rey.material.widget.FloatingActionButton addStationButton;
     public int REQUEST_CODE = 1001;
+    public static final int PUBLIC_CIRCLE_RGB = Color.rgb(0,233,255);
+    public static final int PRIVATE_CIRCLE_RGB = Color.rgb(255,0,233);
+    public static final int CURRENT_CIRCLE_RGB = Color.rgb(0,255,22);
+    public static final int PUBLIC_MARKER_COLOR = 0;
+    public static final int PRIVATE_MARKER_COLOR = 1;
+    public static final int CURRENT_MARKER_COLOR = 2;
     public static final int DEFAULT_ZOOM = 15;
     public static final int PUBLIC_TYPE = 0;
     public static final int PRIVATE_TYPE = 1;
-    public static final double STATION_RADIUS_METERS = 20;
-    public static final double STATION_RADIUS_KILOMETERS = STATION_RADIUS_METERS * .001;
+    public static final double STATION_INTERACTION_RADIUS_METERS = 80;
+    public static final double STATION_DETECTION_RADIUS_METERS = 300;
+    public static final double STATION_INTERACTION_RADIUS_KILOMETERS = STATION_INTERACTION_RADIUS_METERS * .001;
+    public static final double STATION_DETECTION_RADIUS_KILOMETERS = STATION_DETECTION_RADIUS_METERS * .001;
     public static final String KEY_GEOPOINT = "geopoint";
     public static final String TAG = "MainActivity";
     public static final String MAPVIEW_BUNDLE_KEY = "MapViewBundleKey";
-    public TextView nowPlayingText;
+    public ImageView musicIcon;
+    public TextView nowPlayingText,stationNameText;
     LocationController locationController;
     VolumeController volumeController;
     GoogleMap globalMap;
-    SeekBar volControl;
+    Drawable dayIcon, nightIcon;
+    Slider volControl;
     MediaPlayerController mediaPlayerController;
-    Station previousStation;
+    Station globalCurrentStation;
     Location globalLocation;
-    Uri myUri;
+    private Toolbar mToolbar;
+    private ToolbarManager mToolbarManager;
+    Menu toolbarMenu;
+    Button button1, button2, button3;
+    int whichButton;
+    public static final int LIMIT_DEFAULT = 64;
+    public static final int TIMEOUT_DEFAULT = 5000;
+    RadioBrowser browser;
+    String[] DNSlist;
+
     @RequiresApi(api = Build.VERSION_CODES.M)
     @Override
     protected void onCreate(Bundle savedInstanceState) {
+        updateDnsListToPrepareBaseURL();
+        //Places.initialize(getApplicationContext(), "AIzaSyBlTDb5XGjtYo647vgQ-RwRfSVdxyX4hVc");
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
+        //updateDnsListToPrepareBaseURL();
+        initDrawables();
+        initToolbar();
         initLocation();
         initMap(savedInstanceState);
-        initLogoutButton();
-        initStationButton();
+        initStationButton(ParseUser.getCurrentUser(), this);
         initVolume();
         initMediaPlayer();
-        initNowPlayingText();
+        initSlidingPanelElements();
     }
 
     //LIFECYCLE EVENTS
@@ -88,109 +134,197 @@ public class MainActivity extends AppCompatActivity implements OnMapReadyCallbac
         }
         mMapView.onSaveInstanceState(mapViewBundle);
     }
+
     @Override
     protected void onResume() {
         super.onResume();
         mMapView.onResume();
     }
+
     @Override
     protected void onStart() {
         super.onStart();
         mMapView.onStart();
     }
+
     @Override
     protected void onStop() {
         super.onStop();
         mMapView.onStop();
         locationController.stopLiveUpdates();
     }
+
     @Override
     protected void onPause() {
         mMapView.onPause();
         super.onPause();
     }
+
     @Override
     protected void onDestroy() {
         mMapView.onDestroy();
         super.onDestroy();
     }
+
     @Override
     public void onLowMemory() {
         super.onLowMemory();
         mMapView.onLowMemory();
     }
 
+
+    //DRAWABLE CODE
+    public void initDrawables() {
+        dayIcon = AppCompatResources.getDrawable(this, R.drawable.daythemeicon_white);
+        nightIcon = AppCompatResources.getDrawable(this, R.drawable.nightthemeicon_white);
+    }
+
+    //TOOLBAR CODE
+    public void initToolbar() {
+        mToolbar = findViewById(R.id.main_toolbar);
+        mToolbarManager = new ToolbarManager(getDelegate(), mToolbar, R.id.tb_group_main, R.style.ToolbarRippleStyle, R.anim.abc_fade_in, R.anim.abc_fade_out);
+        ViewUtil.setBackground(getWindow().getDecorView(), new ThemeDrawable(R.array.bg_window));
+        ViewUtil.setBackground(mToolbar, new ThemeDrawable(R.array.bg_toolbar));
+
+    }
+    @Override
+    public boolean onCreateOptionsMenu(Menu menu) {
+        mToolbarManager.createMenu(R.menu.menu_main);
+        toolbarMenu = menu;
+        retrieveCurrentTheme();
+        return true;
+    }
+    @Override
+    public boolean onPrepareOptionsMenu(Menu menu) {
+        //mToolbarManager.onPrepareMenu();
+        return super.onPrepareOptionsMenu(menu);
+    }
+    @Override
+    public boolean onOptionsItemSelected(MenuItem item) {
+        switch (item.getItemId()) {
+            case R.id.tb_signout:
+                logoutUser();
+                break;
+            case R.id.tb_theme:
+                rotateTheme();
+                break;
+        }
+        return true;
+    }
+    private void updateThemeButtonIcon(int theme) {
+        if (theme == 0) {
+            toolbarMenu.getItem(0).setIcon(dayIcon);
+        } else if (theme == 1) {
+            toolbarMenu.getItem(0).setIcon(nightIcon);
+        }
+    }
+
+
+    //SLIDING PANEL ELEMENTS
+    public void initSlidingPanelElements(){
+        initNowPlayingText();
+        initStationNameText();
+        initMusicIcon();
+    }
+    public void setSlidingPanelElements(Context context, String favicon,String name, String streamName){
+        setMusicIcon(context, favicon);
+        setStationNameText(name);
+        setNowPlayingText(streamName);
+    }
+    //MUSIC ICON CODE
+    private void initMusicIcon(){
+        musicIcon = findViewById(R.id.musicIcon);
+        musicIcon.setVisibility(View.INVISIBLE);
+    }
+    private String currentFavicon;
+    private void setMusicIcon(Context context, String favicon){
+        if (favicon != null && !favicon.trim().isEmpty() && !favicon.equals(currentFavicon)){
+            Picasso.with(context).load(favicon).placeholder((R.drawable.ic_launcher_background)).error(R.drawable.ic_launcher_background).into(musicIcon, new Callback() {
+                @Override
+                public void onSuccess() {
+                    musicIcon.setVisibility(View.VISIBLE);
+                    currentFavicon = favicon;
+                }
+
+                @Override
+                public void onError() {
+                    Log.e(TAG, "Error loading favicon into musicIcon with Picasso");
+                }
+            });
+            musicIcon.setVisibility(View.VISIBLE);
+        }
+        else {
+            musicIcon.setVisibility(View.INVISIBLE);
+        }
+    }
+    //STATION NAME TEXT CODE
+    private void initStationNameText(){
+        stationNameText = findViewById(R.id.stationNameText);
+    }
+    private String currentStationName;
+    private void setStationNameText(String stationName){
+        if (stationName != null && !stationName.trim().isEmpty() && !stationName.equals(currentStationName)) {
+            stationNameText.setText(stationName + ":");
+            currentStationName = stationName;
+        }
+    }
     //NOW PLAYING TEXT CODE
-    public void initNowPlayingText(){
+    private void initNowPlayingText() {
         nowPlayingText = findViewById(R.id.nowPlayingText);
     }
-    public void setNowPlayingText(String text){
-        nowPlayingText.setText(text);
+    private String currentNowPlayingText;
+    private void setNowPlayingText(String nowPlayingText) {
+        if (nowPlayingText!=null && !nowPlayingText.trim().isEmpty() && !nowPlayingText.equals(currentNowPlayingText)) {
+            this.nowPlayingText.setText(nowPlayingText);
+            currentNowPlayingText = nowPlayingText;
+        }
     }
 
     //MEDIA CONTROLLER
-    private void initMediaPlayer(){
+    private void initMediaPlayer() {
         mediaPlayerController = new MediaPlayerController(this);
     }
 
     //VOLUME CONTROLLER
-    private void initVolume(){
-        volControl = (SeekBar)findViewById(R.id.volumebar);
+    private void initVolume() {
+        volControl = (Slider) findViewById(R.id.volumebar);
         volumeController = new VolumeController(this, this);
-        volControl.setOnSeekBarChangeListener(new SeekBar.OnSeekBarChangeListener() {
+        volControl.setOnPositionChangeListener(new Slider.OnPositionChangeListener() {
             @Override
-            public void onProgressChanged(SeekBar arg0, int arg1, boolean arg2) {
+            public void onPositionChanged(Slider view, boolean fromUser, float oldPos, float newPos, int oldValue, int newValue) {
                 // TODO Auto-generated method stub
-                volumeController.setVolume(arg1);
+                volumeController.setVolume(newValue);
             }
-            @Override
-            public void onStartTrackingTouch(SeekBar seekBar) {}
-            @Override
-            public void onStopTrackingTouch(SeekBar seekBar) {}
         });
     }
+
     @Override
     public void onVolumeChanged(int volume) {
-        volControl.setProgress(volume);
+        volControl.setValue(volume, true);
     }
+
     @Override
     public void onMaxVolumeChanged(int maxVolume) {
-        volControl.setMax(maxVolume);
+        volControl.setValueRange(0, maxVolume, false);
     }
 
     //LOGOUT CODE
-    public void initLogoutButton(){
-        logout = findViewById(R.id.logoutButton);
-        logout.setOnClickListener(v -> {
-            Log.i(TAG, "onClick logout button");
-            logoutUser();
-        });
-    }
     private void logoutUser() {
         ParseUser.logOut();
         ParseUser currentUser = ParseUser.getCurrentUser(); // this will now be null
         Toast.makeText(MainActivity.this, "Success!", Toast.LENGTH_SHORT);
+        onStop();
         Intent i = new Intent(MainActivity.this, LoginActivity.class);
         startActivity(i);
         finish();
     }
 
     //LOCATION CONTROLLER
-    private void initLocation(){
+    private void initLocation() {
         locationController = new LocationController(this);
         locationController.registerCallback(this);
     }
-    //I think I no longer need this, commenting in case I change mind though
-    /*@RequiresApi(api = Build.VERSION_CODES.M)
-    private void requestLocation() {
-        if (!locationController.checkForLocationPermission(this)) {
-            locationController.requestPermission(this);
-            return;
-        }
-        else{
-            locationController.retrieveLocation();
-        }
-    }*/
+
     @Override
     public void onRequestPermissionsResult(int requestCode, @NonNull String[] permissions, @NonNull int[] grantResults) {
         super.onRequestPermissionsResult(requestCode, permissions, grantResults);
@@ -206,16 +340,18 @@ public class MainActivity extends AppCompatActivity implements OnMapReadyCallbac
         }
         locationController.requestPermission(this);
     }
+
     @Override
     public void onPermissionsNeeded() {
         //TODO: spam user
         locationController.requestPermission(this);
     }
+
     @SuppressLint("MissingPermission")
     @Override
     public void onLocationResult(Location location) throws IOException {
         globalLocation = location;
-        //maps, update stations
+        //maps, update stationRecycler
         if (globalMap != null) {
             globalMap.setMyLocationEnabled(true);
             globalMap.getUiSettings().setMyLocationButtonEnabled(true);
@@ -223,15 +359,12 @@ public class MainActivity extends AppCompatActivity implements OnMapReadyCallbac
                     new LatLng(location.getLatitude(),
                             location.getLongitude()), DEFAULT_ZOOM));
         }
-        renderNearbyStations(location);
-        //TODO: something about if there is a nearby station (playing its stream link, greying out button)
-        //         //only visible when there is no nearby station - hide when not
-        //
-        //
+        //this might be the wrong context
+        renderNearbyStations(MainActivity.this, location);
     }
 
-    //MAP CODE
-    public void initMap(Bundle savedInstanceState){
+    //MAP CODE (TODO: refactor through a controller if time permits)
+    public void initMap(Bundle savedInstanceState) {
         Bundle mapViewBundle = null;
         if (savedInstanceState != null) {
             mapViewBundle = savedInstanceState.getBundle(MAPVIEW_BUNDLE_KEY);
@@ -240,31 +373,57 @@ public class MainActivity extends AppCompatActivity implements OnMapReadyCallbac
         mMapView.onCreate(mapViewBundle);
         mMapView.getMapAsync(this);
     }
+
     @RequiresApi(api = Build.VERSION_CODES.M)
     @Override
     public void onMapReady(GoogleMap map) {
         globalMap = map;
         locationController.retrieveLocation(this);
         locationController.startLiveUpdates(this);
-        //map.addMarker(new MarkerOptions().position(new LatLng(0, 0)).title("Marker"));
     }
 
-    //STATION CODE
-    public void initStationButton(){
+    public void updateMapStyle(int themeNumber) {
+        try {
+            // Customise the styling of the base map using a JSON object defined
+            // in a raw resource file.
+            boolean success;
+            if (themeNumber == 0) {
+                success = globalMap.setMapStyle(
+                        MapStyleOptions.loadRawResourceStyle(
+                                this, R.raw.map_day_theme_json));
+            } else {
+                success = globalMap.setMapStyle(
+                        MapStyleOptions.loadRawResourceStyle(
+                                this, R.raw.map_night_theme_json));
+            }
+            if (!success) {
+                Log.e(TAG, "Style parsing failed.");
+            }
+        } catch (Resources.NotFoundException e) {
+            Log.e(TAG, "Can't find style. Error: ", e);
+        }
+    }
+
+    //STATION CODE (TODO: refactor through a controller if time permits)
+    public void initStationButton(ParseUser user, Context context) {
         addStationButton = findViewById(R.id.createButton);
         addStationButton.setVisibility(View.INVISIBLE);
         addStationButton.setOnClickListener(v -> {
-            showAlertDialogForPoint();
+            addStationButton.setLineMorphingState((addStationButton.getLineMorphingState() + 1) % 2, true);
+            showAlertDialogForPoint(new LatLng(globalLocation.getLatitude(), globalLocation.getLongitude()),user, context);
         });
     }
+
     Station nearestStation;
     float shortestDistance;
-    private void renderNearbyStations(Location location) throws IOException {
+
+    private void renderNearbyStations(Context context, Location location) throws IOException {
+        ParseUser user = ParseUser.getCurrentUser();
         // specify what type of data we want to query - Station.class
         ParseQuery<Station> query = ParseQuery.getQuery(Station.class);
-        query.setLimit(20);
+        //query.setLimit(20);
         //query.whereWithinKilometers(KEY_GEOPOINT,new ParseGeoPoint(location.getLatitude(),location.getLongitude()), STATION_RADIUS_KILOMETERS, true);
-        query.whereWithinKilometers(KEY_GEOPOINT,new ParseGeoPoint(location.getLatitude(),location.getLongitude()), STATION_RADIUS_KILOMETERS);
+        query.whereWithinKilometers(KEY_GEOPOINT, new ParseGeoPoint(location.getLatitude(), location.getLongitude()), STATION_DETECTION_RADIUS_KILOMETERS);
         // start an asynchronous call for posts
         nearestStation = null;
         shortestDistance = Integer.MAX_VALUE;
@@ -272,132 +431,206 @@ public class MainActivity extends AppCompatActivity implements OnMapReadyCallbac
             @Override
             public void done(List<Station> stations, ParseException e) {
                 if (e != null) {
-                    Log.e(TAG, "Issue with getting stations", e);
+                    Log.e(TAG, "Issue with getting stationRecycler", e);
                     return;
                 }
-                for (Station station : stations){
-                    renderStation(station);
-                    float[] result = new float[1];
-                    android.location.Location.distanceBetween(location.getLatitude(),location.getLongitude(),station.getLatitude(),station.getLongitude(),result);
-                    if (result != null) {
-                        if (result[0] <= shortestDistance){
-                            shortestDistance = result[0];
-                            nearestStation = station;
+                for (Station station : stations) {
+                    boolean includeStation = false;
+                    if (station.isPublic()) {
+                        includeStation = true;
+                    } else {
+                        String objId = station.getObjectId();
+                        JSONArray array = user.getJSONArray(KEY_USERSSHAREDSTATIONS);
+                        if (array != null) {
+                            for (int i = 0; i < array.length(); i++) {
+                                try {
+                                    if (objId.equals(array.get(i))) {
+                                        includeStation = true;
+                                    }
+                                } catch (JSONException ex) {
+                                    ex.printStackTrace();
+                                }
+                            }
                         }
                     }
-                    else{
-                        Log.e(TAG, "Result is null", e);
+                    if (includeStation) {
+                        if ((globalCurrentStation == null || !station.getObjectId().equals(globalCurrentStation.getObjectId()))){
+                            renderStation(station);
+                        }
+                        float[] result = new float[1];
+                        android.location.Location.distanceBetween(location.getLatitude(), location.getLongitude(), station.getLatitude(), station.getLongitude(), result);
+                        //might crash here check if it's null before but I think I've been doing that wrong
+                        if (result[0] <= shortestDistance) {
+                            shortestDistance = result[0];
+                            nearestStation = station;
+                        } else {
+                            Log.e(TAG, "Result is null", e);
+                        }
                     }
                 }
-                if (nearestStation!=null) {
+                if (nearestStation != null) {
                     Log.d(TAG, "nearest station: " + nearestStation.getName());
-                    if (shortestDistance <= 20) {
-                        handleValidNearestStation(nearestStation);
+                    if (shortestDistance <= STATION_INTERACTION_RADIUS_METERS) {
+                        handleCaseValidNearestStation(context,nearestStation);
                         return;
-                    }
-                    else{
+                    } else {
                         Log.d(TAG, "Nearest station is too far!");
+                        handleCaseNoNearbyStation(location);
                     }
-                }
-                else{
+                } else {
                     Log.e(TAG, "Nearest station is null", e);
+                    handleCaseNoNearbyStation(location);
                 }
-                handleNoNearbyStation(location);
             }
         });
     }
-    public void renderStation(Station station){
+
+    public void renderStation(Station station) {
         Log.d(TAG, station.getName());
         if (station != null && station.getCoords() != null) {
             if (station.isPublic()) {
-                globalMap.addMarker(new MarkerOptions()
+                station.setMarker(globalMap.addMarker(new MarkerOptions()
                         .position(station.getCoords())
                         .title(station.getName())
-                        .icon(BitmapDescriptorFactory.fromResource(R.drawable.threedredstation)));
+                        .icon(BitmapDescriptorFactory.fromResource(R.drawable.broadcastcyan))));
             } else {
-                globalMap.addMarker(new MarkerOptions()
+                station.setMarker(globalMap.addMarker(new MarkerOptions()
                         .position(station.getCoords())
                         .title(station.getName())
-                        .icon(BitmapDescriptorFactory.fromResource(R.drawable.threedblackstation)));
+                        .icon(BitmapDescriptorFactory.fromResource(R.drawable.broadcastpurple))));
             }
-            addCircle(station, station.getCoords());
+            addCircle(station, station.getCoords(),false);
             return;
         }
-        //TODO: fail*/
+        //TODO: fail
     }
-    public void handleValidNearestStation(Station station){
-        if (!station.equals(previousStation)) {
-            addStationButton.setVisibility(View.INVISIBLE);
-            setNowPlayingText("Now Playing: " + station.getName());
-            if (!station.getStreamLink().isEmpty()) {
-                mediaPlayerController.setURLAndPrepare(station.getStreamLink());
-            }
-            previousStation = station;
-            //TODO: fix this so that stations still update while on the same one (in case the radio link changes)
+    public void renderClosestStation(Context context, Station station){
+        if (station.getMarker() == null){
+            station.setMarker(globalMap.addMarker(new MarkerOptions()
+                    .position(station.getCoords())
+                    .title(station.getName())
+                    .icon(BitmapDescriptorFactory.fromResource(R.drawable.broadcastgreen))));
         }
+        else {
+            station.setMarkerColor(CURRENT_MARKER_COLOR);
+        }
+        if(station.getCircle() == null){
+            addCircle(station,station.getCoords(),true);
+        }
+        else {
+            station.setCircleColor(CURRENT_CIRCLE_RGB);
+        }
+        setSlidingPanelElements(context, station.getFavicon(), station.getName(), station.getStreamName());
+        if (!station.getStreamLink().isEmpty()) {
+            mediaPlayerController.setURLAndPrepare(station.getStreamLink());
+        }
+        globalCurrentStation = station;
     }
-    public void handleNoNearbyStation(Location location){
+    public void handleCaseValidNearestStation(Context context, Station station) {
+        if (globalCurrentStation != null && !station.getObjectId().equals(globalCurrentStation.getObjectId())) {
+            renderStation(globalCurrentStation);
+        }
+        addStationButton.setVisibility(View.INVISIBLE);
+        renderClosestStation(context, station);
+    }
+    public void handleCaseNoNearbyStation(Location location) {
         setNowPlayingText("No nearby station detected");
         addStationButton.setVisibility(View.VISIBLE);
+    }
+    public void addCircle(Station station, LatLng coords, boolean current) {
+        if (current){
+            station.setCircle(globalMap.addCircle(new CircleOptions()
+                    .center(coords)
+                    .radius(STATION_INTERACTION_RADIUS_METERS)
+                    .strokeColor(CURRENT_CIRCLE_RGB)
+                    .fillColor(Color.TRANSPARENT).strokeWidth(5.0F)));
+        }
+        else {
+            if (station.isPublic()) {
+                station.setCircle(globalMap.addCircle(new CircleOptions()
+                        .center(coords)
+                        .radius(STATION_INTERACTION_RADIUS_METERS)
+                        .strokeColor(PUBLIC_CIRCLE_RGB)
+                        .fillColor(Color.TRANSPARENT).strokeWidth(5.0F)));
+            } else {
+                station.setCircle(globalMap.addCircle(new CircleOptions()
+                        .center(coords)
+                        .radius(STATION_INTERACTION_RADIUS_METERS)
+                        .strokeColor(PRIVATE_CIRCLE_RGB)
+                        .fillColor(Color.TRANSPARENT).strokeWidth(5.0F)));
+            }
+        }
+    }
 
-        //TODO: other stuff probably
-    }
-    public void addCircle(Station station, LatLng coords){
-        if (station.isPublic()) {
-            globalMap.addCircle(new CircleOptions()
-                    .center(coords)
-                    .radius(STATION_RADIUS_METERS)
-                    .strokeColor(Color.RED)
-                    .fillColor(Color.TRANSPARENT).strokeWidth(5.0F));
-        }
-        else{
-            globalMap.addCircle(new CircleOptions()
-                    .center(coords)
-                    .radius(STATION_RADIUS_METERS)
-                    .strokeColor(Color.BLACK)
-                    .fillColor(Color.TRANSPARENT));
-        }
-    }
-    public void addStation(String name, boolean type, LatLng coords, ParseUser user, String streamLink){
+    public void addStation(String name, int type, LatLng coords, ParseUser user, String streamLink, String streamName, String favicon, Context context) {
         try {
-            saveStation(name, type, coords, user, streamLink);
+            saveStation(name, type, coords, user, streamLink, streamName, favicon, context);
         } catch (JSONException e) {
             e.printStackTrace();
         }
     }
-    private void saveStation(String name, boolean type, LatLng coords, ParseUser user, String streamLink) throws JSONException {
+
+    private void saveStation(String name, int type, LatLng coords, ParseUser user, String streamLink, String streamName, String favicon, Context context) throws JSONException {
         Station station = new Station();
         station.setName(name);
         station.setGeoPoint(coords);
         station.setStreamLink(streamLink);
-        if (type){
+        station.setStreamName(streamName);
+        station.setFavicon(favicon);
+        if (type == PRIVATE_TYPE) {
             station.setType(PRIVATE_TYPE);
             station.setUser(user);
-        }
-        else{
+            station.addUserToSharedList(user);
+        } else {
             station.setType(PUBLIC_TYPE);
         }
-        station.saveInBackground(new SaveCallback() {
-            @Override
-            public void done(ParseException e) {
-                if (e != null) {
-                    Log.e(TAG, "Error while saving", e);
-                    Toast.makeText(MainActivity.this, "Error while saving", Toast.LENGTH_SHORT).show();
-                    return;
+        station.saveInBackground(e -> {
+            if (type == PRIVATE_TYPE) {
+                try {
+                    station.addThisToUsersSharedList(user);
+                    user.saveInBackground();
+                } catch (JSONException ex) {
+                    ex.printStackTrace();
                 }
-                Log.i(TAG, "Station save was successful!!");
             }
+            if (e != null) {
+                Log.e(TAG, "Error while saving", e);
+                Toast.makeText(MainActivity.this, "Error while saving", Toast.LENGTH_SHORT).show();
+                return;
+            }
+            Log.i(TAG, "Station save was successful!!");
+            locationController.retrieveLocation(context);
         });
     }
-    private void showAlertDialogForPoint() {
+
+    private void addStationToAUsersSharedList(Station station, ParseUser user) {
+        try {
+            station.addThisToUsersSharedList(user);
+            station.saveInBackground();
+        } catch (JSONException ex) {
+            ex.printStackTrace();
+        }
+    }
+
+    private void addUserToAStationsSharedList(Station station, ParseUser user) {
+        try {
+            station.addUserToSharedList(user);
+            user.saveInBackground();
+        } catch (JSONException ex) {
+            ex.printStackTrace();
+        }
+    }
+
+    public void shareStationWithUser(Station station, ParseUser user) {
+        addStationToAUsersSharedList(station, user);
+        addUserToAStationsSharedList(station, user);
+    }
+    private void showAlertDialogForPoint(LatLng latLng, ParseUser user, Context context) {
         // inflate message_item.xml view
-        View  messageView = LayoutInflater.from(MainActivity.this).
+        View messageView = LayoutInflater.from(MainActivity.this).
                 inflate(R.layout.message_item, null);
-        // Create alert dialog builder
         AlertDialog.Builder alertDialogBuilder = new AlertDialog.Builder(this);
-        // set message_item.xml to AlertDialog builder
         alertDialogBuilder.setView(messageView);
-        // Create alert dialog
         final AlertDialog alertDialog = alertDialogBuilder.create();
         // Configure dialog button (OK)
         alertDialog.setButton(DialogInterface.BUTTON_POSITIVE, "OK",
@@ -410,25 +643,99 @@ public class MainActivity extends AppCompatActivity implements OnMapReadyCallbac
                         // Extract content from alert dialog
                         String name = ((EditText) alertDialog.findViewById(R.id.etTitle)).
                                 getText().toString();
-                        String streamLink = ((EditText) alertDialog.findViewById(R.id.etStreamLink)).
-                                getText().toString();
-                        boolean typeBoolean = ((Switch)(alertDialog.findViewById(R.id.typeSwitch))).isChecked();
-                        // Creates and adds marker to the map
-                        double lat = globalLocation.getLatitude();
-                        double lon = globalLocation.getLongitude();
-                        //TODO: fix if statement if needed
-                        if (!globalLocation.equals(null)) {
-                            addStation(name, typeBoolean, new LatLng(globalLocation.getLatitude(), globalLocation.getLongitude()), ParseUser.getCurrentUser(), streamLink);
-                            locationController.retrieveLocation(MainActivity.this);
-                        }
+                        launchBrowseStationsActivityForResult(name,latLng);
                     }
                 });
         // Configure dialog button (Cancel)
         alertDialog.setButton(DialogInterface.BUTTON_NEGATIVE, "Cancel",
                 new DialogInterface.OnClickListener() {
-                    public void onClick(DialogInterface dialog, int id) { dialog.cancel(); }
+                    public void onClick(DialogInterface dialog, int id) {
+                        dialog.cancel();
+                        addStationButton.setLineMorphingState((addStationButton.getLineMorphingState() + 1) % 2, true);
+                    }
                 });
         // Display the dialog
         alertDialog.show();
     }
+    private void launchBrowseStationsActivityForResult(String name, LatLng latLng){
+        Intent intent = new Intent(this, BrowseStationsActivity.class);
+        intent.putExtra("stationName",name);
+        intent.putExtra("new", 1);
+        intent.putExtra("latLng",Parcels.wrap(latLng));
+        startActivityForResult(intent, REQUEST_CODE);
+    }
+    @Override
+    protected void onActivityResult(int requestCode, int resultCode, @Nullable Intent data) {
+        super.onActivityResult(requestCode, resultCode, data);
+        Log.i(TAG, String.valueOf(requestCode));
+        Log.i(TAG, String.valueOf(resultCode));
+        if ((requestCode == REQUEST_CODE )&& (resultCode == RESULT_OK)){
+            String stationName = data.getStringExtra("stationName");
+            String streamLink = data.getStringExtra("url");
+            String streamName = data.getStringExtra("name");
+            String favicon = data.getStringExtra("favicon");
+            LatLng latLng = Parcels.unwrap(data.getParcelableExtra("latLng"));
+            int isNew = data.getIntExtra("new",2);
+            if (isNew == 1){
+                addStation(stationName, PRIVATE_TYPE, latLng, ParseUser.getCurrentUser(), streamLink, streamName, favicon, MainActivity.this);
+                locationController.retrieveLocation(MainActivity.this);
+            }
+            else if (isNew == 0){
+                globalCurrentStation.updateStationWithNewRadioToParse(streamLink, streamName, favicon);
+            }
+            else{
+                Log.e(TAG, "Retrieving new value != 0 or 1");
+            }
+        }
+    }
+
+    public void rotateTheme() {
+        int theme = (ThemeManager.getInstance().getCurrentTheme() + 1) % ThemeManager.getInstance().getThemeCount();
+        ThemeManager.getInstance().setCurrentTheme(theme);
+        updateMapStyle(theme);
+        updateThemeButtonIcon(theme);
+    }
+
+    public void retrieveCurrentTheme() {
+        int theme = (ThemeManager.getInstance().getCurrentTheme()) % ThemeManager.getInstance().getThemeCount();
+        ThemeManager.getInstance().setCurrentTheme(theme);
+        updateMapStyle(theme);
+        updateThemeButtonIcon(theme);
+    }
+
+    public int getCurrentTheme() {
+        return (ThemeManager.getInstance().getCurrentTheme()) % ThemeManager.getInstance().getThemeCount();
+    }
+    // or just use de1
+    void updateDnsListToPrepareBaseURL(){
+        // start a thread and do the DNS request
+        final AsyncTask<Void, Void, String[]> xxx = new AsyncTask<Void, Void, String[]>() {
+            @Override
+            protected String[] doInBackground(Void... params) {
+                Vector<String> listResult = new Vector<String>();
+                try {
+                    // add all round robin servers one by one to select them separately
+                    InetAddress[] list = InetAddress.getAllByName("all.api.radio-browser.info");
+                    for (InetAddress item : list) {
+                        listResult.add(item.getCanonicalHostName());
+                    }
+                } catch (UnknownHostException e) {
+                    e.printStackTrace();
+                }
+                return listResult.toArray(new String[0]);
+            }
+
+            @Override
+            protected void onPostExecute(String[] result) {
+                // do something with the result
+                super.onPostExecute(result);
+                DNSlist = result;
+                boolean contains = false;
+                for (String string : result){
+                    Log.d("browser",string);
+                }
+            }
+        }.execute();
+    }
+
 }

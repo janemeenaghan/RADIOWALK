@@ -1,8 +1,11 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
+    <dimen name="drawer_width">240dp</dimen>
+    <dimen name="drawer_text">20sp</dimen>
+    <dimen name="title_text">16sp</dimen>
+    <dimen name="bt_height">36dp</dimen>
     <dimen name="wrapperWidth">404dp</dimen>
     <dimen name="wrapperHeight">63dp</dimen>
     <dimen name="editTextWidth">327dp</dimen>
     <dimen name="editTextHeight">44dp</dimen>
-
 </resources>

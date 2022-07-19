@@ -1,5 +1,7 @@
 package com.example.janecapstoneproject;
 import androidx.appcompat.app.AppCompatActivity;
+
+import android.content.Context;
 import android.content.Intent;
 import android.os.Bundle;
 import android.util.Log;
@@ -36,6 +38,8 @@ public class LoginActivity extends AppCompatActivity {
                 loginUser(username, password);
             }
         });
+
+
         createAccount = findViewById(R.id.createAccount);
         createAccount.setOnClickListener(new View.OnClickListener() {
             @Override

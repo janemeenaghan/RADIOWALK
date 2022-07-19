@@ -6,6 +6,21 @@
     android:layout_width="match_parent"
     android:layout_height="match_parent"
     tools:context=".LoginActivity">
+
+    <androidx.constraintlayout.widget.Guideline
+        android:id="@+id/aboveIconGuidelineSignup"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:orientation="horizontal"
+        app:layout_constraintGuide_percent="0.08" />
+    <ImageView
+        android:id="@+id/iconImageViewSignup"
+        app:layout_constraintWidth_percent="0.25"
+        app:layout_constraintDimensionRatio="1:1"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toTopOf="@+id/aboveIconGuidelineSignup"
+        app:srcCompat="@drawable/launchicon"  android:layout_width="0dp" android:layout_height="0dp"/>
     <com.google.android.material.textfield.TextInputLayout
         android:id="@+id/tilWrapper1"
         android:layout_width="@dimen/wrapperWidth"
@@ -13,12 +28,13 @@
         android:layout_alignParentStart="true"
         android:layout_alignParentTop="true"
         android:layout_centerInParent="true"
-        android:layout_marginTop="168dp"
+        android:layout_marginTop="32dp"
         app:counterEnabled="false"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintHorizontal_bias="0.428"
         app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toTopOf="parent">
+        app:layout_constraintTop_toBottomOf="@+id/iconImageViewSignup">
+
         <EditText
             android:id="@+id/email"
             android:layout_width="@dimen/editTextWidth"
@@ -35,6 +51,7 @@
             app:layout_constraintStart_toStartOf="parent"
             app:layout_constraintTop_toTopOf="@+id/tilWrapper1" />
     </com.google.android.material.textfield.TextInputLayout>
+
     <com.google.android.material.textfield.TextInputLayout
         android:id="@+id/tilWrapper2"
         android:layout_width="@dimen/wrapperWidth"
@@ -76,6 +93,7 @@
         app:layout_constraintHorizontal_bias="0.428"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toBottomOf="@+id/tilWrapper2">
+
         <EditText
             android:id="@+id/password"
             android:layout_width="@dimen/editTextWidth"
@@ -84,7 +102,6 @@
             android:layout_marginTop="0dp"
             android:layout_weight="1"
             android:ems="10"
-            android:hint="Password"
             android:inputType="textPassword"
             android:textStyle="bold"
             app:layout_constraintEnd_toEndOf="parent"
@@ -92,6 +109,7 @@
             app:layout_constraintStart_toStartOf="parent"
             app:layout_constraintTop_toTopOf="@+id/tilWrapper3" />
     </com.google.android.material.textfield.TextInputLayout>
+
     <com.google.android.material.textfield.TextInputLayout
         android:id="@+id/tilWrapper4"
         android:layout_width="@dimen/wrapperWidth"
@@ -104,6 +122,7 @@
         app:layout_constraintHorizontal_bias="0.428"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toBottomOf="@+id/tilWrapper3">
+
         <EditText
             android:id="@+id/passwordConfirm"
             android:layout_width="@dimen/editTextWidth"
@@ -120,6 +139,7 @@
             app:layout_constraintStart_toStartOf="parent"
             app:layout_constraintTop_toTopOf="@+id/tilWrapper4" />
     </com.google.android.material.textfield.TextInputLayout>
+
     <Button
         android:id="@+id/signup"
         android:layout_width="316dp"
@@ -129,6 +149,6 @@
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintHorizontal_bias="0.494"
         app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toBottomOf="@+id/tilWrapper3"
-        app:layout_constraintVertical_bias="0.231" />
+        app:layout_constraintTop_toBottomOf="@+id/tilWrapper4"
+        app:layout_constraintVertical_bias="0.277" />
 </androidx.constraintlayout.widget.ConstraintLayout>

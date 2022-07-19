@@ -18,12 +18,15 @@
         <entry key="app/src/main/res/layout/activity_main2.xml" value="0.35052083333333334" />
         <entry key="app/src/main/res/layout/activity_signup.xml" value="0.5380126953125001" />
         <entry key="app/src/main/res/layout/fragment_user_list.xml" value="0.3494791666666667" />
+        <entry key="app/src/main/res/layout/instructions_item.xml" value="0.3806352820763218" />
         <entry key="app/src/main/res/layout/message_item.xml" value="0.2997039794921876" />
         <entry key="app/src/main/res/layout/message_item2.xml" value="0.34564102564102567" />
         <entry key="app/src/main/res/layout/message_item_old.xml" value="0.34564102564102567" />
         <entry key="app/src/main/res/layout/panel_contents.xml" value="0.35052083333333334" />
         <entry key="app/src/main/res/layout/station_option_item.xml" value="0.42667236328124997" />
+        <entry key="app/src/main/res/layout/tutorial_item.xml" value="0.3446153846153846" />
         <entry key="app/src/main/res/menu/menu_main.xml" value="0.2982940673828125" />
+        <entry key="app/src/main/res/mipmap-anydpi-v26/ic_launcher.xml" value="0.3515" />
         <entry key="app/src/main/res/mipmap-anydpi-v26/ic_launcher_round.xml" value="0.3525" />
       </map>
     </option>

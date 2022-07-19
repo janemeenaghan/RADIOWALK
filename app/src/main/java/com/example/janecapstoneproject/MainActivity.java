@@ -97,8 +97,6 @@ public class MainActivity extends AppCompatActivity implements OnMapReadyCallbac
     private Toolbar mToolbar;
     private ToolbarManager mToolbarManager;
     Menu toolbarMenu;
-    Button button1, button2, button3;
-    int whichButton;
     public static final int LIMIT_DEFAULT = 64;
     public static final int TIMEOUT_DEFAULT = 5000;
     RadioBrowser browser;
@@ -185,7 +183,6 @@ public class MainActivity extends AppCompatActivity implements OnMapReadyCallbac
         mToolbarManager = new ToolbarManager(getDelegate(), mToolbar, R.id.tb_group_main, R.style.ToolbarRippleStyle, R.anim.abc_fade_in, R.anim.abc_fade_out);
         ViewUtil.setBackground(getWindow().getDecorView(), new ThemeDrawable(R.array.bg_window));
         ViewUtil.setBackground(mToolbar, new ThemeDrawable(R.array.bg_toolbar));
-
     }
     @Override
     public boolean onCreateOptionsMenu(Menu menu) {
@@ -208,14 +205,31 @@ public class MainActivity extends AppCompatActivity implements OnMapReadyCallbac
             case R.id.tb_theme:
                 rotateTheme();
                 break;
+            case R.id.tb_question:
+                launchInfoPopUp();
+                break;
         }
         return true;
     }
+    private void launchInfoPopUp() {
+        View instructionsView = LayoutInflater.from(MainActivity.this).
+                inflate(R.layout.instructions_item, null);
+        AlertDialog.Builder alertDialogBuilder = new AlertDialog.Builder(this);
+        alertDialogBuilder.setView(instructionsView);
+        final AlertDialog alertDialog = alertDialogBuilder.create();
+        alertDialog.setButton(DialogInterface.BUTTON_POSITIVE, "OK",
+                new DialogInterface.OnClickListener() {
+                    @Override
+                    public void onClick(DialogInterface dialog, int which) {
+                    }
+                });
+        alertDialog.show();
+    }
     private void updateThemeButtonIcon(int theme) {
         if (theme == 0) {
-            toolbarMenu.getItem(0).setIcon(dayIcon);
+            toolbarMenu.getItem(1).setIcon(dayIcon);
         } else if (theme == 1) {
-            toolbarMenu.getItem(0).setIcon(nightIcon);
+            toolbarMenu.getItem(1).setIcon(nightIcon);
         }
     }
 

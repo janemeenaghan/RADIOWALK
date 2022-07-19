@@ -63,7 +63,6 @@ import java.util.List;
 import java.util.Vector;
 
 import de.sfuhrm.radiobrowser4j.RadioBrowser;
-import io.github.inflationx.viewpump.*;
 
 public class MainActivity extends AppCompatActivity implements OnMapReadyCallback, VolumeController.VolumeCallback, LocationController.LocationCallback {
     private MapView mMapView;
@@ -104,10 +103,6 @@ public class MainActivity extends AppCompatActivity implements OnMapReadyCallbac
     public static final int TIMEOUT_DEFAULT = 5000;
     RadioBrowser browser;
     String[] DNSlist;
-    @Override
-    protected void attachBaseContext(Context newBase) {
-        super.attachBaseContext(ViewPumpContextWrapper.wrap(newBase));
-    }
 
     @RequiresApi(api = Build.VERSION_CODES.M)
     @Override

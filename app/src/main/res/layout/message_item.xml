@@ -2,31 +2,15 @@
 <RelativeLayout xmlns:tools="http://schemas.android.com/tools"
     android:id="@+id/layout_root"
     xmlns:android="http://schemas.android.com/apk/res/android"
-    android:layout_width="match_parent"
-    android:layout_height="match_parent"
+    android:layout_width="wrap_content"
+    android:layout_height="wrap_content"
     android:padding="10dp">
+
     <EditText
         android:id="@+id/etTitle"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:layout_alignStart="@+id/etStreamLink"
-        android:paddingTop="20dp"
-        android:hint="Title"/>
+        android:layout_marginTop="11dp"
+        android:hint="Name your station" />
 
-    <EditText
-        android:id="@+id/etStreamLink"
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:hint="Stream URL" />
-
-    <Switch
-        android:id="@+id/typeSwitch"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:layout_below="@id/etStreamLink"
-        android:layout_marginTop="0dp"
-        android:showText="true"
-        android:textOff="Public"
-        android:textOn="Private"
-        tools:checked="false" />
 </RelativeLayout>

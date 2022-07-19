@@ -10,6 +10,7 @@ import java.util.ArrayList;
 public class MediaPlayerController {
     private MediaPlayer mediaPlayer;
     private Context context;
+    String currentURI;
     private static final String TAG = "MediaPlayerController";
     private ArrayList<MediaPlayerCallback> callbacks = new ArrayList<>();
 
@@ -30,17 +31,19 @@ public class MediaPlayerController {
     }
 
     public void setURLAndPrepare(String uriString) {
-        try {
-            Log.e("EEJ",uriString);
-            Log.e("EEJ2",""+context);
-            if (mediaPlayer != null) {
-                mediaPlayer.stop();
-                mediaPlayer.reset();
-                mediaPlayer.release();
+        if (currentURI == null || currentURI.isEmpty() || !currentURI.equals(uriString)) {
+            try {
+                Log.e("EEJ", uriString);
+                Log.e("EEJ2", "" + context);
+                if (mediaPlayer != null) {
+                    mediaPlayer.stop();
+                    mediaPlayer.reset();
+                    mediaPlayer.release();
+                }
+                initNewMediaPlayer(context, uriString);
+            } catch (IOException e) {
+                e.printStackTrace();
             }
-            initNewMediaPlayer(context, uriString);
-        } catch (IOException e) {
-            e.printStackTrace();
         }
     }
 

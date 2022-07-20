@@ -16,6 +16,7 @@ import com.google.android.gms.location.LocationCallback;
 import com.google.android.gms.location.LocationRequest;
 import com.google.android.gms.location.LocationResult;
 import com.google.android.gms.location.LocationServices;
+import com.google.android.gms.location.Priority;
 import com.google.android.gms.tasks.Task;
 
 import java.io.IOException;
@@ -29,12 +30,14 @@ public class LocationController {
     private com.google.android.gms.location.LocationCallback androidLocationCallback = new com.google.android.gms.location.LocationCallback() {
         @Override
         public void onLocationAvailability(@NonNull LocationAvailability locationAvailability) {
+            Log.d("LocationController","LocationAvailability");
             super.onLocationAvailability(locationAvailability);
         }
 
         @Override
         public void onLocationResult(@NonNull LocationResult locationResult) {
             super.onLocationResult(locationResult);
+            Log.d("LocationController","onLocationResult");
             for(LocationCallback callback : callbacks) {
                 try {
                     callback.onLocationResult(locationResult.getLastLocation());
@@ -49,9 +52,8 @@ public class LocationController {
     public LocationController(Context context){
         fusedLocationProviderClient = LocationServices.getFusedLocationProviderClient(context);
     }
-
     public void startLiveUpdates(Context context){
-        locationRequest = LocationRequest.create().setSmallestDisplacement(10);
+        locationRequest = LocationRequest.create().setInterval(10).setFastestInterval(1).setSmallestDisplacement(1)/*.setMaxWaitTime(1000)*/.setPriority(Priority.PRIORITY_HIGH_ACCURACY);
 
         if (checkForLocationPermission(context)) {
             fusedLocationProviderClient.requestLocationUpdates(locationRequest,
@@ -72,7 +74,6 @@ public class LocationController {
     public void requestPermission(Activity activity){
         requestPermissions(activity, new String[]{Manifest.permission.ACCESS_COARSE_LOCATION, Manifest.permission.ACCESS_FINE_LOCATION}, REQUEST_CODE);
     }
-
     public void retrieveLocation(Context context) {
         try {
             if (!checkForLocationPermission(context)) {
@@ -85,6 +86,7 @@ public class LocationController {
                     if (task.isSuccessful()){
                         for(LocationCallback callback : callbacks) {
                             try {
+                                callback.onRetrieveLocationResultAccompanyingBypass();
                                 callback.onLocationResult(locationResult.getResult());
                             } catch (IOException e) {
                                 e.printStackTrace();
@@ -115,8 +117,8 @@ public class LocationController {
     }
 
     public interface LocationCallback{
+        void onRetrieveLocationResultAccompanyingBypass();
         void onLocationResult(Location location) throws IOException;
         void onPermissionsNeeded();
     }
-
 }

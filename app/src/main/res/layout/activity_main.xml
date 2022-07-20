@@ -93,7 +93,7 @@
             android:focusable="true"
             android:focusableInTouchMode="true"
             android:scrollHorizontally="true"
-            android:text="No nearby station"
+            android:text="@string/noStationFound"
             android:textSize="8sp"
             app:v_styleId="@array/text_body"
             sothree:layout_constraintBottom_toBottomOf="@+id/musicIcon"

@@ -8,22 +8,25 @@
         <entry key="app/src/main/res/drawable-v24/color_switch_dark.xml" value="0.3515" />
         <entry key="app/src/main/res/drawable-v24/color_wv_text.xml" value="0.3515" />
         <entry key="app/src/main/res/drawable-v24/ic_launcher_foreground.xml" value="0.2005" />
+        <entry key="app/src/main/res/drawable/ic_baseline_add_24.xml" value="0.3515" />
         <entry key="app/src/main/res/drawable/ic_baseline_add_circle_outline_24.xml" value="0.2005" />
+        <entry key="app/src/main/res/drawable/ic_baseline_settings_24.xml" value="0.3515" />
         <entry key="app/src/main/res/drawable/ic_launcher_background.xml" value="0.1" />
         <entry key="app/src/main/res/layout/aaa.xml" value="0.3494791666666667" />
         <entry key="app/src/main/res/layout/activity_browse_stations.xml" value="0.27807988347233936" />
         <entry key="app/src/main/res/layout/activity_launch.xml" value="0.24866180419921874" />
         <entry key="app/src/main/res/layout/activity_login.xml" value="0.2376510620117187" />
-        <entry key="app/src/main/res/layout/activity_main.xml" value="0.24669799804687495" />
+        <entry key="app/src/main/res/layout/activity_main.xml" value="0.2871658325195312" />
         <entry key="app/src/main/res/layout/activity_main2.xml" value="0.35052083333333334" />
         <entry key="app/src/main/res/layout/activity_signup.xml" value="0.5380126953125001" />
+        <entry key="app/src/main/res/layout/confirm_edit_item.xml" value="0.3435897435897436" />
         <entry key="app/src/main/res/layout/fragment_user_list.xml" value="0.3494791666666667" />
         <entry key="app/src/main/res/layout/instructions_item.xml" value="0.3806352820763218" />
         <entry key="app/src/main/res/layout/message_item.xml" value="0.2997039794921876" />
         <entry key="app/src/main/res/layout/message_item2.xml" value="0.34564102564102567" />
         <entry key="app/src/main/res/layout/message_item_old.xml" value="0.34564102564102567" />
         <entry key="app/src/main/res/layout/panel_contents.xml" value="0.35052083333333334" />
-        <entry key="app/src/main/res/layout/station_option_item.xml" value="0.42667236328124997" />
+        <entry key="app/src/main/res/layout/station_option_item.xml" value="0.7841690063476563" />
         <entry key="app/src/main/res/layout/tutorial_item.xml" value="0.3446153846153846" />
         <entry key="app/src/main/res/menu/menu_main.xml" value="0.2982940673828125" />
         <entry key="app/src/main/res/mipmap-anydpi-v26/ic_launcher.xml" value="0.3515" />

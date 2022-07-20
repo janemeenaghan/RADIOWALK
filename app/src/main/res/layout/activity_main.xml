@@ -25,14 +25,26 @@
             app:theme="@style/AppBar"/>
 
         <com.rey.material.widget.FloatingActionButton
+            android:id="@+id/editButton"
+            android:layout_width="70dp"
+            android:layout_height="70dp"
+            android:visibility="invisible"
+            android:layout_marginStart="280dp"
+            android:layout_marginTop="610dp"
+            android:elevation="1dp"
+            android:src="@drawable/ic_baseline_settings_24"
+            app:v_styleId="@array/fab_line_green" />
+
+        <com.rey.material.widget.FloatingActionButton
             android:id="@+id/createButton"
             android:layout_width="70dp"
             android:layout_height="70dp"
             android:layout_marginStart="280dp"
+            android:visibility="invisible"
             android:layout_marginTop="610dp"
             android:elevation="1dp"
             android:src="@drawable/ic_baseline_add_24"
-            app:v_styleId="@array/fab_line" />
+            app:v_styleId="@array/fab_line_purple" />
 
         <com.google.android.gms.maps.MapView
             android:id="@+id/mapView"
@@ -97,6 +109,7 @@
 
         <com.rey.material.widget.Slider
             android:layout_width="fill_parent"
+            app:layout_constraintWidth_percent="0.85"
             android:layout_height="wrap_content"
             style="@style/Material.Widget.Slider.Discrete"
             android:id="@+id/volumebar"

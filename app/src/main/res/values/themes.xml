@@ -95,6 +95,15 @@
         <item>@style/DarkFABLine</item>
     </array>
 
+    <array name="fab_line_green">
+        <item>@style/LightFABLineGreen</item>
+        <item>@style/DarkFABLineGreen</item>
+    </array>
+
+    <array name="fab_line_purple">
+        <item>@style/LightFABLinePurple</item>
+        <item>@style/DarkFABLinePurple</item>
+    </array>
     <array name="fab">
         <item>@style/LightFAB</item>
         <item>@style/DarkFAB</item>

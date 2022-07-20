@@ -3,11 +3,14 @@
 
     <color name="colorPrimary">#03A9F4</color>
     <color name="colorPrimaryDark">#ff0171c9</color>
+    <color name="colorPurplePrimary">#AC009D</color>
+    <color name="colorPurpleAccent">#FF00E9</color>
+    <color name="colorGreenPrimary">#01BC11</color>
+    <color name="colorGreenAccent">#00FF16</color>
     <color name="colorAccent">#FF00E5FF</color>
     <color name="colorControlNormal">#FF78909C</color>
     <color name="colorControlActivated">#FF03A9F4</color>
     <color name="colorSwitchThumbNormal">#FF78909C</color>
-
     <color name="colorPrimaryQuarter">#3303A9F4</color>
     <color name="colorPrimaryHalf">#9003A9F4</color>
     <color name="colorControlNormalHalf">#9078909C</color>

@@ -1,25 +1,26 @@
 package com.example.janecapstoneproject;
+
 import android.content.Context;
-import android.content.Intent;
-import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.ImageView;
 import android.widget.TextView;
+
 import androidx.recyclerview.widget.RecyclerView;
+
 import com.jakewharton.picasso.OkHttp3Downloader;
 import com.squareup.picasso.Picasso;
-import org.parceler.Parcels;
+
 import java.util.List;
 
-public class StationListAdapter extends RecyclerView.Adapter<StationListAdapter.CustomViewHolder> {
+public class PlaceForStationAdapter extends RecyclerView.Adapter<PlaceForStationAdapter.CustomViewHolder> {
 
     private List<StationInfo> dataList;
     private Context context;
     private OnStationListener mOnStationListener;
 
-    public StationListAdapter(Context context,List<StationInfo> dataList, OnStationListener onStationListener){
+    public PlaceForStationAdapter(Context context, List<StationInfo> dataList, OnStationListener onStationListener){
         this.context = context;
         this.dataList = dataList;
         this.mOnStationListener = onStationListener;
@@ -28,7 +29,7 @@ public class StationListAdapter extends RecyclerView.Adapter<StationListAdapter.
     public class CustomViewHolder extends RecyclerView.ViewHolder implements View.OnClickListener {
         public final View mView;
         ImageView faviconImageView;
-        android.widget.TextView nameTextView;
+        TextView nameTextView;
         TextView tagsTextView;
         ImageView likeCountImageView;
         TextView likeCountTextView;

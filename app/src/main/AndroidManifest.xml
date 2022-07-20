@@ -24,6 +24,9 @@
             android:name=".BrowseStationsActivity"
             android:exported="false" />
         <activity
+            android:name=".MakeStationsActivity"
+            android:exported="false" />
+        <activity
             android:name=".LoginActivity"
             android:exported="false"
             android:screenOrientation="portrait" />

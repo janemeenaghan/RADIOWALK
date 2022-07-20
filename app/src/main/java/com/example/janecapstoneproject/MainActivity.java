@@ -107,11 +107,8 @@ public class MainActivity extends AppCompatActivity implements OnMapReadyCallbac
     @RequiresApi(api = Build.VERSION_CODES.M)
     @Override
     protected void onCreate(Bundle savedInstanceState) {
-        updateDnsListToPrepareBaseURL();
-        //Places.initialize(getApplicationContext(), "AIzaSyBlTDb5XGjtYo647vgQ-RwRfSVdxyX4hVc");
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
-        //updateDnsListToPrepareBaseURL();
         editHasBeenInitialized = false;
         initDrawables();
         initToolbar();

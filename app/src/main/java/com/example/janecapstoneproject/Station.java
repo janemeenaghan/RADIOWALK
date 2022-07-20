@@ -64,8 +64,8 @@ public class Station extends ParseObject {
     public String getStreamLink(){ return getString(KEY_STREAMLINK); }
     public String getStreamName(){ return getString(KEY_STREAMNAME); }
     public String getFavicon(){
-        if (getString(KEY_FAVICON) != null){
-        return "";
+        if (getString(KEY_FAVICON) == null){
+            return "";
         }
         else{
             return getString(KEY_FAVICON);
@@ -152,6 +152,7 @@ public class Station extends ParseObject {
         setStreamLink(streamLink);
         setStreamName(streamName);
         setFavicon(favicon);
+        saveInBackground();
     }
     /*public boolean thisIsIncludedInUsersSharedList(ParseUser user){
         JSONArray array = user.getJSONArray(KEY_USERSSHAREDSTATIONS);

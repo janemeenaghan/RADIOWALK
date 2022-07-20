@@ -136,6 +136,18 @@
         <item name="fab_iconLineMorphing">@style/LightFloatingActionButtonIcon</item>
     </style>
 
+    <style name="LightFABLineGreen" parent="Material.Widget.FloatingActionButton.Light">
+        <item name="rd_rippleColor">#33000000</item>
+        <item name="fab_backgroundColor">@color/colorGreenPrimary</item>
+        <item name="fab_iconLineMorphing">@style/LightFloatingActionButtonIcon</item>
+    </style>
+
+    <style name="LightFABLinePurple" parent="Material.Widget.FloatingActionButton.Light">
+        <item name="rd_rippleColor">#33000000</item>
+        <item name="fab_backgroundColor">@color/colorPurplePrimary</item>
+        <item name="fab_iconLineMorphing">@style/LightFloatingActionButtonIcon</item>
+    </style>
+
     <style name="LightFAB" parent="Material.Drawable.Ripple.Touch.Light">
         <item name="fab_backgroundColor">#FFDFDFDF</item>
         <item name="fab_elevation">4dp</item>

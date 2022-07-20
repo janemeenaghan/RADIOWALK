@@ -3,6 +3,7 @@ import static com.example.janecapstoneproject.Station.KEY_USERSSHAREDSTATIONS;
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
 import androidx.annotation.RequiresApi;
+import androidx.annotation.StringRes;
 import androidx.appcompat.app.AlertDialog;
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.appcompat.content.res.AppCompatResources;
@@ -245,9 +246,9 @@ public class MainActivity extends AppCompatActivity implements OnMapReadyCallbac
         initMusicIcon();
     }
     public void setSlidingPanelElements(Context context, String favicon,String name, String streamName){
-        setMusicIcon(context, favicon);
+        setMusicIcon(context, favicon,bypassFavicon);
         setStationNameText(name);
-        setNowPlayingText(streamName);
+        setNowPlayingText(streamName,false);
     }
     //MUSIC ICON CODE
     private void initMusicIcon(){
@@ -255,7 +256,7 @@ public class MainActivity extends AppCompatActivity implements OnMapReadyCallbac
         musicIcon.setVisibility(View.INVISIBLE);
     }
     private String currentFavicon;
-    private void setMusicIcon(Context context, String favicon){
+    private void setMusicIcon(Context context, String favicon, boolean bypass){
         boolean proceed = false;
         if (currentFavicon == null){
             proceed = true;
@@ -263,7 +264,7 @@ public class MainActivity extends AppCompatActivity implements OnMapReadyCallbac
         else if (currentFavicon.trim().isEmpty()) {
             proceed = true;
         }
-        else if (bypassFavicon){
+        else if (bypass){
             proceed = true;
         }
         else if (favicon == null) {
@@ -276,20 +277,25 @@ public class MainActivity extends AppCompatActivity implements OnMapReadyCallbac
 
         }
         if (proceed){
-            Picasso.with(context).load(favicon).placeholder((R.drawable.ic_launcher_background)).error(R.drawable.ic_launcher_background).into(musicIcon, new Callback() {
-                @Override
-                public void onSuccess() {
-                    musicIcon.setVisibility(View.VISIBLE);
-                }
+            if (favicon.isEmpty()){
+                musicIcon.setVisibility(View.INVISIBLE);
+            }else {
+                Picasso.with(context).load(favicon).placeholder((R.drawable.ic_launcher_background)).error(R.drawable.ic_launcher_background).into(musicIcon, new Callback() {
+                    @Override
+                    public void onSuccess() {
+                        musicIcon.setVisibility(View.VISIBLE);
+                    }
 
-                @Override
-                public void onError() {
-                    Log.e(TAG, "Error loading favicon into musicIcon with Picasso");
-                }
-            });
+                    @Override
+                    public void onError() {
+                        Log.e(TAG, "Error loading favicon into musicIcon with Picasso");
+                        musicIcon.setVisibility(View.INVISIBLE);
+                    }
+                });
+            }
             bypassFavicon = false;
             currentFavicon = favicon;
-            musicIcon.setVisibility(View.VISIBLE);
+
         }
         else {
             //musicIcon.setVisibility(View.INVISIBLE);
@@ -302,7 +308,14 @@ public class MainActivity extends AppCompatActivity implements OnMapReadyCallbac
     private String currentStationName;
     private void setStationNameText(String stationName){
         if (stationName != null && !stationName.trim().isEmpty() && !stationName.equals(currentStationName)) {
-            stationNameText.setText(stationName + ":");
+            String string;
+            if (stationName.equals(getString(R.string.noStationFound))){
+                string = getString(R.string.noStationFound);
+            }
+            else{
+                string = stationName + ":";
+            }
+            stationNameText.setText(string);
             currentStationName = stationName;
         }
     }
@@ -311,13 +324,31 @@ public class MainActivity extends AppCompatActivity implements OnMapReadyCallbac
         nowPlayingText = findViewById(R.id.nowPlayingText);
     }
     private String currentNowPlayingText;
-    private void setNowPlayingText(String nowPlayingText) {
-        if (nowPlayingText!=null && !nowPlayingText.trim().isEmpty() && !nowPlayingText.equals(currentNowPlayingText)) {
+    private void setNowPlayingText(String nowPlayingText,boolean bypass) {
+        boolean proceed = false;
+        if (currentNowPlayingText == null){
+            proceed = true;
+        }
+        else if (currentNowPlayingText.trim().isEmpty()) {
+            proceed = true;
+        }
+        else if (bypass){
+            proceed = true;
+        }
+        else if (nowPlayingText == null) {
+
+        }
+        else if (!nowPlayingText.equals(currentNowPlayingText)) {
+            proceed = true;
+        }
+        else{
+
+        }
+        if (proceed) {
             this.nowPlayingText.setText(nowPlayingText);
             currentNowPlayingText = nowPlayingText;
         }
     }
-
     //MEDIA CONTROLLER
     private void initMediaPlayer() {
         mediaPlayerController = new MediaPlayerController(this);
@@ -597,11 +628,26 @@ public class MainActivity extends AppCompatActivity implements OnMapReadyCallbac
         editStationButton.setVisibility(View.VISIBLE);
     }
     public void handleCaseNoNearbyStation(Location location) {
-        setStationNameText("No nearby station");
         addStationButton.setVisibility(View.VISIBLE);
         if (editHasBeenInitialized) {
             editStationButton.setVisibility(View.INVISIBLE);
         }
+
+        if (globalCurrentStation != null){
+            if (globalCurrentStation.getMarker() != null){
+                if (globalCurrentStation.isPublic()) {
+                    globalCurrentStation.setMarkerColor(0);
+                }
+                else{
+                    globalCurrentStation.setMarkerColor(1);//(BitmapDescriptorFactory.fromResource(R.drawable.broadcastgreen));
+                }
+            }
+        }
+        mediaPlayerController.setURLAndPrepare(null,true);
+        setStationNameText(getString(R.string.noStationFound));
+        setNowPlayingText("",true);
+        setMusicIcon(MainActivity.this,"",true);
+        locationController.retrieveLocation(MainActivity.this);
     }
     public void addCircle(Station station, LatLng coords) {
         if (station.isPublic()) {

@@ -30,7 +30,7 @@ public class MediaPlayerController {
         }
     }
 
-    public void setURLAndPrepare(String uriString,boolean bypassMedia) {
+    public void setURLAndPrepare(String uriString,boolean bypass) {
         boolean proceed = false;
         if (currentURI == null){
             proceed = true;
@@ -38,7 +38,7 @@ public class MediaPlayerController {
         else if (currentURI.trim().isEmpty()) {
             proceed = true;
         }
-        else if (bypassMedia){
+        else if (bypass){
             proceed = true;
         }
         else if (uriString == null) {
@@ -53,11 +53,7 @@ public class MediaPlayerController {
         if (proceed){
             try {
                 currentURI = uriString;
-                Log.e("EEJ", uriString);
-                Log.e("EEJ2", "" + context);
                 if (mediaPlayer != null) {
-                    mediaPlayer.stop();
-                    mediaPlayer.reset();
                     mediaPlayer.release();
                 }
                 initNewMediaPlayer(context, uriString);
@@ -94,21 +90,29 @@ public class MediaPlayerController {
     }
 
     private void initNewMediaPlayer(Context context, String uriString) throws IOException {
-        mediaPlayer = new MediaPlayer();
-        mediaPlayer.setAudioStreamType(AudioManager.STREAM_MUSIC);
-        // If breaks, try Context.AUDIO_SERVICE or context.AUDIO_SERVICE here instead of just AUDIO_SERVICE
-        mediaPlayer.setOnPreparedListener(mp -> startPlaying());
-        mediaPlayer.setOnErrorListener(new MediaPlayer.OnErrorListener() {
-            @Override
-            public boolean onError(MediaPlayer mp, int what, int extra) {
-                for (MediaPlayerCallback callback : callbacks){
-                    callback.onMediaPlayerError();
+        if (uriString == null){
+
+        }
+        else if (uriString.isEmpty()){
+
+        }
+        else {
+            mediaPlayer = new MediaPlayer();
+            mediaPlayer.setAudioStreamType(AudioManager.STREAM_MUSIC);
+            // If breaks, try Context.AUDIO_SERVICE or context.AUDIO_SERVICE here instead of just AUDIO_SERVICE
+            mediaPlayer.setOnPreparedListener(mp -> startPlaying());
+            mediaPlayer.setOnErrorListener(new MediaPlayer.OnErrorListener() {
+                @Override
+                public boolean onError(MediaPlayer mp, int what, int extra) {
+                    for (MediaPlayerCallback callback : callbacks) {
+                        callback.onMediaPlayerError();
+                    }
+                    Log.e(TAG, "Error with URL");
+                    return false;
                 }
-                Log.e(TAG, "Error with URL");
-                return false;
-            }
-        });
-        mediaPlayer.setDataSource(context, Uri.parse(uriString));
-        mediaPlayer.prepareAsync();
+            });
+            mediaPlayer.setDataSource(context, Uri.parse(uriString));
+            mediaPlayer.prepareAsync();
+        }
     }
 }

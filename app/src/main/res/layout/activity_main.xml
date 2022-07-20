@@ -15,7 +15,10 @@
         android:id="@+id/framelayout"
         android:layout_height="match_parent"
         android:orientation="horizontal"
-        android:gravity="center">
+        android:layout_gravity="center_vertical"
+        android:weightSum="3">
+
+
         <androidx.appcompat.widget.Toolbar
             android:id="@+id/main_toolbar"
             android:layout_height="wrap_content"
@@ -53,6 +56,38 @@
             android:layout_marginTop="55dp"
             android:contentDescription="@string/app_name"
             android:gravity="center" />
+
+        <RadioGroup
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="60dp"
+            android:orientation="horizontal">
+
+            <RadioButton
+                android:id="@+id/radio_public"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:onClick="onRadioButtonClicked"
+                android:text="Public"
+                android:textSize="12sp" />
+
+            <RadioButton
+                android:id="@+id/radio_private"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:onClick="onRadioButtonClicked"
+                android:text="Private"
+                android:textSize="12sp" />
+
+            <RadioButton
+                android:id="@+id/radio_both"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:onClick="onRadioButtonClicked"
+                android:text="Both"
+                android:textSize="12sp" />
+        </RadioGroup>
+
 
     </FrameLayout>
     <androidx.constraintlayout.widget.ConstraintLayout

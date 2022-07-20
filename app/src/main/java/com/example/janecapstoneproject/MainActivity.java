@@ -1,4 +1,5 @@
 package com.example.janecapstoneproject;
+import static com.example.janecapstoneproject.Station.KEY_TYPE;
 import static com.example.janecapstoneproject.Station.KEY_USERSSHAREDSTATIONS;
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
@@ -8,6 +9,8 @@ import androidx.appcompat.app.AlertDialog;
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.appcompat.content.res.AppCompatResources;
 import androidx.appcompat.widget.Toolbar;
+
+import com.google.android.gms.maps.model.Circle;
 import com.google.android.gms.maps.model.CircleOptions;
 import android.annotation.SuppressLint;
 import android.content.Context;
@@ -27,8 +30,11 @@ import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
 import android.widget.Button;
+import android.widget.CompoundButton;
 import android.widget.EditText;
 import android.widget.ImageView;
+import android.widget.RadioButton;
+import android.widget.Switch;
 import android.widget.TextView;
 import android.widget.Toast;
 import com.google.android.gms.maps.CameraUpdateFactory;
@@ -39,6 +45,7 @@ import com.google.android.gms.maps.model.BitmapDescriptor;
 import com.google.android.gms.maps.model.BitmapDescriptorFactory;
 import com.google.android.gms.maps.model.LatLng;
 import com.google.android.gms.maps.model.MapStyleOptions;
+import com.google.android.gms.maps.model.Marker;
 import com.google.android.gms.maps.model.MarkerOptions;
 import com.google.android.material.floatingactionbutton.FloatingActionButton;
 import com.parse.FindCallback;
@@ -61,6 +68,7 @@ import org.parceler.Parcels;
 import java.io.IOException;
 import java.net.InetAddress;
 import java.net.UnknownHostException;
+import java.util.ArrayList;
 import java.util.List;
 
 import java.util.Vector;
@@ -69,6 +77,7 @@ import de.sfuhrm.radiobrowser4j.RadioBrowser;
 public class MainActivity extends AppCompatActivity implements OnMapReadyCallback, VolumeController.VolumeCallback, LocationController.LocationCallback, Station.StationCallback {
     private MapView mMapView;
     public com.rey.material.widget.FloatingActionButton addStationButton,editStationButton;
+    private Switch privateSwitch,publicSwitch;
     public int REQUEST_CODE = 1001;
     public static final int PUBLIC_CIRCLE_RGB = Color.rgb(0,233,255);
     public static final int PRIVATE_CIRCLE_RGB = Color.rgb(255,0,233);
@@ -79,8 +88,8 @@ public class MainActivity extends AppCompatActivity implements OnMapReadyCallbac
     public static final int DEFAULT_ZOOM = 15;
     public static final int PUBLIC_TYPE = 0;
     public static final int PRIVATE_TYPE = 1;
-    public static final double STATION_INTERACTION_RADIUS_METERS = 80;
-    public static final double STATION_DETECTION_RADIUS_METERS = 300;
+    public static final double STATION_INTERACTION_RADIUS_METERS = 30;
+    public static final double STATION_DETECTION_RADIUS_METERS = 100;
     public static final double STATION_INTERACTION_RADIUS_KILOMETERS = STATION_INTERACTION_RADIUS_METERS * .001;
     public static final double STATION_DETECTION_RADIUS_KILOMETERS = STATION_DETECTION_RADIUS_METERS * .001;
     public static final String KEY_GEOPOINT = "geopoint";
@@ -101,9 +110,8 @@ public class MainActivity extends AppCompatActivity implements OnMapReadyCallbac
     Menu toolbarMenu;
     public static final int LIMIT_DEFAULT = 64;
     public static final int TIMEOUT_DEFAULT = 5000;
-    RadioBrowser browser;
     String[] DNSlist;
-    private boolean editHasBeenInitialized,bypassFavicon,bypassMap,bypassMedia;
+    private boolean editHasBeenInitialized,bypassFavicon,bypassMap,bypassMedia,noStationsLastLocationCheck,includePublic,includePrivate;
 
     @RequiresApi(api = Build.VERSION_CODES.M)
     @Override
@@ -114,6 +122,9 @@ public class MainActivity extends AppCompatActivity implements OnMapReadyCallbac
         bypassMedia = false;
         bypassFavicon = false;
         bypassMap = false;
+        noStationsLastLocationCheck = false;
+        includePublic = false;
+        includePrivate = false;
         initDrawables();
         initToolbar();
         initLocation();
@@ -175,7 +186,26 @@ public class MainActivity extends AppCompatActivity implements OnMapReadyCallbac
         mMapView.onLowMemory();
     }
 
-
+    public void onRadioButtonClicked(View view) {
+        // Is the button now checked?
+        //boolean checked = ((RadioButton) view).isChecked();
+        // Check which radio button was clicked
+        switch(view.getId()) {
+            case R.id.radio_public:
+                includePublic = true;
+                includePrivate = false;
+                break;
+            case R.id.radio_private:
+                includePrivate = true;
+                includePublic = false;
+                break;
+            case R.id.radio_both:
+                includePrivate = true;
+                includePublic = true;
+                break;
+        }
+        locationController.retrieveLocation(MainActivity.this);
+    }
     //DRAWABLE CODE
     public void initDrawables() {
         dayIcon = AppCompatResources.getDrawable(this, R.drawable.daythemeicon_white);
@@ -510,9 +540,15 @@ public class MainActivity extends AppCompatActivity implements OnMapReadyCallbac
         //query.setLimit(20);
         //query.whereWithinKilometers(KEY_GEOPOINT,new ParseGeoPoint(location.getLatitude(),location.getLongitude()), STATION_RADIUS_KILOMETERS, true);
         query.whereWithinKilometers(KEY_GEOPOINT, new ParseGeoPoint(location.getLatitude(), location.getLongitude()), STATION_DETECTION_RADIUS_KILOMETERS);
+        if (includePublic && !includePrivate) {
+            query.whereEqualTo(KEY_TYPE, 0);
+        } else if (includePrivate && !includePublic) {
+            query.whereEqualTo(KEY_TYPE, 1);
+        }
         // start an asynchronous call for posts
         nearestStation = null;
         shortestDistance = Integer.MAX_VALUE;
+
         query.findInBackground(new FindCallback<Station>() {
             @Override
             public void done(List<Station> stations, ParseException e) {
@@ -522,9 +558,9 @@ public class MainActivity extends AppCompatActivity implements OnMapReadyCallbac
                 }
                 for (Station station : stations) {
                     boolean includeStation = false;
-                    if (station.isPublic()) {
+                    if (station.isPublic() && includePublic) {
                         includeStation = true;
-                    } else {
+                    } else if (station.isPrivate() && includePrivate){
                         String objId = station.getObjectId();
                         JSONArray array = user.getJSONArray(KEY_USERSSHAREDSTATIONS);
                         if (array != null) {
@@ -540,7 +576,7 @@ public class MainActivity extends AppCompatActivity implements OnMapReadyCallbac
                         }
                     }
                     if (includeStation) {
-                        if ((globalCurrentStation == null || !station.getObjectId().equals(globalCurrentStation.getObjectId()))){
+                        if ((globalCurrentStation == null || !station.getObjectId().equals(globalCurrentStation.getObjectId()))) {
                             renderStation(station);
                         }
                         float[] result = new float[1];
@@ -557,7 +593,7 @@ public class MainActivity extends AppCompatActivity implements OnMapReadyCallbac
                 if (nearestStation != null) {
                     Log.d(TAG, "nearest station: " + nearestStation.getName());
                     if (shortestDistance <= STATION_INTERACTION_RADIUS_METERS) {
-                        handleCaseValidNearestStation(context,nearestStation);
+                        handleCaseValidNearestStation(context, nearestStation);
                         return;
                     } else {
                         Log.d(TAG, "Nearest station is too far!");
@@ -626,39 +662,42 @@ public class MainActivity extends AppCompatActivity implements OnMapReadyCallbac
             initEditStationButton(station,station.getCoords(),ParseUser.getCurrentUser(),context);
         }
         editStationButton.setVisibility(View.VISIBLE);
+        noStationsLastLocationCheck = false;
     }
     public void handleCaseNoNearbyStation(Location location) {
-        addStationButton.setVisibility(View.VISIBLE);
-        if (editHasBeenInitialized) {
-            editStationButton.setVisibility(View.INVISIBLE);
-        }
-
-        if (globalCurrentStation != null){
-            if (globalCurrentStation.getMarker() != null){
-                if (globalCurrentStation.isPublic()) {
-                    globalCurrentStation.setMarkerColor(0);
-                }
-                else{
-                    globalCurrentStation.setMarkerColor(1);//(BitmapDescriptorFactory.fromResource(R.drawable.broadcastgreen));
+        if (!noStationsLastLocationCheck) {
+            addStationButton.setVisibility(View.VISIBLE);
+            if (editHasBeenInitialized) {
+                editStationButton.setVisibility(View.INVISIBLE);
+            }
+            if (globalCurrentStation != null) {
+                if (globalCurrentStation.getMarker() != null) {
+                    if (globalCurrentStation.isPublic()) {
+                        globalCurrentStation.setMarkerColor(0);
+                    } else {
+                        globalCurrentStation.setMarkerColor(1);//(BitmapDescriptorFactory.fromResource(R.drawable.broadcastgreen));
+                    }
                 }
             }
+            mediaPlayerController.setURLAndPrepare(null, true);
+            setStationNameText(getString(R.string.noStationFound));
+            setNowPlayingText("", true);
+            setMusicIcon(MainActivity.this, "", true);
+            locationController.retrieveLocation(MainActivity.this);
+            noStationsLastLocationCheck = true;
+        }else {
         }
-        mediaPlayerController.setURLAndPrepare(null,true);
-        setStationNameText(getString(R.string.noStationFound));
-        setNowPlayingText("",true);
-        setMusicIcon(MainActivity.this,"",true);
-        locationController.retrieveLocation(MainActivity.this);
     }
     public void addCircle(Station station, LatLng coords) {
         if (station.isPublic()) {
-                station.setCircle(globalMap.addCircle(new CircleOptions()
+            station.setCircleAndReturnIt(globalMap.addCircle(new CircleOptions()
                         .center(coords)
                         .radius(STATION_INTERACTION_RADIUS_METERS)
                         .strokeColor(PUBLIC_CIRCLE_RGB)
                         .fillColor(Color.TRANSPARENT).strokeWidth(5.0F)));
         }
         else {
-                station.setCircle(globalMap.addCircle(new CircleOptions()
+            station.setCircleAndReturnIt(globalMap.addCircle(new CircleOptions()
                         .center(coords)
                         .radius(STATION_INTERACTION_RADIUS_METERS)
                         .strokeColor(PRIVATE_CIRCLE_RGB)
@@ -763,10 +802,7 @@ public class MainActivity extends AppCompatActivity implements OnMapReadyCallbac
         alertDialog.setButton(DialogInterface.BUTTON_POSITIVE, "OK",
                 new DialogInterface.OnClickListener() {
                     @Override
-                    public void onClick(DialogInterface dialog, int which) {/*
-                        // Define color of marker icon
-                        BitmapDescriptor defaultMarker =
-                                BitmapDescriptorFactory.defaultMarker(BitmapDescriptorFactory.HUE_GREEN);*/
+                    public void onClick(DialogInterface dialog, int which) {
                         // Extract content from alert dialog
                         String name = ((EditText) alertDialog.findViewById(R.id.etTitle)).
                                 getText().toString();

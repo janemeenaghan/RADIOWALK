@@ -93,6 +93,10 @@ public class Station extends ParseObject {
     public void setCircle(Circle circle) {
         this.circle = circle;
     }
+    public Circle setCircleAndReturnIt(Circle circle) {
+        this.circle = circle;
+        return this.circle;
+    }
     public void setCircleColor(int rgb){
         circle.setStrokeColor(rgb);
     }
@@ -101,6 +105,10 @@ public class Station extends ParseObject {
     }*/
     public void setMarker(Marker marker) {
         this.marker = marker;
+    }
+    public Marker setMarkerAndReturnIt(Marker marker) {
+        this.marker = marker;
+        return this.marker;
     }
 
     public void setMarkerColor(int which){

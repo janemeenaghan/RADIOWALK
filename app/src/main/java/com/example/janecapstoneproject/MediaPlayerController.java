@@ -30,9 +30,29 @@ public class MediaPlayerController {
         }
     }
 
-    public void setURLAndPrepare(String uriString) {
-        if (currentURI == null || currentURI.isEmpty() /*|| !currentURI.equals(uriString)*/) {
+    public void setURLAndPrepare(String uriString,boolean bypassMedia) {
+        boolean proceed = false;
+        if (currentURI == null){
+            proceed = true;
+        }
+        else if (currentURI.trim().isEmpty()) {
+            proceed = true;
+        }
+        else if (bypassMedia){
+            proceed = true;
+        }
+        else if (uriString == null) {
+
+        }
+        else if (!uriString.equals(currentURI)) {
+            proceed = true;
+        }
+        else{
+
+        }
+        if (proceed){
             try {
+                currentURI = uriString;
                 Log.e("EEJ", uriString);
                 Log.e("EEJ2", "" + context);
                 if (mediaPlayer != null) {
@@ -41,7 +61,8 @@ public class MediaPlayerController {
                     mediaPlayer.release();
                 }
                 initNewMediaPlayer(context, uriString);
-            } catch (IOException e) {
+            }
+            catch (IOException e) {
                 e.printStackTrace();
             }
         }

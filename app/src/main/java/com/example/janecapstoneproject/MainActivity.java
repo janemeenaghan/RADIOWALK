@@ -65,7 +65,7 @@ import java.util.List;
 import java.util.Vector;
 import de.sfuhrm.radiobrowser4j.RadioBrowser;
 
-public class MainActivity extends AppCompatActivity implements OnMapReadyCallback, VolumeController.VolumeCallback, LocationController.LocationCallback {
+public class MainActivity extends AppCompatActivity implements OnMapReadyCallback, VolumeController.VolumeCallback, LocationController.LocationCallback, Station.StationCallback {
     private MapView mMapView;
     public com.rey.material.widget.FloatingActionButton addStationButton,editStationButton;
     public int REQUEST_CODE = 1001;
@@ -102,7 +102,7 @@ public class MainActivity extends AppCompatActivity implements OnMapReadyCallbac
     public static final int TIMEOUT_DEFAULT = 5000;
     RadioBrowser browser;
     String[] DNSlist;
-    boolean editHasBeenInitialized;
+    private boolean editHasBeenInitialized,bypassFavicon,bypassMap,bypassMedia;
 
     @RequiresApi(api = Build.VERSION_CODES.M)
     @Override
@@ -110,6 +110,9 @@ public class MainActivity extends AppCompatActivity implements OnMapReadyCallbac
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
         editHasBeenInitialized = false;
+        bypassMedia = false;
+        bypassFavicon = false;
+        bypassMap = false;
         initDrawables();
         initToolbar();
         initLocation();
@@ -143,6 +146,7 @@ public class MainActivity extends AppCompatActivity implements OnMapReadyCallbac
     protected void onStart() {
         super.onStart();
         mMapView.onStart();
+        locationController.startLiveUpdates(this);
     }
 
     @Override
@@ -252,12 +256,30 @@ public class MainActivity extends AppCompatActivity implements OnMapReadyCallbac
     }
     private String currentFavicon;
     private void setMusicIcon(Context context, String favicon){
-        if (favicon != null && !favicon.trim().isEmpty() && !favicon.equals(currentFavicon)){
+        boolean proceed = false;
+        if (currentFavicon == null){
+            proceed = true;
+        }
+        else if (currentFavicon.trim().isEmpty()) {
+            proceed = true;
+        }
+        else if (bypassFavicon){
+            proceed = true;
+        }
+        else if (favicon == null) {
+
+        }
+        else if (!favicon.equals(currentFavicon)) {
+            proceed = true;
+        }
+        else{
+
+        }
+        if (proceed){
             Picasso.with(context).load(favicon).placeholder((R.drawable.ic_launcher_background)).error(R.drawable.ic_launcher_background).into(musicIcon, new Callback() {
                 @Override
                 public void onSuccess() {
                     musicIcon.setVisibility(View.VISIBLE);
-                    currentFavicon = favicon;
                 }
 
                 @Override
@@ -265,10 +287,12 @@ public class MainActivity extends AppCompatActivity implements OnMapReadyCallbac
                     Log.e(TAG, "Error loading favicon into musicIcon with Picasso");
                 }
             });
+            bypassFavicon = false;
+            currentFavicon = favicon;
             musicIcon.setVisibility(View.VISIBLE);
         }
         else {
-            musicIcon.setVisibility(View.INVISIBLE);
+            //musicIcon.setVisibility(View.INVISIBLE);
         }
     }
     //STATION NAME TEXT CODE
@@ -365,18 +389,25 @@ public class MainActivity extends AppCompatActivity implements OnMapReadyCallbac
     @Override
     public void onLocationResult(Location location) throws IOException {
         Log.d("MainActivity","onLocationResult");
-        Toast.makeText(this, "onLoc in main", Toast.LENGTH_SHORT).show();
         globalLocation = location;
         //maps, update stationRecycler
         if (globalMap != null) {
-            globalMap.setMyLocationEnabled(true);
-            globalMap.getUiSettings().setMyLocationButtonEnabled(true);
-            globalMap.moveCamera(CameraUpdateFactory.newLatLngZoom(
-                    new LatLng(location.getLatitude(),
-                            location.getLongitude()), DEFAULT_ZOOM));
+            if(bypassMap) {
+                globalMap.setMyLocationEnabled(true);
+                globalMap.getUiSettings().setMyLocationButtonEnabled(true);
+                globalMap.moveCamera(CameraUpdateFactory.newLatLngZoom(
+                        new LatLng(location.getLatitude(),
+                                location.getLongitude()), DEFAULT_ZOOM));
+                bypassMap = false;
+            }
             renderNearbyStations(MainActivity.this, location);
         }
-
+    }
+    @Override
+    public void onRetrieveLocationResultAccompanyingBypass() {
+        bypassMedia = true;
+        bypassFavicon = true;
+        bypassMap = true;
     }
 
     //MAP CODE (TODO: refactor through a controller if time permits)
@@ -395,7 +426,6 @@ public class MainActivity extends AppCompatActivity implements OnMapReadyCallbac
     public void onMapReady(GoogleMap map) {
         globalMap = map;
         locationController.retrieveLocation(this);
-        locationController.startLiveUpdates(this);
     }
 
     public void updateMapStyle(int themeNumber) {
@@ -545,7 +575,8 @@ public class MainActivity extends AppCompatActivity implements OnMapReadyCallbac
 
         setSlidingPanelElements(context, station.getFavicon(), station.getName(), station.getStreamName());
         if (!station.getStreamLink().isEmpty()) {
-            mediaPlayerController.setURLAndPrepare(station.getStreamLink());
+            mediaPlayerController.setURLAndPrepare(station.getStreamLink(),bypassMedia);
+            bypassMedia = false;
         }
         globalCurrentStation = station;
     }
@@ -641,6 +672,7 @@ public class MainActivity extends AppCompatActivity implements OnMapReadyCallbac
         try {
             station.addUserToSharedList(user);
             user.saveInBackground();
+            locationController.retrieveLocation(this);
         } catch (JSONException ex) {
             ex.printStackTrace();
         }
@@ -727,11 +759,10 @@ public class MainActivity extends AppCompatActivity implements OnMapReadyCallbac
             int isNew = data.getIntExtra("new",2);
             if (isNew == 1){
                 addStation(stationName, PRIVATE_TYPE, latLng, ParseUser.getCurrentUser(), streamLink, streamName, favicon, MainActivity.this);
-                locationController.retrieveLocation(MainActivity.this);
             }
             else if (isNew == 0){
                 globalCurrentStation.updateStationWithNewRadioToParse(streamLink, streamName, favicon);
-                locationController.retrieveLocation(MainActivity.this);
+
             }
             else{
                 Log.e(TAG, "Retrieving new value != 0 or 1");
@@ -787,4 +818,8 @@ public class MainActivity extends AppCompatActivity implements OnMapReadyCallbac
         }.execute();
     }
 
+    @Override
+    public void onSaveInBackground() {
+        locationController.retrieveLocation(this);
+    }
 }

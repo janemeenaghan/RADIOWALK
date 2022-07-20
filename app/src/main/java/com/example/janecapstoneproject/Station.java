@@ -19,6 +19,7 @@ import com.parse.ParseObject;
 import com.parse.ParseClassName;
 import com.parse.ParseQuery;
 import com.parse.ParseUser;
+import com.parse.SaveCallback;
 
 import org.json.JSONArray;
 import org.json.JSONException;
@@ -152,7 +153,12 @@ public class Station extends ParseObject {
         setStreamLink(streamLink);
         setStreamName(streamName);
         setFavicon(favicon);
-        saveInBackground();
+        saveInBackground(new SaveCallback() {
+            @Override
+            public void done(ParseException e) {
+
+            }
+        });
     }
     /*public boolean thisIsIncludedInUsersSharedList(ParseUser user){
         JSONArray array = user.getJSONArray(KEY_USERSSHAREDSTATIONS);
@@ -199,6 +205,10 @@ public class Station extends ParseObject {
             e.printStackTrace();
         }
         return "";
+    }
+
+    public interface StationCallback{
+        void onSaveInBackground();
     }
 
 }

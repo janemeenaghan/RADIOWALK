@@ -74,7 +74,6 @@ public class LocationController {
     public void requestPermission(Activity activity){
         requestPermissions(activity, new String[]{Manifest.permission.ACCESS_COARSE_LOCATION, Manifest.permission.ACCESS_FINE_LOCATION}, REQUEST_CODE);
     }
-
     public void retrieveLocation(Context context) {
         try {
             if (!checkForLocationPermission(context)) {

@@ -2,6 +2,7 @@ package com.example.janecapstoneproject;
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
+import android.app.ProgressDialog;
 import android.content.Intent;
 import android.os.Bundle;
 import android.util.Log;
@@ -25,6 +26,7 @@ public class BrowseStationsActivity extends AppCompatActivity implements Station
     private int isNew;
     private LatLng latLng;
     private String stationName;
+    ProgressDialog progressDialog;
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -51,6 +53,9 @@ public class BrowseStationsActivity extends AppCompatActivity implements Station
     }
 
     public void fetchAllStations() {
+        progressDialog = new ProgressDialog(BrowseStationsActivity.this);
+        progressDialog.setMessage("Loading....");
+        progressDialog.show();
         Call<List<StationInfo>> call = service.getAllStations();
         call.enqueue(new Callback<List<StationInfo>>() {
             @Override

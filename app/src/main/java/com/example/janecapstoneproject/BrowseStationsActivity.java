@@ -61,9 +61,6 @@ public class BrowseStationsActivity extends AppCompatActivity implements Station
             @Override
             public void onResponse(Call<List<StationInfo>> call, Response<List<StationInfo>> response) {
                 List<StationInfo> list = response.body();
-                for (StationInfo stationInfo : list) {
-                    Log.e("kys", stationInfo.getName());
-                }
                 //dismiss progress loader
                 generateDataList(response.body());
             }

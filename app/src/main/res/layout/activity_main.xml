@@ -66,33 +66,36 @@
             android:layout_height="wrap_content"
             android:orientation="horizontal"
             sothree:layout_constraintGuide_percent="0.04" />
-        <TextView
+
+        <com.rey.material.widget.TextView
             android:id="@+id/nowPlayingText"
             android:layout_width="237dp"
             android:layout_height="20dp"
             android:layout_weight="1"
             android:ellipsize="marquee"
-            android:marqueeRepeatLimit="marquee_forever"
-            android:singleLine="true"
             android:focusable="true"
             android:focusableInTouchMode="true"
+            android:marqueeRepeatLimit="marquee_forever"
             android:scrollHorizontally="true"
+            android:singleLine="true"
             android:text=""
-            android:textSize="12sp"
+            android:textSize="8sp"
+            app:v_styleId="@array/text_body"
             sothree:layout_constraintBottom_toBottomOf="@+id/musicIcon"
             sothree:layout_constraintStart_toEndOf="@+id/stationNameText"
             sothree:layout_constraintTop_toTopOf="@+id/musicIcon" />
-        <TextView
+        <com.rey.material.widget.TextView
             android:id="@+id/stationNameText"
-            android:layout_width="100dp"
+            android:layout_width="150dp"
             android:layout_height="20dp"
             android:layout_weight="1"
             android:singleLine="true"
             android:focusable="true"
             android:focusableInTouchMode="true"
             android:scrollHorizontally="true"
-            android:text="No nearby station detected"
-            android:textSize="12sp"
+            android:text="No nearby station"
+            android:textSize="8sp"
+            app:v_styleId="@array/text_body"
             sothree:layout_constraintBottom_toBottomOf="@+id/musicIcon"
             sothree:layout_constraintStart_toEndOf="@+id/musicIcon"
             sothree:layout_constraintTop_toTopOf="@+id/musicIcon" />
@@ -104,11 +107,11 @@
             android:visibility="visible"
             sothree:srcCompat="@drawable/tempmusicicon"
             tools:layout_editor_absoluteX="16dp"
-            tools:layout_editor_absoluteY="28dp"
+            tools:layout_editor_absoluteY="45dp"
             tools:srcCompat="@tools:sample/avatars" />
 
         <com.rey.material.widget.Slider
-            android:layout_width="fill_parent"
+            android:layout_width="0dp"
             app:layout_constraintWidth_percent="0.85"
             android:layout_height="wrap_content"
             style="@style/Material.Widget.Slider.Discrete"
@@ -117,10 +120,12 @@
             app:sl_maxValue="100"
             app:sl_value="50"
             app:v_styleId="@array/slider"
-            android:paddingBottom="10dip"
+            android:paddingTop="0dip"
+            android:paddingRight="10dp"
+            android:paddingLeft="10dp"
             android:gravity="center"
-            sothree:layout_constraintStart_toStartOf="@+id/nowPlayingText"
-            sothree:layout_constraintBottom_toTopOf="@+id/nowPlayingText" />
+            sothree:layout_constraintRight_toRightOf="parent"
+            sothree:layout_constraintTop_toBottomOf="@+id/nowPlayingText"/>
 
         <androidx.constraintlayout.widget.Guideline
             android:id="@+id/guidelineVertForImage"

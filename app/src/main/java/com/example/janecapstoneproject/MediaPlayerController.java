@@ -31,7 +31,7 @@ public class MediaPlayerController {
     }
 
     public void setURLAndPrepare(String uriString) {
-        if (currentURI == null || currentURI.isEmpty() || !currentURI.equals(uriString)) {
+        if (currentURI == null || currentURI.isEmpty() /*|| !currentURI.equals(uriString)*/) {
             try {
                 Log.e("EEJ", uriString);
                 Log.e("EEJ2", "" + context);

@@ -1,4 +1,5 @@
 package com.example.janecapstoneproject;
+
 import android.content.Context;
 import android.media.AudioManager;
 import android.media.MediaPlayer;
@@ -12,22 +13,10 @@ public class MediaPlayerController {
     private Context context;
     String currentURI;
     private static final String TAG = "MediaPlayerController";
-    private ArrayList<MediaPlayerCallback> callbacks = new ArrayList<>();
+    private ArrayList<MediaPlayerController.MediaPlayerCallback> callbacks = new ArrayList<>();
 
     public MediaPlayerController(Context context){
         this.context = context;
-    }
-
-    public void registerCallback(MediaPlayerCallback mediaPlayerCallback){
-        if (!callbacks.contains(mediaPlayerCallback)){
-            callbacks.add(mediaPlayerCallback);
-        }
-    }
-
-    public void unRegisterCallback(MediaPlayerCallback mediaPlayerCallback){
-        if (callbacks.contains(mediaPlayerCallback)){
-            callbacks.remove(mediaPlayerCallback);
-        }
     }
 
     public void setURLAndPrepare(String uriString,boolean bypass) {
@@ -75,18 +64,13 @@ public class MediaPlayerController {
 
     public void startPlaying(){
         mediaPlayer.start();
-        for (MediaPlayerCallback callback : callbacks){
+        for (MediaPlayerController.MediaPlayerCallback callback : callbacks){
             callback.onPlayingChanged(isPlaying());
         }
     }
 
     public boolean isPlaying(){
         return mediaPlayer.isPlaying();
-    }
-
-    public interface MediaPlayerCallback{
-        void onPlayingChanged(boolean isPlaying);
-        void onMediaPlayerError();
     }
 
     private void initNewMediaPlayer(Context context, String uriString) throws IOException {
@@ -104,7 +88,7 @@ public class MediaPlayerController {
             mediaPlayer.setOnErrorListener(new MediaPlayer.OnErrorListener() {
                 @Override
                 public boolean onError(MediaPlayer mp, int what, int extra) {
-                    for (MediaPlayerCallback callback : callbacks) {
+                    for (MediaPlayerController.MediaPlayerCallback callback : callbacks) {
                         callback.onMediaPlayerError();
                     }
                     Log.e(TAG, "Error with URL");
@@ -114,5 +98,21 @@ public class MediaPlayerController {
             mediaPlayer.setDataSource(context, Uri.parse(uriString));
             mediaPlayer.prepareAsync();
         }
+    }
+    public void registerCallback(MediaPlayerController.MediaPlayerCallback mediaPlayerCallback){
+        if (!callbacks.contains(mediaPlayerCallback)){
+            callbacks.add(mediaPlayerCallback);
+        }
+    }
+
+    public void unRegisterCallback(MediaPlayerController.MediaPlayerCallback mediaPlayerCallback){
+        if (callbacks.contains(mediaPlayerCallback)){
+            callbacks.remove(mediaPlayerCallback);
+        }
+    }
+
+    public interface MediaPlayerCallback{
+        void onPlayingChanged(boolean isPlaying);
+        void onMediaPlayerError();
     }
 }

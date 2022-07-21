@@ -6,9 +6,9 @@ import retrofit2.http.GET;
 import retrofit2.http.Path;
 
 public interface GetDataService {
-    @GET("/json/stations?limit=20&order=votes&reverse=true&hidebroken=true")
+    @GET("/json/stations")
     Call<List<StationInfo>> getAllStations();
 
-    @GET("/json/stations/bytag/{tag}?limit=20&order=votes&reverse=true&hidebroken=true")
+    @GET("/json/stations/bytag/{tag}")
     Call<List<StationInfo>> getStationsByTag(@Path("tag") String tag);
 }

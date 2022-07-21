@@ -118,7 +118,6 @@
             android:id="@+id/volumebar"
             app:sl_minValue="0"
             app:sl_maxValue="100"
-            app:sl_value="50"
             app:v_styleId="@array/slider"
             android:paddingTop="0dip"
             android:paddingRight="10dp"

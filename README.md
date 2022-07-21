@@ -44,7 +44,8 @@ Coming soon:
 
 ## Video Walkthrough
 
-Here's a walkthrough of implemented user stories:<img src='https://https://github.com/janemeenaghan/JaneCapstoneProject/blob/master/Demo%201.gif' title='Video Walkthrough' width='' alt='Video Walkthrough' />
+Here's a walkthrough of implemented user stories:
+<img src='https://github.com/janemeenaghan/JaneCapstoneProject/blob/629064186c800381dd15d76a1955e775bc0bc8cc/Demo%201.gif' title='Video Walkthrough' width='' alt='Video Walkthrough' />
 
 GIF created with [ezgif](https://ezgif.com/video-to-gif).
 

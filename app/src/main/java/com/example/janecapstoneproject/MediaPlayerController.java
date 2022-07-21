@@ -69,6 +69,15 @@ public class MediaPlayerController {
         }
     }
 
+    public void pause(){
+        if(mediaPlayer.isPlaying()) {
+            mediaPlayer.pause();
+        }
+        for (MediaPlayerController.MediaPlayerCallback callback : callbacks){
+            callback.onPlayingChanged(isPlaying());
+        }
+    }
+
     public boolean isPlaying(){
         return mediaPlayer.isPlaying();
     }
@@ -83,7 +92,6 @@ public class MediaPlayerController {
         else {
             mediaPlayer = new MediaPlayer();
             mediaPlayer.setAudioStreamType(AudioManager.STREAM_MUSIC);
-            // If breaks, try Context.AUDIO_SERVICE or context.AUDIO_SERVICE here instead of just AUDIO_SERVICE
             mediaPlayer.setOnPreparedListener(mp -> startPlaying());
             mediaPlayer.setOnErrorListener(new MediaPlayer.OnErrorListener() {
                 @Override

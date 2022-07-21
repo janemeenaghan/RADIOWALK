@@ -1,111 +1,75 @@
 package com.example.janecapstoneproject;
 
 import static com.example.janecapstoneproject.MainActivity.KEY_GEOPOINT;
-import static com.example.janecapstoneproject.MainActivity.STATION_DETECTION_RADIUS_KILOMETERS;
+import static com.example.janecapstoneproject.MapController.CURRENT_MARKER_COLOR;
+import static com.example.janecapstoneproject.MainActivity.PUBLIC_TYPE;
+import static com.example.janecapstoneproject.MainActivity.PRIVATE_TYPE;
 import static com.example.janecapstoneproject.MainActivity.STATION_INTERACTION_RADIUS_METERS;
 import static com.example.janecapstoneproject.Station.KEY_USERSSHAREDSTATIONS;
-
 import android.content.Context;
-import android.graphics.Color;
 import android.location.Location;
 import android.util.Log;
-
-import com.google.android.gms.maps.model.BitmapDescriptorFactory;
 import com.google.android.gms.maps.model.Circle;
-import com.google.android.gms.maps.model.CircleOptions;
 import com.google.android.gms.maps.model.LatLng;
-import com.google.android.gms.maps.model.MarkerOptions;
+import com.google.android.gms.maps.model.Marker;
 import com.parse.FindCallback;
 import com.parse.ParseException;
 import com.parse.ParseGeoPoint;
 import com.parse.ParseQuery;
 import com.parse.ParseUser;
-
 import org.json.JSONArray;
 import org.json.JSONException;
-
 import java.io.IOException;
 import java.util.ArrayList;
 import java.util.List;
 
 public class StationController {
     public static final String TAG = "StationController";
-    Station nearestStation;
-    float shortestDistance;
-    //private ArrayList<StationController.StationControllerCallback> callbacks = new ArrayList<>();
-    StationController.StationControllerCallback myCallback;
+    private Station globalCurrentStation;
+    public static final int DEFAULT_ZOOM = 15;
+    private Station nearestStation;
+    private float shortestDistance;
+    private ArrayList<StationController.StationControllerCallback> callbacks = new ArrayList<>();
 
-    public StationController(){
-
+    public Station getGlobalCurrentStation() {
+        return globalCurrentStation;
     }
 
-
-    public Circle addCircleAndReturnIt(Station station, LatLng coords) {
-
-        if (station.isPublic()) {
-            station.setCircle(globalMap.addCircle(new CircleOptions()
-                    .center(coords)
-                    .radius(STATION_INTERACTION_RADIUS_METERS)
-                    .strokeColor(PUBLIC_CIRCLE_RGB)
-                    .fillColor(Color.TRANSPARENT).strokeWidth(5.0F)));
-        }
-        else {
-            station.setCircle(globalMap.addCircle(new CircleOptions()
-                    .center(coords)
-                    .radius(STATION_INTERACTION_RADIUS_METERS)
-                    .strokeColor(PRIVATE_CIRCLE_RGB)
-                    .fillColor(Color.TRANSPARENT).strokeWidth(5.0F)));
-        }
+    public void setGlobalCurrentStation(Station globalCurrentStation) {
+        this.globalCurrentStation = globalCurrentStation;
     }
-    public void renderStation(Station station) {
-        Log.d(TAG, station.getName());
-        if (station != null && station.getCoords() != null) {
-            if (station.isPublic()) {
-                station.setMarker(globalMap.addMarker(new MarkerOptions()
-                        .position(station.getCoords())
-                        .title(station.getName())
-                        .icon(BitmapDescriptorFactory.fromResource(R.drawable.broadcastcyan))));
-            } else {
-                station.setMarker(globalMap.addMarker(new MarkerOptions()
-                        .position(station.getCoords())
-                        .title(station.getName())
-                        .icon(BitmapDescriptorFactory.fromResource(R.drawable.broadcastpurple))));
+
+    public void setGlobalCurrentStationMarkerColor(int which) {
+        globalCurrentStation.setMarkerColor(which);
+    }
+
+    public boolean globalCurrentStationExists() {
+        return globalCurrentStation != null;
+    }
+
+    public void renderClosestStation(Context context, Station closestStation) {
+        if (closestStation.getMarker() == null){
+            for (StationController.StationControllerCallback callback : callbacks) {
+                closestStation.setMarker(callback.onRequestMarkerAddedToClosestStation(closestStation));
             }
-            addCircle(station, station.getCoords());
-            return;
-        }
-        //TODO: fail
-    }
-
-    public void renderClosestStation(Context context, Station station){
-        if (station.getMarker() == null){
-            station.setMarker(globalMap.addMarker(new MarkerOptions()
-                    .position(station.getCoords())
-                    .title(station.getName())
-                    .icon(BitmapDescriptorFactory.fromResource(R.drawable.broadcastgreen))));
         }
         else {
-            station.setMarkerColor(CURRENT_MARKER_COLOR);
+            closestStation.setMarkerColor(CURRENT_MARKER_COLOR);
         }
-        if(station.getCircle() == null){
-            addCircle(station,station.getCoords());
+        if(closestStation.getCircle() == null){
+            for (StationController.StationControllerCallback callback : callbacks) {
+                closestStation.setCircle(callback.onRequestCircleAddedToClosestStation(closestStation));
+            }
         }
-
-        setSlidingPanelElements(context, station.getFavicon(), station.getName(), station.getStreamName());
-        if (!station.getStreamLink().isEmpty()) {
-            mediaPlayerController.setURLAndPrepare(station.getStreamLink(),bypassMedia);
-            bypassMedia = false;
+        for (StationController.StationControllerCallback callback : callbacks) {
+            callback.updateUIToRenderClosestStation(closestStation);
         }
-        globalCurrentStation = station;
     }
 
-    private void renderNearbyStations(Context context, Location location, ) throws IOException {
-        ParseUser user = ParseUser.getCurrentUser();
-        // specify what type of data we want to query - Station.class
+    public void renderNearbyStations(ParseUser user, Context context, Location location, double kiloRadius) throws IOException {
         ParseQuery<Station> query = ParseQuery.getQuery(Station.class);
         //query.setLimit(20);
-        query.whereWithinKilometers(KEY_GEOPOINT, new ParseGeoPoint(location.getLatitude(), location.getLongitude()), STATION_DETECTION_RADIUS_KILOMETERS);
-        // start an asynchronous call for posts
+        query.whereWithinKilometers(KEY_GEOPOINT, new ParseGeoPoint(location.getLatitude(), location.getLongitude()), kiloRadius);
         nearestStation = null;
         shortestDistance = Integer.MAX_VALUE;
         query.findInBackground(new FindCallback<Station>() {
@@ -136,7 +100,9 @@ public class StationController {
                     }
                     if (includeStation) {
                         if ((globalCurrentStation == null || !station.getObjectId().equals(globalCurrentStation.getObjectId()))){
-                            renderStation(station);
+                            for (StationController.StationControllerCallback callback : callbacks) {
+                                callback.renderAStationToMap(station);
+                            }
                         }
                         float[] result = new float[1];
                         android.location.Location.distanceBetween(location.getLatitude(), location.getLongitude(), station.getLatitude(), station.getLongitude(), result);
@@ -152,22 +118,111 @@ public class StationController {
                 if (nearestStation != null) {
                     Log.d(TAG, "nearest station: " + nearestStation.getName());
                     if (shortestDistance <= STATION_INTERACTION_RADIUS_METERS) {
-                        myCallback.onCaseValidNearestStation(location,nearestStation);
+                        for (StationController.StationControllerCallback callback : callbacks) {
+                            callback.onCaseValidNearestStation(location,nearestStation,(globalCurrentStationExists() && !nearestStation.getObjectId().equals(globalCurrentStation.getObjectId())));
+                        }
                         return;
                     } else {
                         Log.d(TAG, "Nearest station is too far!");
-                        myCallback.onCaseNoNearbyStation(location);
+                        for (StationController.StationControllerCallback callback : callbacks) {
+                            callback.onCaseNoNearbyStation(location);
+                        }
                     }
                 } else {
                     Log.e(TAG, "Nearest station is null", e);
-                    myCallback.onCaseNoNearbyStation(location);
+                    for (StationController.StationControllerCallback callback : callbacks) {
+                        callback.onCaseNoNearbyStation(location);
+                    }
                 }
             }
         });
     }
 
+    public void addStation (String name,int type, LatLng coords, ParseUser user, String
+            streamLink, String streamName, String favicon, Context context){
+        try {
+            saveStation(name, type, coords, user, streamLink, streamName, favicon, context);
+        } catch (JSONException e) {
+            e.printStackTrace();
+        }
+    }
+
+    private void saveStation(String name, int type, LatLng coords, ParseUser user, String streamLink, String streamName, String favicon, Context context) throws JSONException {
+        Station station = new Station();
+        station.setName(name);
+        station.setGeoPoint(coords);
+        station.setStreamLink(streamLink);
+        station.setStreamName(streamName);
+        station.setFavicon(favicon);
+        if (type == PRIVATE_TYPE) {
+            station.setType(PRIVATE_TYPE);
+            station.setUser(user);
+            station.addUserToSharedList(user);
+        } else {
+            station.setType(PUBLIC_TYPE);
+        }
+        station.saveInBackground(e -> {
+            if (type == PRIVATE_TYPE) {
+                try {
+                    for (StationController.StationControllerCallback callback : callbacks) {
+                        callback.onSaveStation(station,user);
+                    }
+                } catch (JSONException ex) {
+                    ex.printStackTrace();
+                }
+            }
+            if (e != null) {
+                Log.e(TAG, "Error while saving", e);
+            }
+            else{
+                Log.d(TAG, "Station save was successful!");
+            }
+        });
+    }
+
+    private void addStationToAUsersSharedList (Station station, ParseUser user){
+        try {
+            station.addThisToUsersSharedList(user);
+            station.saveInBackground();
+        } catch (JSONException ex) {
+            ex.printStackTrace();
+        }
+    }
+
+    private void addUserToAStationsSharedList (Station station, ParseUser user){
+        try {
+            station.addUserToSharedList(user);
+            user.saveInBackground();
+        } catch (JSONException ex) {
+            ex.printStackTrace();
+        }
+    }
+
+    public void shareStationWithUser (Station station, ParseUser user){
+        addStationToAUsersSharedList(station, user);
+        addUserToAStationsSharedList(station, user);
+    }
+
+    public void registerCallback(StationController.StationControllerCallback stationControllerCallback){
+        if (!callbacks.contains(stationControllerCallback)){
+            callbacks.add(stationControllerCallback);
+        }
+    }
+
+    public void unRegisterCallback(StationController.StationControllerCallback stationControllerCallback){
+        if (callbacks.contains(stationControllerCallback)){
+            callbacks.remove(stationControllerCallback);
+        }
+    }
+
     public interface StationControllerCallback{
         void onCaseNoNearbyStation(Location location);
-        void onCaseValidNearestStation(Location location, Station nearestStation);
+        void onCaseValidNearestStation(Location location, Station nearestStation, boolean needToDeselectCurrentStation);
+        void onSaveStation(Station station,ParseUser user) throws JSONException;
+        Marker onRequestMarkerAddedToClosestStation(Station closestStation);
+        Circle onRequestCircleAddedToClosestStation(Station closestStation);
+        void updateUIToRenderClosestStation(Station station);
+        void renderAStationToMap(Station station);
+
     }
 }

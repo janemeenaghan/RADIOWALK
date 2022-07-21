@@ -78,17 +78,18 @@ public class BrowseStationsActivity extends AppCompatActivity implements Station
         call.enqueue(new Callback<List<StationInfo>>() {
             @Override
             public void onResponse(Call<List<StationInfo>> call, Response<List<StationInfo>> response) {
-                //dismiss progress loader
                 generateDataList(response.body());
+                progressDialog.dismiss();
             }
 
             @Override
             public void onFailure(Call<List<StationInfo>> call, Throwable t) {
-                //dismiss progress loader
                 Toast.makeText(BrowseStationsActivity.this, "Something went wrong...Please try later!", Toast.LENGTH_SHORT).show();
+                progressDialog.dismiss();
             }
         });
     }
+
 
 
     public void initSearchView(){
@@ -96,7 +97,6 @@ public class BrowseStationsActivity extends AppCompatActivity implements Station
         searchView.setOnQueryTextListener(new SearchView.OnQueryTextListener() {
             @Override
             public boolean onQueryTextChange(String newText) {
-                //Log.e("onQueryTextChange", "==called");
                 return false;
             }
 
@@ -109,15 +109,7 @@ public class BrowseStationsActivity extends AppCompatActivity implements Station
 
         });
     }
-    /*private void generateGenreList(){
-        tagsRecycler = findViewById(R.id.tagsRecycler);
-        //adapter setup
-        LinearLayoutManager layoutManager
-                = new LinearLayoutManager(this, LinearLayoutManager.HORIZONTAL, false);
-        tagsRecycler.setLayoutManager(layoutManager);
-        //tagsRecycler.setAdapter(someadapter);
-    }*/
-    /*Method to generate List of data using RecyclerView with custom adapter*/
+
     private void generateDataList(List<StationInfo> stationList) {
         stationInfoListStorage = stationList;
         stationRecycler = findViewById(R.id.stationRecycler);

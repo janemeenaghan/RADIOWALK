@@ -16,6 +16,7 @@ public class VolumeController {
             callback.onMaxVolumeChanged(leftAm.getStreamMaxVolume(AudioManager.STREAM_MUSIC));
             callback.onVolumeChanged(leftAm.getStreamVolume(AudioManager.STREAM_MUSIC));
         }
+
     }
     public void setVolume(int volume){
         leftAm.setStreamVolume(AudioManager.STREAM_MUSIC, volume, 0);

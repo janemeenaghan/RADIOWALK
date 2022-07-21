@@ -26,7 +26,7 @@ public class BrowseStationsActivity extends AppCompatActivity implements Station
     private int isNew;
     private LatLng latLng;
     private String stationName;
-    ProgressDialog progressDialog;
+    ProgressDialog progressDialog, referenceToProgressDialogShow;
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -55,7 +55,7 @@ public class BrowseStationsActivity extends AppCompatActivity implements Station
     public void fetchAllStations() {
         progressDialog = new ProgressDialog(BrowseStationsActivity.this);
         progressDialog.setMessage("Loading....");
-        progressDialog.show();
+        referenceToProgressDialogShow =progressDialog.show(this, "Loading","Please wait a few seconds....");
         Call<List<StationInfo>> call = service.getAllStations();
         call.enqueue(new Callback<List<StationInfo>>() {
             @Override
@@ -78,14 +78,16 @@ public class BrowseStationsActivity extends AppCompatActivity implements Station
         call.enqueue(new Callback<List<StationInfo>>() {
             @Override
             public void onResponse(Call<List<StationInfo>> call, Response<List<StationInfo>> response) {
-                generateDataList(response.body());
                 progressDialog.dismiss();
+                referenceToProgressDialogShow.dismiss();
+                generateDataList(response.body());
             }
 
             @Override
             public void onFailure(Call<List<StationInfo>> call, Throwable t) {
-                Toast.makeText(BrowseStationsActivity.this, "Something went wrong...Please try later!", Toast.LENGTH_SHORT).show();
                 progressDialog.dismiss();
+                referenceToProgressDialogShow.dismiss();
+                Toast.makeText(BrowseStationsActivity.this, "Something went wrong...Please try later!", Toast.LENGTH_SHORT).show();
             }
         });
     }

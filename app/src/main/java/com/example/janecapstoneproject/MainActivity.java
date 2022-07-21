@@ -48,8 +48,8 @@ import org.json.JSONException;
 import org.parceler.Parcels;
 import java.io.IOException;
 
-public class MainActivity extends AppCompatActivity implements OnMapReadyCallback, VolumeController.VolumeCallback, LocationController.LocationCallback, Station.StationCallback, StationController.StationControllerCallback, MediaPlayerController.MediaPlayerCallback {
-    private boolean editButtonHasBeenInitialized, bypassFaviconChecks, bypassMediaChecks;
+public class MainActivity extends AppCompatActivity implements OnMapReadyCallback, VolumeController.VolumeCallback, LocationController.LocationCallback, Station.StationCallback, StationController.StationControllerCallback, MediaPlayerController.MediaPlayerCallback, MapController.MapCallback {
+    private boolean editButtonHasBeenInitialized, bypassFaviconChecks, bypassMediaChecks,bypassMapChecks;
     public int REQUEST_CODE = 1001;
     public static final int PUBLIC_TYPE = 0;
     public static final int PRIVATE_TYPE = 1;
@@ -85,6 +85,7 @@ public class MainActivity extends AppCompatActivity implements OnMapReadyCallbac
         editButtonHasBeenInitialized = false;
         bypassMediaChecks = false;
         bypassFaviconChecks = false;
+        bypassMapChecks = false;
         initDrawables();
         initToolbar();
         initStation();
@@ -132,10 +133,12 @@ public class MainActivity extends AppCompatActivity implements OnMapReadyCallbac
     @Override
     protected void onDestroy() {
         mMapView.onDestroy();
+        volumeController.unRegisterCallback(this);
         mediaPlayerController.unRegisterCallback(this);
         stationController.unRegisterCallback(this);
         locationController.unRegisterCallback(this);
-        volumeController.unRegisterCallback(this);
+        mapController.unRegisterCallback((MapController.MapCallback) this);
+
         super.onDestroy();
     }
     @Override
@@ -420,9 +423,8 @@ public class MainActivity extends AppCompatActivity implements OnMapReadyCallbac
     public void onLocationResult(Location location) throws IOException {
         Log.d("MainActivity", "onLocationResult");
         locationController.setGlobalLocation(location);
-        //maps, update stationRecycler
         if (mapController.getMap() != null) {
-            mapController.updateMapPositioning(location);
+            mapController.updateMapPositioning(location,bypassMapChecks);
             stationController.renderNearbyStations(ParseUser.getCurrentUser(),MainActivity.this,location,STATION_DETECTION_RADIUS_KILOMETERS);
         }
     }
@@ -430,7 +432,7 @@ public class MainActivity extends AppCompatActivity implements OnMapReadyCallbac
     public void onRetrieveLocationResultAccompanyingBypass() {
         bypassMediaChecks = true;
         bypassFaviconChecks = true;
-        mapController.setBypassChecks(true);
+        bypassMapChecks = true;
     }
 
     //STATION CONTROLLER
@@ -453,9 +455,13 @@ public class MainActivity extends AppCompatActivity implements OnMapReadyCallbac
     @Override
     public void onMapReady(GoogleMap map) {
         mapController = new MapController(this, map);
+        mapController.registerCallback(this);
         locationController.retrieveLocation(this);
     }
-
+    @Override
+    public void turnOffBypass() {
+        bypassMapChecks = false;
+    }
     //STATION BUTTONS CODE
     private void initAddStationButton(ParseUser user, Context context) {
         addStationButton = findViewById(R.id.createButton);

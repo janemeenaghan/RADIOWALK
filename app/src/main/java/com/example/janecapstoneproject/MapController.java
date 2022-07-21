@@ -18,6 +18,7 @@ import android.graphics.Color;
 import android.location.Location;
 import android.util.Log;
 import java.io.IOException;
+import java.util.ArrayList;
 
 public class MapController {
     public static final String TAG = "MapController";
@@ -28,7 +29,8 @@ public class MapController {
     public static final int CURRENT_MARKER_COLOR = 2;
     private GoogleMap map;
     private Context context;
-    private boolean firstInstance,bypassChecks;
+    private boolean firstInstance;
+    private ArrayList<MapController.MapCallback> callbacks = new ArrayList<>();
 
     public MapController(Context context, GoogleMap map) {
         firstInstance=true;
@@ -44,13 +46,9 @@ public class MapController {
         this.map = map;
     }
 
-    public void setBypassChecks(boolean bypassChecks) {
-        this.bypassChecks = bypassChecks;
-    }
-
     //MAP RENDERING
     @SuppressLint("MissingPermission")
-    public void updateMapPositioning(Location location) throws IOException {
+    public void updateMapPositioning(Location location,boolean bypassChecks) throws IOException {
         if (bypassChecks) {
             float zoom;
             map.setMyLocationEnabled(true);
@@ -65,7 +63,9 @@ public class MapController {
                         new LatLng(location.getLatitude(),
                                 location.getLongitude())));
             }
-            bypassChecks = false;
+            for(MapController.MapCallback callback : callbacks) {
+                callback.turnOffBypass();
+            }
         }
     }
 
@@ -125,5 +125,20 @@ public class MapController {
                 .radius(radiusMeters)
                 .strokeColor(strokeColor)
                 .fillColor(Color.TRANSPARENT).strokeWidth(5.0F)));
+    }
+
+    public void registerCallback(MapController.MapCallback mapCallback){
+        if (!callbacks.contains(mapCallback)){
+            callbacks.add(mapCallback);
+        }
+    }
+
+    public void unRegisterCallback(MapController.MapCallback mapCallback){
+        if (callbacks.contains(mapCallback)){
+            callbacks.remove(mapCallback);
+        }
+    }
+    public interface MapCallback{
+        void turnOffBypass();
     }
 }

@@ -66,7 +66,7 @@ import java.util.List;
 import java.util.Vector;
 import de.sfuhrm.radiobrowser4j.RadioBrowser;
 
-public class MainActivity extends AppCompatActivity implements OnMapReadyCallback, VolumeController.VolumeCallback, LocationController.LocationCallback, Station.StationCallback {
+public class MainActivity extends AppCompatActivity implements OnMapReadyCallback, VolumeController.VolumeCallback, LocationController.LocationCallback, Station.StationCallback, StationController.StationControllerCallback{
     private MapView mMapView;
     public com.rey.material.widget.FloatingActionButton addStationButton,editStationButton;
     public int REQUEST_CODE = 1001;
@@ -505,155 +505,10 @@ public class MainActivity extends AppCompatActivity implements OnMapReadyCallbac
         });
     }
 
-    Station nearestStation;
-    float shortestDistance;
-    private void renderNearbyStations(Context context, Location location) throws IOException {
-        ParseUser user = ParseUser.getCurrentUser();
-        // specify what type of data we want to query - Station.class
-        ParseQuery<Station> query = ParseQuery.getQuery(Station.class);
-        //query.setLimit(20);
-        //query.whereWithinKilometers(KEY_GEOPOINT,new ParseGeoPoint(location.getLatitude(),location.getLongitude()), STATION_RADIUS_KILOMETERS, true);
-        query.whereWithinKilometers(KEY_GEOPOINT, new ParseGeoPoint(location.getLatitude(), location.getLongitude()), STATION_DETECTION_RADIUS_KILOMETERS);
-        // start an asynchronous call for posts
-        nearestStation = null;
-        shortestDistance = Integer.MAX_VALUE;
-        query.findInBackground(new FindCallback<Station>() {
-            @Override
-            public void done(List<Station> stations, ParseException e) {
-                if (e != null) {
-                    Log.e(TAG, "Issue with getting stationRecycler", e);
-                    return;
-                }
-                for (Station station : stations) {
-                    boolean includeStation = false;
-                    if (station.isPublic()) {
-                        includeStation = true;
-                    } else {
-                        String objId = station.getObjectId();
-                        JSONArray array = user.getJSONArray(KEY_USERSSHAREDSTATIONS);
-                        if (array != null) {
-                            for (int i = 0; i < array.length(); i++) {
-                                try {
-                                    if (objId.equals(array.get(i))) {
-                                        includeStation = true;
-                                    }
-                                } catch (JSONException ex) {
-                                    ex.printStackTrace();
-                                }
-                            }
-                        }
-                    }
-                    if (includeStation) {
-                        if ((globalCurrentStation == null || !station.getObjectId().equals(globalCurrentStation.getObjectId()))){
-                            renderStation(station);
-                        }
-                        float[] result = new float[1];
-                        android.location.Location.distanceBetween(location.getLatitude(), location.getLongitude(), station.getLatitude(), station.getLongitude(), result);
-                        //might crash here check if it's null before but I think I've been doing that wrong
-                        if (result[0] <= shortestDistance) {
-                            shortestDistance = result[0];
-                            nearestStation = station;
-                        } else {
-                            Log.e(TAG, "Result is null", e);
-                        }
-                    }
-                }
-                if (nearestStation != null) {
-                    Log.d(TAG, "nearest station: " + nearestStation.getName());
-                    if (shortestDistance <= STATION_INTERACTION_RADIUS_METERS) {
-                        handleCaseValidNearestStation(context,nearestStation);
-                        return;
-                    } else {
-                        Log.d(TAG, "Nearest station is too far!");
-                        handleCaseNoNearbyStation(location);
-                    }
-                } else {
-                    Log.e(TAG, "Nearest station is null", e);
-                    handleCaseNoNearbyStation(location);
-                }
-            }
-        });
-    }
 
-    public void renderStation(Station station) {
-        Log.d(TAG, station.getName());
-        if (station != null && station.getCoords() != null) {
-            if (station.isPublic()) {
-                station.setMarker(globalMap.addMarker(new MarkerOptions()
-                        .position(station.getCoords())
-                        .title(station.getName())
-                        .icon(BitmapDescriptorFactory.fromResource(R.drawable.broadcastcyan))));
-            } else {
-                station.setMarker(globalMap.addMarker(new MarkerOptions()
-                        .position(station.getCoords())
-                        .title(station.getName())
-                        .icon(BitmapDescriptorFactory.fromResource(R.drawable.broadcastpurple))));
-            }
-            addCircle(station, station.getCoords());
-            return;
-        }
-        //TODO: fail
-    }
-    public void renderClosestStation(Context context, Station station){
-        if (station.getMarker() == null){
-            station.setMarker(globalMap.addMarker(new MarkerOptions()
-                    .position(station.getCoords())
-                    .title(station.getName())
-                    .icon(BitmapDescriptorFactory.fromResource(R.drawable.broadcastgreen))));
-        }
-        else {
-            station.setMarkerColor(CURRENT_MARKER_COLOR);
-        }
-        if(station.getCircle() == null){
-            addCircle(station,station.getCoords());
-        }
 
-        setSlidingPanelElements(context, station.getFavicon(), station.getName(), station.getStreamName());
-        if (!station.getStreamLink().isEmpty()) {
-            mediaPlayerController.setURLAndPrepare(station.getStreamLink(),bypassMedia);
-            bypassMedia = false;
-        }
-        globalCurrentStation = station;
-    }
-    public void handleCaseValidNearestStation(Context context, Station station) {
-        boolean initEdit = false;
-        if (globalCurrentStation != null && !station.getObjectId().equals(globalCurrentStation.getObjectId())) {
-            renderStation(globalCurrentStation);
-            initEdit = true;
-        }
-        addStationButton.setVisibility(View.INVISIBLE);
-        renderClosestStation(context, station);
-        if (initEdit){
-            initEditStationButton(station,station.getCoords(),ParseUser.getCurrentUser(),context);
-        }
-        if (!editHasBeenInitialized){
-            initEditStationButton(station,station.getCoords(),ParseUser.getCurrentUser(),context);
-        }
-        editStationButton.setVisibility(View.VISIBLE);
-    }
-    public void handleCaseNoNearbyStation(Location location) {
-        addStationButton.setVisibility(View.VISIBLE);
-        if (editHasBeenInitialized) {
-            editStationButton.setVisibility(View.INVISIBLE);
-        }
 
-        if (globalCurrentStation != null){
-            if (globalCurrentStation.getMarker() != null){
-                if (globalCurrentStation.isPublic()) {
-                    globalCurrentStation.setMarkerColor(0);
-                }
-                else{
-                    globalCurrentStation.setMarkerColor(1);//(BitmapDescriptorFactory.fromResource(R.drawable.broadcastgreen));
-                }
-            }
-        }
-        mediaPlayerController.setURLAndPrepare(null,true);
-        setStationNameText(getString(R.string.noStationFound));
-        setNowPlayingText("",true);
-        setMusicIcon(MainActivity.this,"",true);
-        locationController.retrieveLocation(MainActivity.this);
-    }
-    public void addCircle(Station station, LatLng coords) {
+    /*public void addCircle(Station station, LatLng coords) {
         if (station.isPublic()) {
                 station.setCircle(globalMap.addCircle(new CircleOptions()
                         .center(coords)
@@ -668,7 +523,25 @@ public class MainActivity extends AppCompatActivity implements OnMapReadyCallbac
                         .strokeColor(PRIVATE_CIRCLE_RGB)
                         .fillColor(Color.TRANSPARENT).strokeWidth(5.0F)));
             }
-    }
+    }*/
+    //DOES MAPS ACTUALLY RENDER CIRCLES/STATIONS OR DOES IT JUST CONVERT OPTIONS -> CIRCLE/STATION OBJECTS WHICH ARE SELF-RENDERING ON MAPS
+    public void addCircle(Station station, LatLng coords) {
+
+        if (station.isPublic()) {
+                station.setCircle(globalMap.addCircle(new CircleOptions()
+                        .center(coords)
+                        .radius(STATION_INTERACTION_RADIUS_METERS)
+                        .strokeColor(PUBLIC_CIRCLE_RGB)
+                        .fillColor(Color.TRANSPARENT).strokeWidth(5.0F)));
+        }
+        else {
+                station.setCircle(globalMap.addCircle(new CircleOptions()
+                        .center(coords)
+                        .radius(STATION_INTERACTION_RADIUS_METERS)
+                        .strokeColor(PRIVATE_CIRCLE_RGB)
+                        .fillColor(Color.TRANSPARENT).strokeWidth(5.0F)));
+            }
+    }*/
 
     public void addStation(String name, int type, LatLng coords, ParseUser user, String streamLink, String streamName, String favicon, Context context) {
         try {
@@ -871,5 +744,46 @@ public class MainActivity extends AppCompatActivity implements OnMapReadyCallbac
     @Override
     public void onSaveInBackground() {
         locationController.retrieveLocation(this);
+    }
+
+    @Override
+    public void onCaseNoNearbyStation(Location location) {
+        addStationButton.setVisibility(View.VISIBLE);
+        if (editHasBeenInitialized) {
+            editStationButton.setVisibility(View.INVISIBLE);
+        }
+        if (globalCurrentStation != null){
+            if (globalCurrentStation.getMarker() != null){
+                if (globalCurrentStation.isPublic()) {
+                    globalCurrentStation.setMarkerColor(0);
+                }
+                else{
+                    globalCurrentStation.setMarkerColor(1);//(BitmapDescriptorFactory.fromResource(R.drawable.broadcastgreen));
+                }
+            }
+        }
+        mediaPlayerController.setURLAndPrepare(null,true);
+        setStationNameText(getString(R.string.noStationFound));
+        setNowPlayingText("",true);
+        setMusicIcon(MainActivity.this,"",true);
+        locationController.retrieveLocation(MainActivity.this);
+    }
+
+    @Override
+    public void onCaseValidNearestStation(Location location, Station station) {
+        boolean initEdit = false;
+        if (globalCurrentStation != null && !station.getObjectId().equals(globalCurrentStation.getObjectId())) {
+            renderStation(globalCurrentStation);
+            initEdit = true;
+        }
+        addStationButton.setVisibility(View.INVISIBLE);
+        renderClosestStation(MainActivity.this, station);
+        if (initEdit){
+            initEditStationButton(station,station.getCoords(),ParseUser.getCurrentUser(),MainActivity.this);
+        }
+        if (!editHasBeenInitialized){
+            initEditStationButton(station,station.getCoords(),ParseUser.getCurrentUser(),MainActivity.this);
+        }
+        editStationButton.setVisibility(View.VISIBLE);
     }
 }

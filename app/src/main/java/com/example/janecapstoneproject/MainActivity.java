@@ -22,6 +22,7 @@ import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
 import android.widget.EditText;
+import android.widget.ImageButton;
 import android.widget.ImageView;
 import android.widget.TextView;
 import android.widget.Toast;
@@ -63,9 +64,10 @@ public class MainActivity extends AppCompatActivity implements OnMapReadyCallbac
     private Menu toolbarMenu;
     private MapView mMapView;
     private ImageView musicIcon;
-    private TextView nowPlayingText, stationNameText;
-    private Drawable dayIcon, nightIcon;
+    private TextView nowPlayingText, stationNameText,minusText,plusText;
+    private Drawable dayIcon, nightIcon, playIcon, pauseIcon;
     private Slider volControl;
+    private ImageButton playPauseButton;
     private com.rey.material.widget.FloatingActionButton addStationButton, editStationButton;
 
     private MapController mapController;
@@ -133,6 +135,7 @@ public class MainActivity extends AppCompatActivity implements OnMapReadyCallbac
         mediaPlayerController.unRegisterCallback(this);
         stationController.unRegisterCallback(this);
         locationController.unRegisterCallback(this);
+        volumeController.unRegisterCallback(this);
         super.onDestroy();
     }
     @Override
@@ -145,6 +148,8 @@ public class MainActivity extends AppCompatActivity implements OnMapReadyCallbac
     private void initDrawables() {
         dayIcon = AppCompatResources.getDrawable(this, R.drawable.daythemeicon_white);
         nightIcon = AppCompatResources.getDrawable(this, R.drawable.nightthemeicon_white);
+        playIcon = AppCompatResources.getDrawable(this, R.drawable.ic_media_play);
+        pauseIcon = AppCompatResources.getDrawable(this, R.drawable.ic_media_pause);
     }
 
     //TOOLBAR CODE
@@ -331,14 +336,45 @@ public class MainActivity extends AppCompatActivity implements OnMapReadyCallbac
 
     //MEDIA CONTROLLER
     private void initMediaPlayer() {
+        playPauseButton = findViewById(R.id.playPauseButton);
+        playPauseButton.setOnClickListener(v -> {
+            if(mediaPlayerController.isPlaying()){
+                mediaPlayerController.pause();
+            }
+            else{
+                mediaPlayerController.startPlaying();
+            }
+        });
         mediaPlayerController = new MediaPlayerController(this);
         mediaPlayerController.registerCallback(this);
     }
+    @RequiresApi(api = Build.VERSION_CODES.M)
+    @Override
+    public void onPlayingChanged(boolean isPlaying) {
+        if (isPlaying){
+            playPauseButton.setImageDrawable(pauseIcon);
+        }
+        else{
+            playPauseButton.setImageDrawable(playIcon);
+        }
+    }
+    @Override
+    public void onMediaPlayerError() {}
+
 
     //VOLUME CONTROLLER
     private void initVolume() {
+        plusText = findViewById(R.id.plusText);
+        plusText.setOnClickListener(v -> {
+            volumeController.raiseVolume();
+        });
+        minusText = findViewById(R.id.minusText);
+        minusText.setOnClickListener(v -> {
+            volumeController.lowerVolume();
+        });
         volControl = (Slider) findViewById(R.id.volumebar);
-        volumeController = new VolumeController(this, this);
+        volumeController = new VolumeController(this);
+        volumeController.registerCallback(this);
         volControl.setOnPositionChangeListener(new Slider.OnPositionChangeListener() {
             @Override
             public void onPositionChanged(Slider view, boolean fromUser, float oldPos, float newPos, int oldValue, int newValue) {
@@ -518,7 +554,7 @@ public class MainActivity extends AppCompatActivity implements OnMapReadyCallbac
         }
     }
 
-    //CALLBACKS
+    //STATIONCONTROLLER CALLBACKS
     @Override
     public void onSaveInBackground () {
         locationController.retrieveLocation(this);
@@ -588,10 +624,4 @@ public class MainActivity extends AppCompatActivity implements OnMapReadyCallbac
     public void renderAStationToMap(Station station) {
         mapController.renderStation(station);
     }
-
-    @Override
-    public void onPlayingChanged(boolean isPlaying) {}
-
-    @Override
-    public void onMediaPlayerError() {}
 }

@@ -5,8 +5,7 @@
     android:layout_width="match_parent"
     android:layout_height="match_parent"
     tools:context=".BrowseStationsActivity">
-
-
+    
     <TextView
         android:id="@+id/chooseAStationTextView"
         android:layout_width="0dp"
@@ -42,11 +41,11 @@
         app:layout_constraintWidth_percent="0.25"
         app:srcCompat="@drawable/launchicon" />
 
-
     <androidx.recyclerview.widget.RecyclerView
         android:id="@+id/stationRecycler"
         android:layout_width="match_parent"
-        android:layout_height="485dp"
+        android:layout_height="0dp"
+        app:layout_constraintHeight_percent="0.66"
         android:layout_marginTop="44dp"
         android:scrollbarAlwaysDrawVerticalTrack="true"
         android:scrollbars="vertical"
@@ -58,12 +57,10 @@
     <SearchView
         android:id="@+id/searchView"
         android:layout_width="0dp"
-        android:layout_height="25dp"
+        android:layout_height="0dp"
+        app:layout_constraintHeight_percent="0.03"
         app:barrierMargin="10dp"
         app:layout_constraintStart_toStartOf="@+id/chooseToSearchGuideline"
         app:layout_constraintTop_toTopOf="@+id/chooseAStationTextView"
         app:layout_constraintWidth_percent="0.4" />
-
-
-
 </androidx.constraintlayout.widget.ConstraintLayout>

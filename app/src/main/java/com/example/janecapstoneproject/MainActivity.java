@@ -184,9 +184,6 @@ public class MainActivity extends AppCompatActivity implements OnMapReadyCallbac
     public boolean onOptionsItemSelected(MenuItem item) {
         switch (item.getItemId()) {
             case R.id.tb_signout:
-                if (mediaPlayerController.isPlaying()) {
-                    mediaPlayerController.setURLAndPrepare(null, true);
-                }
                 logoutUser();
                 break;
             case R.id.tb_theme:

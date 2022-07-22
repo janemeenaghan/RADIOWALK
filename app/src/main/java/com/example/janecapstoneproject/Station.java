@@ -1,13 +1,11 @@
 package com.example.janecapstoneproject;
-import static com.example.janecapstoneproject.LoginActivity.TAG;
 
+import static com.example.janecapstoneproject.LoginActivity.TAG;
 import android.graphics.Color;
 import android.os.Parcelable;
 import android.util.Log;
 import android.widget.RatingBar;
-
 import androidx.annotation.Nullable;
-
 import com.google.android.gms.maps.model.BitmapDescriptorFactory;
 import com.google.android.gms.maps.model.Circle;
 import com.google.android.gms.maps.model.LatLng;
@@ -20,17 +18,22 @@ import com.parse.ParseClassName;
 import com.parse.ParseQuery;
 import com.parse.ParseUser;
 import com.parse.SaveCallback;
-
 import org.json.JSONArray;
 import org.json.JSONException;
 import org.parceler.Parcel;
-
 import java.lang.reflect.Array;
 import java.util.Date;
+import androidx.appcompat.app.AppCompatActivity;
+import android.app.AlertDialog;
+import android.app.ProgressDialog;
+import android.content.Intent;
+import android.os.Bundle;
+import android.widget.Button;
+import com.facebook.login.LoginManager;
+import com.parse.ParseUser;
 //@Parcel(analyze= Station.class)
 @ParseClassName("Station")
 public class Station extends ParseObject {
-//    Circle circle;
     public static final String KEY_GEOPOINT = "geopoint";
     public static final String KEY_TYPE = "type";
     public static final String KEY_NAME = "name";
@@ -72,6 +75,7 @@ public class Station extends ParseObject {
             return getString(KEY_FAVICON);
         }
     }
+
     public ParseUser getUser(){ return getParseUser(KEY_USER);}
     public JSONArray getUsersSharedWith(){
         return getJSONArray(KEY_USERSSHAREDWITH);
@@ -93,12 +97,12 @@ public class Station extends ParseObject {
     public void setCircle(Circle circle) {
         this.circle = circle;
     }
+    public Circle setCircleAndRetrieve(Circle circle) {
+        return this.circle = circle;
+    }
     public void setCircleColor(int rgb){
         circle.setStrokeColor(rgb);
     }
-    /*public void handleSetMarkerColor(int which){
-
-    }*/
     public void setMarker(Marker marker) {
         this.marker = marker;
     }
@@ -127,6 +131,7 @@ public class Station extends ParseObject {
             }
         }
     }
+
     public void addUserToSharedList(ParseUser user) throws JSONException {
         if (getJSONArray(KEY_USERSSHAREDWITH)==null){
             JSONArray array = new JSONArray().put(user.getObjectId());
@@ -136,8 +141,8 @@ public class Station extends ParseObject {
             JSONArray array = getJSONArray(KEY_USERSSHAREDWITH).put(user.getObjectId());
             put(KEY_USERSSHAREDWITH, array);
         }
-
     }
+
     public void addThisToUsersSharedList(ParseUser user) throws JSONException {
         if (user.getJSONArray(KEY_USERSSHAREDSTATIONS)==null){
             JSONArray array = new JSONArray().put(this.getObjectId());
@@ -160,11 +165,6 @@ public class Station extends ParseObject {
             }
         });
     }
-    /*public boolean thisIsIncludedInUsersSharedList(ParseUser user){
-        JSONArray array = user.getJSONArray(KEY_USERSSHAREDSTATIONS);
-
-    }*/
-
 
     @Override
     public boolean equals(@Nullable Object obj) {
@@ -172,7 +172,6 @@ public class Station extends ParseObject {
             return getObjectId().equals(((Station) obj).getObjectId());
         }
         return false;
-        //return super.equals(obj);
     }
 
     public static String calculateTimeAgo(Date createdAt) {

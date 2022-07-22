@@ -1,0 +1,76 @@
+<?xml version="1.0" encoding="utf-8"?>
+<androidx.constraintlayout.widget.ConstraintLayout
+    xmlns:sothree="http://schemas.android.com/apk/res-auto"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:orientation="horizontal"
+    android:gravity="center">
+
+    <androidx.appcompat.widget.Toolbar
+        android:id="@+id/main_toolbar"
+        android:layout_height="wrap_content"
+        android:layout_width="match_parent"
+        android:visibility="visible"
+        android:minHeight="?attr/actionBarSize"
+        app:theme="@style/AppBar"/>
+
+    <androidx.constraintlayout.widget.Guideline
+        android:id="@+id/fabGuidelineVert"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:orientation="vertical"
+        app:layout_constraintGuide_percent="0.9" />
+
+    <androidx.constraintlayout.widget.Guideline
+        android:id="@+id/fabGuidelineHoriz"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:orientation="horizontal"
+        app:layout_constraintGuide_percent="0.875" />
+
+    <androidx.constraintlayout.widget.Guideline
+        android:id="@+id/mapGuidelineHoriz"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:orientation="horizontal"
+        app:layout_constraintGuide_percent="0.08" />
+
+    <com.rey.material.widget.FloatingActionButton
+        android:id="@+id/editButton"
+        android:layout_width="0dp"
+        android:layout_height="0dp"
+        app:layout_constraintWidth_percent="0.171"
+        app:layout_constraintDimensionRatio="1:1"
+        app:layout_constraintRight_toLeftOf="@id/fabGuidelineVert"
+        app:layout_constraintBottom_toBottomOf="@id/fabGuidelineHoriz"
+        android:elevation="1dp"
+        android:visibility="invisible"
+        android:src="@drawable/ic_baseline_settings_24"
+        app:v_styleId="@array/fab_line_green" />
+
+    <com.rey.material.widget.FloatingActionButton
+        android:id="@+id/createButton"
+        android:layout_width="0dp"
+        android:layout_height="0dp"
+        app:layout_constraintWidth_percent="0.171"
+        app:layout_constraintDimensionRatio="1:1"
+        app:layout_constraintRight_toLeftOf="@id/fabGuidelineVert"
+        app:layout_constraintBottom_toBottomOf="@id/fabGuidelineHoriz"
+        android:elevation="1dp"
+        android:visibility="invisible"
+        android:src="@drawable/ic_baseline_add_24"
+        app:v_styleId="@array/fab_line_purple" />
+
+    <com.google.android.gms.maps.MapView
+        android:id="@+id/mapView"
+        android:layout_width="match_parent"
+        android:layout_height="0dp"
+        app:layout_constraintHeight_percent=".94"
+        app:layout_constraintTop_toTopOf="@id/mapGuidelineHoriz"
+        android:contentDescription="@string/app_name"
+        android:gravity="center" />
+
+</androidx.constraintlayout.widget.ConstraintLayout>

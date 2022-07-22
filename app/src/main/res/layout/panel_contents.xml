@@ -1,45 +1,140 @@
 <?xml version="1.0" encoding="utf-8"?>
 <androidx.constraintlayout.widget.ConstraintLayout
-    xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:sothree="http://schemas.android.com/apk/res-auto"
     xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
     android:orientation="horizontal"
     android:gravity="center|top">
-    <androidx.constraintlayout.widget.Guideline
-        android:id="@+id/guidelineHorizForImage"
+
+    <ImageView
+        android:id="@+id/musicIcon"
+        android:layout_width="0dp"
+        app:layout_constraintWidth_percent="0.17"
+        android:layout_height="0dp"
+        app:layout_constraintDimensionRatio="1:1"
+        sothree:layout_constraintLeft_toLeftOf="parent"
+        sothree:layout_constraintTop_toTopOf="parent"
+        android:visibility="visible"
+        sothree:srcCompat="@drawable/tempmusicicon"
+        tools:srcCompat="@tools:sample/avatars" />
+
+    <ImageButton
+        android:id="@+id/playPauseButton"
+        android:layout_width="0dp"
+        android:background="@null"
+        app:layout_constraintWidth_percent="0.17"
+        android:layout_height="0dp"
+        app:layout_constraintDimensionRatio="1:1"
+        sothree:layout_constraintLeft_toRightOf="@id/musicIcon"
+        sothree:layout_constraintTop_toTopOf="@id/musicIcon"
+        tools:srcCompat="@android:drawable/ic_media_play"
+        />
+
+    <com.rey.material.widget.TextView
+        android:id="@+id/stationNameText"
+        android:layout_width="0dp"
+        app:layout_constraintWidth_percent="0.3"
+        android:layout_height="0dp"
+        app:layout_constraintHeight_percent="0.025"
+        android:layout_weight="1"
+        android:singleLine="true"
+        android:focusable="true"
+        android:focusableInTouchMode="true"
+        android:scrollHorizontally="true"
+        android:text="@string/noStationFound"
+        android:textSize="8sp"
+        app:v_styleId="@array/text_body"
+        sothree:layout_constraintLeft_toRightOf="@+id/playPauseButton"
+        sothree:layout_constraintTop_toTopOf="@+id/musicIcon" />
+
+    <com.rey.material.widget.TextView
+        android:id="@+id/minusText"
+        android:text="-"
+        android:textSize="12sp"
+        app:v_styleId="@array/text_title"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:orientation="horizontal"
-        app:layout_constraintGuide_percent="0.04" />
-    <TextView
-        android:id="@+id/musicInformation"
-        android:layout_width="237dp"
-        android:layout_height="20dp"
+        android:paddingLeft="10dp"
+        sothree:layout_constraintLeft_toLeftOf="@+id/volumebar"
+        sothree:layout_constraintTop_toTopOf="@+id/nowPlayingText"
+        sothree:layout_constraintBottom_toBottomOf="@+id/volumebar"/>
+
+    <com.rey.material.widget.TextView
+        android:id="@+id/plusText"
+        android:text="+"
+        android:textSize="12sp"
+        app:v_styleId="@array/text_title"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:paddingRight="10dp"
+        sothree:layout_constraintRight_toRightOf="@+id/volumebar"
+        sothree:layout_constraintTop_toTopOf="@+id/nowPlayingText"
+        sothree:layout_constraintBottom_toBottomOf="@+id/volumebar"/>
+
+
+    <com.rey.material.widget.TextView
+        android:id="@+id/nowPlayingText"
+        android:layout_width="0dp"
+        app:layout_constraintWidth_percent="0.3"
+        android:layout_height="0dp"
+        app:layout_constraintHeight_percent="0.025"
         android:layout_weight="1"
         android:ellipsize="marquee"
         android:focusable="true"
         android:focusableInTouchMode="true"
+        android:marqueeRepeatLimit="marquee_forever"
         android:scrollHorizontally="true"
-        android:text="TextView"
-        android:textSize="12sp"
-        app:layout_constraintBottom_toBottomOf="@+id/musicIcon"
-        app:layout_constraintStart_toEndOf="@+id/musicIcon"
-        app:layout_constraintTop_toTopOf="@+id/musicIcon" />
-    <ImageView
-        android:id="@+id/musicIcon"
-        android:layout_width="67dp"
-        android:layout_height="76dp"
-        sothree:srcCompat="@drawable/tempmusicicon"
-        tools:layout_editor_absoluteX="16dp"
-        tools:layout_editor_absoluteY="28dp"
-        tools:srcCompat="@tools:sample/avatars" />
+        android:singleLine="true"
+        android:text=""
+        android:textSize="8sp"
+        app:v_styleId="@array/text_body"
+        sothree:layout_constraintLeft_toRightOf="@+id/guidelineVertForNowPlayingText"
+        sothree:layout_constraintTop_toTopOf="@+id/musicIcon" />
+
+    <com.rey.material.widget.Slider
+        android:id="@+id/volumebar"
+        style="@style/Material.Widget.Slider.Discrete"
+        android:layout_width="0dp"
+        android:layout_height="wrap_content"
+        android:gravity="center"
+        android:paddingLeft="10dp"
+        android:paddingTop="0dip"
+        app:layout_constraintWidth_percent="0.6"
+        sothree:sl_maxValue="15"
+        sothree:sl_minValue="0"
+        app:v_styleId="@array/slider"
+        sothree:layout_constraintBottom_toBottomOf="@+id/playPauseButton"
+        sothree:layout_constraintLeft_toRightOf="@id/playPauseButton" />
+
     <androidx.constraintlayout.widget.Guideline
         android:id="@+id/guidelineVertForImage"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:orientation="vertical"
-        app:layout_constraintGuide_percent="0.04" />
+        sothree:layout_constraintGuide_percent="0.04" />
+
+    <androidx.constraintlayout.widget.Guideline
+        android:id="@+id/guidelineVertForStationNameText"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:orientation="vertical"
+        sothree:layout_constraintGuide_percent="0.2" />
+
+    <androidx.constraintlayout.widget.Guideline
+        android:id="@+id/guidelineVertForNowPlayingText"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:orientation="vertical"
+        sothree:layout_constraintGuide_percent="0.66" />
+
+    <androidx.constraintlayout.widget.Guideline
+        android:id="@+id/guidelineHorizForImage"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:orientation="horizontal"
+        sothree:layout_constraintGuide_percent="0.04" />
+
 </androidx.constraintlayout.widget.ConstraintLayout>

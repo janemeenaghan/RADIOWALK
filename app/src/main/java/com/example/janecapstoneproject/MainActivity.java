@@ -6,7 +6,6 @@ import androidx.appcompat.app.AlertDialog;
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.appcompat.content.res.AppCompatResources;
 import androidx.appcompat.widget.Toolbar;
-
 import android.annotation.SuppressLint;
 import android.content.Context;
 import android.content.DialogInterface;
@@ -26,7 +25,7 @@ import android.widget.ImageButton;
 import android.widget.ImageView;
 import android.widget.TextView;
 import android.widget.Toast;
-
+import com.facebook.login.LoginManager;
 import com.google.android.gms.maps.GoogleMap;
 import com.google.android.gms.maps.MapView;
 import com.google.android.gms.maps.OnMapReadyCallback;
@@ -36,6 +35,7 @@ import com.google.android.gms.maps.model.LatLng;
 import com.google.android.gms.maps.model.Marker;
 import com.google.android.gms.maps.model.MarkerOptions;
 import com.parse.ParseUser;
+import com.parse.facebook.ParseFacebookUtils;
 import com.rey.material.app.ThemeManager;
 import com.rey.material.app.ToolbarManager;
 import com.rey.material.drawable.ThemeDrawable;
@@ -43,10 +43,11 @@ import com.rey.material.util.ViewUtil;
 import com.rey.material.widget.Slider;
 import com.squareup.picasso.Callback;
 import com.squareup.picasso.Picasso;
-
 import org.json.JSONException;
 import org.parceler.Parcels;
 import java.io.IOException;
+import java.util.Arrays;
+import java.util.Collection;
 
 public class MainActivity extends AppCompatActivity implements OnMapReadyCallback, VolumeController.VolumeCallback, LocationController.LocationCallback, Station.StationCallback, StationController.StationControllerCallback, MediaPlayerController.MediaPlayerCallback, MapController.MapCallback {
     private boolean editButtonHasBeenInitialized, bypassFaviconChecks, bypassMediaChecks,bypassMapChecks;
@@ -164,9 +165,9 @@ public class MainActivity extends AppCompatActivity implements OnMapReadyCallbac
     }
     private void updateThemeButtonIcon(int theme) {
         if (theme == 0) {
-            toolbarMenu.getItem(1).setIcon(dayIcon);
+            toolbarMenu.getItem(2).setIcon(dayIcon);
         } else if (theme == 1) {
-            toolbarMenu.getItem(1).setIcon(nightIcon);
+            toolbarMenu.getItem(2).setIcon(nightIcon);
         }
     }
     @Override
@@ -192,10 +193,28 @@ public class MainActivity extends AppCompatActivity implements OnMapReadyCallbac
             case R.id.tb_question:
                 launchInfoPopUp();
                 break;
+            case R.id.tb_fb:
+                linkUserToFB();
+                break;
         }
         return true;
     }
+
+    private void linkUserToFB(){
+        Collection<String> permissions = Arrays.asList("public_profile", "email");
+        if (!ParseFacebookUtils.isLinked(ParseUser.getCurrentUser())) {
+            ParseFacebookUtils.linkWithReadPermissionsInBackground(ParseUser.getCurrentUser(), this, permissions, ex -> {
+                if (ParseFacebookUtils.isLinked(ParseUser.getCurrentUser())) {
+                    Toast.makeText(this, "Woohoo, user logged in with Facebook.", Toast.LENGTH_LONG).show();
+                    Log.d("FacebookLoginExample", "Woohoo, user logged in with Facebook!");
+                }
+            });
+        } else {
+            Toast.makeText(this, "You have already linked your account with Facebook.", Toast.LENGTH_LONG).show();
+        }
+    }
     private void logoutUser() {
+        LoginManager.getInstance().logOut();
         ParseUser.logOut();
         ParseUser currentUser = ParseUser.getCurrentUser();
         Toast.makeText(MainActivity.this, "Success!", Toast.LENGTH_SHORT);

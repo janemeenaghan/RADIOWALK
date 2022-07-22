@@ -23,6 +23,14 @@ import org.json.JSONException;
 import org.parceler.Parcel;
 import java.lang.reflect.Array;
 import java.util.Date;
+import androidx.appcompat.app.AppCompatActivity;
+import android.app.AlertDialog;
+import android.app.ProgressDialog;
+import android.content.Intent;
+import android.os.Bundle;
+import android.widget.Button;
+import com.facebook.login.LoginManager;
+import com.parse.ParseUser;
 //@Parcel(analyze= Station.class)
 @ParseClassName("Station")
 public class Station extends ParseObject {

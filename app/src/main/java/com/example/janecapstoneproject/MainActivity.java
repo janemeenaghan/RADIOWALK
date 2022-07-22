@@ -50,7 +50,7 @@ import java.util.Arrays;
 import java.util.Collection;
 
 public class MainActivity extends AppCompatActivity implements OnMapReadyCallback, VolumeController.VolumeCallback, LocationController.LocationCallback, Station.StationCallback, StationController.StationControllerCallback, MediaPlayerController.MediaPlayerCallback, MapController.MapCallback {
-    private boolean editButtonHasBeenInitialized, bypassFaviconChecks, bypassMediaChecks,bypassMapChecks;
+    private boolean editButtonHasBeenInitialized, bypassFaviconChecks,bypassMapChecks;
     public int REQUEST_CODE = 1001;
     public static final int PUBLIC_TYPE = 0;
     public static final int PRIVATE_TYPE = 1;
@@ -84,7 +84,6 @@ public class MainActivity extends AppCompatActivity implements OnMapReadyCallbac
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
         editButtonHasBeenInitialized = false;
-        bypassMediaChecks = false;
         bypassFaviconChecks = false;
         bypassMapChecks = false;
         initDrawables();
@@ -93,8 +92,8 @@ public class MainActivity extends AppCompatActivity implements OnMapReadyCallbac
         initLocation();
         initMap(savedInstanceState);
         initAddStationButton(ParseUser.getCurrentUser(), this);
-        initVolume();
         initMediaPlayer();
+        initVolume();
         initSlidingPanelElements();
     }
 
@@ -124,6 +123,7 @@ public class MainActivity extends AppCompatActivity implements OnMapReadyCallbac
     protected void onStop() {
         super.onStop();
         mMapView.onStop();
+        mediaPlayerController.reset();
         locationController.stopLiveUpdates();
     }
     @Override
@@ -135,6 +135,7 @@ public class MainActivity extends AppCompatActivity implements OnMapReadyCallbac
     protected void onDestroy() {
         mMapView.onDestroy();
         volumeController.unRegisterCallback(this);
+        mediaPlayerController.terminatePlayer();
         mediaPlayerController.unRegisterCallback(this);
         stationController.unRegisterCallback(this);
         locationController.unRegisterCallback(this);
@@ -355,7 +356,10 @@ public class MainActivity extends AppCompatActivity implements OnMapReadyCallbac
 
     //MEDIA CONTROLLER
     private void initMediaPlayer() {
+        mediaPlayerController = new MediaPlayerController(this);
+        mediaPlayerController.registerCallback(this);
         playPauseButton = findViewById(R.id.playPauseButton);
+        playPauseButton.setVisibility(View.INVISIBLE);
         playPauseButton.setOnClickListener(v -> {
             if(mediaPlayerController.isPlaying()){
                 mediaPlayerController.pause();
@@ -364,17 +368,29 @@ public class MainActivity extends AppCompatActivity implements OnMapReadyCallbac
                 mediaPlayerController.startPlaying();
             }
         });
-        mediaPlayerController = new MediaPlayerController(this);
-        mediaPlayerController.registerCallback(this);
     }
     @RequiresApi(api = Build.VERSION_CODES.M)
     @Override
-    public void onPlayingChanged(boolean isPlaying) {
-        if (isPlaying){
+    public void onPlayingChanged(int playingState) {
+        //isPlaying
+        if (playingState == 0) {
             playPauseButton.setImageDrawable(pauseIcon);
+            Log.e(TAG,"0");
+            playPauseButton.setVisibility(View.VISIBLE);
+            musicIcon.setVisibility(View.VISIBLE);
         }
-        else{
+        //isPaused
+        else if (playingState == 1) {
             playPauseButton.setImageDrawable(playIcon);
+            playPauseButton.setVisibility(View.VISIBLE);
+            musicIcon.setVisibility(View.VISIBLE);
+            Log.e(TAG,"1");
+        }
+        //isStopped
+        else{
+            playPauseButton.setVisibility(View.INVISIBLE);
+            musicIcon.setVisibility(View.INVISIBLE);
+            Log.e(TAG,"else");
         }
     }
     @Override
@@ -391,19 +407,22 @@ public class MainActivity extends AppCompatActivity implements OnMapReadyCallbac
         minusText.setOnClickListener(v -> {
             volumeController.lowerVolume();
         });
-        volControl = (Slider) findViewById(R.id.volumebar);
         volumeController = new VolumeController(this);
         volumeController.registerCallback(this);
+        volControl = findViewById(R.id.volumebar);
+        volControl.setValueRange(0,volumeController.getMaxVolume(),false);
+        volControl.setValue(volumeController.getVolume(),false);
         volControl.setOnPositionChangeListener(new Slider.OnPositionChangeListener() {
             @Override
             public void onPositionChanged(Slider view, boolean fromUser, float oldPos, float newPos, int oldValue, int newValue) {
                 volumeController.setVolume(newValue);
             }
         });
+
     }
     @Override
     public void onVolumeChanged(int volume) {
-        volControl.setValue(volume, true);
+        volControl.setValue(volume, false);
     }
     @Override
     public void onMaxVolumeChanged(int maxVolume) {
@@ -446,8 +465,6 @@ public class MainActivity extends AppCompatActivity implements OnMapReadyCallbac
     }
     @Override
     public void onRetrieveLocationResultAccompanyingBypass() {
-        bypassMediaChecks = true;
-        bypassFaviconChecks = true;
         bypassMapChecks = true;
     }
 
@@ -596,11 +613,11 @@ public class MainActivity extends AppCompatActivity implements OnMapReadyCallbac
                 }
             }
         }
-        mediaPlayerController.setURLAndPrepare(null, true);
+        mediaPlayerController.reset();//.setURLAndPrepare(null, true);
         setStationNameText(getString(R.string.noStationFound));
         setNowPlayingText("", true);
         setMusicIcon(MainActivity.this, "", true);
-        locationController.retrieveLocation(MainActivity.this);
+        //locationController.retrieveLocation(MainActivity.this);
     }
     @Override
     public void onCaseValidNearestStation (Location location, Station newNearestStation, boolean needToDeselectCurrentStation){
@@ -637,8 +654,7 @@ public class MainActivity extends AppCompatActivity implements OnMapReadyCallbac
     public void updateUIToRenderClosestStation(Station closestStation) {
         setSlidingPanelElements(MainActivity.this, closestStation.getFavicon(), closestStation.getName(), closestStation.getStreamName());
         if (!closestStation.getStreamLink().isEmpty()) {
-            mediaPlayerController.setURLAndPrepare(closestStation.getStreamLink(),bypassMediaChecks);
-            bypassMediaChecks = false;
+            mediaPlayerController.setURLAndPrepare(closestStation.getStreamLink());
         }
         stationController.setGlobalCurrentStation(closestStation);
     }

@@ -15,112 +15,133 @@ public class MediaPlayerController {
     private static final String TAG = "MediaPlayerController";
     private ArrayList<MediaPlayerController.MediaPlayerCallback> callbacks = new ArrayList<>();
 
-    public MediaPlayerController(Context context){
+    public MediaPlayerController(Context context) {
         this.context = context;
+        mediaPlayer = new MediaPlayer();
     }
-
-    public void setURLAndPrepare(String uriString,boolean bypass) {
-        boolean proceed = false;
-        if (currentURI == null){
-            proceed = true;
+    public void terminatePlayer(){
+        if (currentURI != null){
+            currentURI = null;
         }
-        else if (currentURI.trim().isEmpty()) {
-            proceed = true;
+        if(mediaPlayer != null){
+            reset();
+            mediaPlayer.release();
         }
-        else if (bypass){
-            proceed = true;
+        //maybe add onPlayingChanged callback here.
+    }
+    public void reset(){
+        if (currentURI != null){
+            currentURI = null;
         }
-        else if (uriString == null) {
-
-        }
-        else if (!uriString.equals(currentURI)) {
-            proceed = true;
-        }
-        else{
-
-        }
-        if (proceed){
-            try {
-                currentURI = uriString;
-                if (mediaPlayer != null) {
-                    mediaPlayer.release();
-                }
-                initNewMediaPlayer(context, uriString);
+        if(mediaPlayer != null){
+            if(mediaPlayer.isPlaying()){
+                mediaPlayer.stop();
             }
-            catch (IOException e) {
+            mediaPlayer.reset();
+        }
+        updateStateToMain();
+    }
+    public void setURLAndPrepare(String uriString) {
+        if (uriString == null){
+            Log.e(TAG,"(top) was given same source:"+ uriString);
+            return;
+        }
+        if (currentURI == null || !uriString.equals(currentURI)){
+            try {
+                reset();
+                //mediaPlayer.release();
+                initNewMediaPlayer(uriString);
+                currentURI = uriString;
+            } catch (IOException e) {
+                Log.e(TAG,"catch on initNew, shouldn't ever happen");
                 e.printStackTrace();
             }
         }
-    }
-
-    public void setURLAndPrepare(Uri uri) {
-        try {
-            mediaPlayer.setDataSource(context, uri);
-            mediaPlayer.prepareAsync();
-        } catch (IOException e) {
-            e.printStackTrace();
+        else{
+            Log.e(TAG,"was given same source: (this should be correct)"+ uriString);
         }
     }
-
     public void startPlaying(){
-        mediaPlayer.start();
-        for (MediaPlayerController.MediaPlayerCallback callback : callbacks){
-            callback.onPlayingChanged(isPlaying());
+        if (mediaPlayer == null || currentURI == null){
+            Log.e(TAG,"startPlaying() on null mediaplayer or currentURI ignored");
+            return;
+        }
+        if (!mediaPlayer.isPlaying()){
+            if (currentURI != null) {
+                mediaPlayer.start();
+                updateStateToMain();
+            }
         }
     }
 
     public void pause(){
+        if (mediaPlayer == null){
+            Log.e(TAG,"MediaPlayer was null on pause call");
+            return;
+        }
         if(mediaPlayer.isPlaying()) {
             mediaPlayer.pause();
         }
-        for (MediaPlayerController.MediaPlayerCallback callback : callbacks){
-            callback.onPlayingChanged(isPlaying());
-        }
+        updateStateToMain();
     }
-
     public boolean isPlaying(){
+        if (mediaPlayer== null){
+            Log.e(TAG,"MediaPlayer was null on isPlaying call");
+            return false;
+        }
         return mediaPlayer.isPlaying();
     }
-
-    private void initNewMediaPlayer(Context context, String uriString) throws IOException {
-        if (uriString == null){
-
-        }
-        else if (uriString.isEmpty()){
-
-        }
-        else {
+    private void initNewMediaPlayer(String uriString) throws IOException {
+        if (mediaPlayer == null) {
             mediaPlayer = new MediaPlayer();
-            mediaPlayer.setAudioStreamType(AudioManager.STREAM_MUSIC);
-            mediaPlayer.setOnPreparedListener(mp -> startPlaying());
-            mediaPlayer.setOnErrorListener(new MediaPlayer.OnErrorListener() {
-                @Override
-                public boolean onError(MediaPlayer mp, int what, int extra) {
-                    for (MediaPlayerController.MediaPlayerCallback callback : callbacks) {
-                        callback.onMediaPlayerError();
-                    }
-                    Log.e(TAG, "Error with URL");
-                    return false;
+        }
+        mediaPlayer.setAudioStreamType(AudioManager.STREAM_MUSIC);
+        mediaPlayer.setOnPreparedListener(mp -> startPlaying());
+        mediaPlayer.setOnErrorListener(new MediaPlayer.OnErrorListener() {
+            @Override
+            public boolean onError(MediaPlayer mp, int what, int extra) {
+                for (MediaPlayerController.MediaPlayerCallback callback : callbacks) {
+                    callback.onMediaPlayerError();
                 }
-            });
+                Log.e(TAG, "Error with URL");
+                return false;
+            }
+        });
+        if (uriString != null && !uriString.isEmpty()){
             mediaPlayer.setDataSource(context, Uri.parse(uriString));
             mediaPlayer.prepareAsync();
         }
+        else{
+            Log.e(TAG,"MediaPlayer was null or empty on init therefore did not");
+        }
     }
+
+    private void updateStateToMain(){
+        for (MediaPlayerController.MediaPlayerCallback callback : callbacks) {
+            if (currentURI == null){
+                callback.onPlayingChanged(2);
+            }
+            else if (!mediaPlayer.isPlaying()){
+                callback.onPlayingChanged(1);
+            }
+            else{
+                callback.onPlayingChanged(0);
+            }
+        }
+    }
+
     public void registerCallback(MediaPlayerController.MediaPlayerCallback mediaPlayerCallback){
         if (!callbacks.contains(mediaPlayerCallback)){
             callbacks.add(mediaPlayerCallback);
         }
     }
-
     public void unRegisterCallback(MediaPlayerController.MediaPlayerCallback mediaPlayerCallback){
         if (callbacks.contains(mediaPlayerCallback)){
             callbacks.remove(mediaPlayerCallback);
         }
     }
-
     public interface MediaPlayerCallback{
-        void onPlayingChanged(boolean isPlaying);
+        void onPlayingChanged(int playingState);
         void onMediaPlayerError();
     }
 }

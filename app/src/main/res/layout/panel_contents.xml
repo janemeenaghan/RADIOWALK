@@ -95,21 +95,19 @@
         sothree:layout_constraintTop_toTopOf="@+id/musicIcon" />
 
     <com.rey.material.widget.Slider
-        android:layout_width="0dp"
-        app:layout_constraintWidth_percent="0.6"
-        android:layout_height="wrap_content"
-        style="@style/Material.Widget.Slider.Discrete"
         android:id="@+id/volumebar"
-        app:sl_minValue="0"
-        app:sl_maxValue="100"
-        app:sl_value="50"
-        app:v_styleId="@array/slider"
-        android:paddingTop="0dip"
-        android:paddingRight="10dp"
-        android:paddingLeft="10dp"
+        style="@style/Material.Widget.Slider.Discrete"
+        android:layout_width="0dp"
+        android:layout_height="wrap_content"
         android:gravity="center"
-        sothree:layout_constraintLeft_toRightOf="@id/playPauseButton"
-        sothree:layout_constraintBottom_toBottomOf="@+id/playPauseButton"/>
+        android:paddingLeft="10dp"
+        android:paddingTop="0dip"
+        app:layout_constraintWidth_percent="0.6"
+        sothree:sl_maxValue="15"
+        sothree:sl_minValue="0"
+        app:v_styleId="@array/slider"
+        sothree:layout_constraintBottom_toBottomOf="@+id/playPauseButton"
+        sothree:layout_constraintLeft_toRightOf="@id/playPauseButton" />
 
     <androidx.constraintlayout.widget.Guideline
         android:id="@+id/guidelineVertForImage"

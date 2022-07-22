@@ -16,17 +16,17 @@ import retrofit2.Callback;
 import retrofit2.Response;
 
 public class BrowseStationsActivity extends AppCompatActivity implements StationListAdapter.OnStationListener {
+    public static final String TAG = "BrowseStationsActivity";
     private RecyclerView stationRecycler/*, tagsRecycler*/;
     private StationListAdapter adapter;
     private SearchView searchView;
     private RecyclerView.LayoutManager layoutManager;
     private GetDataService service;
     private List<StationInfo> stationInfoListStorage;
-    public static final String TAG = "BrowseStationsActivity";
     private int isNew;
     private LatLng latLng;
     private String stationName;
-    ProgressDialog progressDialog, referenceToProgressDialogShow;
+    private ProgressDialog progressDialog, referenceToProgressDialogShow;
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -43,15 +43,10 @@ public class BrowseStationsActivity extends AppCompatActivity implements Station
         latLng = Parcels.unwrap(getIntent().getParcelableExtra("latLng"));
         stationName = getIntent().getStringExtra("stationName");
         setContentView(R.layout.activity_browse_stations);
-        //generateGenreList();
-        //Progress loader or some placeholder goes here
-
-        /*Create handle for the RetrofitInstance interface*/
         service = RetrofitClientInstance.getRetrofitInstance().create(GetDataService.class);
         fetchAllStations();
         initSearchView();
     }
-
     public void fetchAllStations() {
         progressDialog = new ProgressDialog(BrowseStationsActivity.this);
         progressDialog.setMessage("Loading....");
@@ -60,19 +55,20 @@ public class BrowseStationsActivity extends AppCompatActivity implements Station
         call.enqueue(new Callback<List<StationInfo>>() {
             @Override
             public void onResponse(Call<List<StationInfo>> call, Response<List<StationInfo>> response) {
+                progressDialog.dismiss();
+                referenceToProgressDialogShow.dismiss();
                 List<StationInfo> list = response.body();
-                //dismiss progress loader
                 generateDataList(response.body());
             }
 
             @Override
             public void onFailure(Call<List<StationInfo>> call, Throwable t) {
-                //dismiss progress loader
+                progressDialog.dismiss();
+                referenceToProgressDialogShow.dismiss();
                 Toast.makeText(BrowseStationsActivity.this, "Something went wrong...Please try later!", Toast.LENGTH_SHORT).show();
             }
         });
     }
-
     public void fetchStationsByTag(String tag){
         Call<List<StationInfo>> call = service.getStationsByTag(tag);
         call.enqueue(new Callback<List<StationInfo>>() {
@@ -82,7 +78,6 @@ public class BrowseStationsActivity extends AppCompatActivity implements Station
                 referenceToProgressDialogShow.dismiss();
                 generateDataList(response.body());
             }
-
             @Override
             public void onFailure(Call<List<StationInfo>> call, Throwable t) {
                 progressDialog.dismiss();
@@ -91,9 +86,6 @@ public class BrowseStationsActivity extends AppCompatActivity implements Station
             }
         });
     }
-
-
-
     public void initSearchView(){
         searchView = findViewById(R.id.searchView);
         searchView.setOnQueryTextListener(new SearchView.OnQueryTextListener() {
@@ -101,17 +93,13 @@ public class BrowseStationsActivity extends AppCompatActivity implements Station
             public boolean onQueryTextChange(String newText) {
                 return false;
             }
-
             @Override
             public boolean onQueryTextSubmit(String query) {
-                // Do something
                 fetchStationsByTag(query);
                 return false;
             }
-
         });
     }
-
     private void generateDataList(List<StationInfo> stationList) {
         stationInfoListStorage = stationList;
         stationRecycler = findViewById(R.id.stationRecycler);
@@ -120,10 +108,8 @@ public class BrowseStationsActivity extends AppCompatActivity implements Station
         stationRecycler.setLayoutManager(layoutManager);
         stationRecycler.setAdapter(adapter);
     }
-
     @Override
     public void onStationClick(int position) {
-        //if bugs make sure this storage is the right way to find the position; https://www.youtube.com/watch?v=69C1ljfDvl0&t=211
         StationInfo selectedStationInfo = stationInfoListStorage.get(position);
         Intent intent = new Intent();
         intent.putExtra("new",isNew);

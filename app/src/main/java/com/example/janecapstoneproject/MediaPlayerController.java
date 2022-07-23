@@ -1,5 +1,4 @@
 package com.example.janecapstoneproject;
-
 import android.content.Context;
 import android.media.AudioManager;
 import android.media.MediaPlayer;
@@ -7,14 +6,12 @@ import android.net.Uri;
 import android.util.Log;
 import java.io.IOException;
 import java.util.ArrayList;
-
 public class MediaPlayerController {
     private MediaPlayer mediaPlayer;
     private Context context;
     String currentURI;
     private static final String TAG = "MediaPlayerController";
     private ArrayList<MediaPlayerController.MediaPlayerCallback> callbacks = new ArrayList<>();
-
     public MediaPlayerController(Context context) {
         this.context = context;
         mediaPlayer = new MediaPlayer();
@@ -27,7 +24,6 @@ public class MediaPlayerController {
             reset();
             mediaPlayer.release();
         }
-        //maybe add onPlayingChanged callback here.
     }
     public void reset(){
         if (currentURI != null){
@@ -49,7 +45,6 @@ public class MediaPlayerController {
         if (currentURI == null || !uriString.equals(currentURI)){
             try {
                 reset();
-                //mediaPlayer.release();
                 initNewMediaPlayer(uriString);
                 currentURI = uriString;
             } catch (IOException e) {
@@ -73,7 +68,6 @@ public class MediaPlayerController {
             }
         }
     }
-
     public void pause(){
         if (mediaPlayer == null){
             Log.e(TAG,"MediaPlayer was null on pause call");
@@ -115,7 +109,6 @@ public class MediaPlayerController {
             Log.e(TAG,"MediaPlayer was null or empty on init therefore did not");
         }
     }
-
     private void updateStateToMain(){
         for (MediaPlayerController.MediaPlayerCallback callback : callbacks) {
             if (currentURI == null){
@@ -129,7 +122,6 @@ public class MediaPlayerController {
             }
         }
     }
-
     public void registerCallback(MediaPlayerController.MediaPlayerCallback mediaPlayerCallback){
         if (!callbacks.contains(mediaPlayerCallback)){
             callbacks.add(mediaPlayerCallback);

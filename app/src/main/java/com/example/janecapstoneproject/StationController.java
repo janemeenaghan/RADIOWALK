@@ -69,7 +69,7 @@ public class StationController {
             callback.updateUIToRenderClosestStation(closestStation);
         }
     }
-    public void renderNearbyStations(ParseUser user, Context context, Location location, double kiloRadius, double chaosFactor,String tag) throws IOException {
+    public void queryFilterAndRenderNearbyStations(ParseUser user, Location location, double kiloRadius, double chaosFactor, String tag) throws IOException {
         ParseQuery<Station> query = ParseQuery.getQuery(Station.class);
         query.whereWithinKilometers(KEY_GEOPOINT, new ParseGeoPoint(location.getLatitude(), location.getLongitude()), kiloRadius);
         if (publicPrivateSelection == 0) {
@@ -86,61 +86,67 @@ public class StationController {
                     Log.e(TAG, "Issue with getting station", e);
                     return;
                 }
-                for (Station station : stations) {
-                    if (tag.isEmpty()) {
-                        if (shouldIncludeStation(station, user.getJSONArray(KEY_USERSSHAREDSTATIONS))) {
-                            if ((globalCurrentStation == null || !station.getObjectId().equals(globalCurrentStation.getObjectId()))) {
-                                for (StationController.StationControllerCallback callback : callbacks) {
-                                    callback.renderAStationToMap(station);
-                                }
-                            }
-                            double score = computeScore(station, location, globalCurrentStation, chaosFactor);
-                            if (score > highestScore) {
-                                highestScore = score;
-                                bestStation = station;
-                            } else {
-                                Log.e(TAG, "Result is null", e);
-                            }
-                        }
-                    }
-                    else{
-                        if (shouldIncludeStationWithTag(tag,station, user.getJSONArray(KEY_USERSSHAREDSTATIONS))) {
-                            if ((globalCurrentStation == null || !station.getObjectId().equals(globalCurrentStation.getObjectId()))) {
-                                for (StationController.StationControllerCallback callback : callbacks) {
-                                    callback.renderAStationToMap(station);
-                                }
-                            }
-                            double score = computeScore(station, location, globalCurrentStation, chaosFactor);
-                            if (score > highestScore) {
-                                highestScore = score;
-                                bestStation = station;
-                            } else {
-                                Log.e(TAG, "Result is null", e);
-                            }
-                        }
-                    }
-                }
-                if (bestStation != null) {
-                    Log.d(TAG, "nearest station: " + bestStation.getName());
-                    if (distance(bestStation, location) <= STATION_DETECTION_RADIUS_METERS) {
+                computeBestStation(stations,user,location,kiloRadius,chaosFactor,tag);
+                handleBestStation(bestStation,location);
+            }
+        });
+    }
+    private void computeBestStation(List<Station> stations, ParseUser user, Location location, double kiloRadius, double chaosFactor,String tag){
+        for (Station station : stations) {
+            if (tag.isEmpty()) {
+                if (shouldIncludeStation(station, user.getJSONArray(KEY_USERSSHAREDSTATIONS))) {
+                    if ((globalCurrentStation == null || !station.getObjectId().equals(globalCurrentStation.getObjectId()))) {
                         for (StationController.StationControllerCallback callback : callbacks) {
-                            callback.onCaseValidNearestStation(location, bestStation, (globalCurrentStationExists() && !bestStation.getObjectId().equals(globalCurrentStation.getObjectId())));
+                            callback.renderAStationToMap(station);
                         }
-                        return;
+                    }
+                    double score = computeScore(station, location, globalCurrentStation, chaosFactor);
+                    if (score > highestScore) {
+                        highestScore = score;
+                        bestStation = station;
                     } else {
-                        Log.d(TAG, "Nearest station is out of range");
-                        for (StationController.StationControllerCallback callback : callbacks) {
-                            callback.onCaseNoNearbyStation(location);
-                        }
-                    }
-                } else {
-                    Log.e(TAG, "Nearest station is null", e);
-                    for (StationController.StationControllerCallback callback : callbacks) {
-                        callback.onCaseNoNearbyStation(location);
+                        Log.e(TAG, "Result is null");
                     }
                 }
             }
-        });
+            else{
+                if (shouldIncludeStationWithTag(tag,station, user.getJSONArray(KEY_USERSSHAREDSTATIONS))) {
+                    if ((globalCurrentStation == null || !station.getObjectId().equals(globalCurrentStation.getObjectId()))) {
+                        for (StationController.StationControllerCallback callback : callbacks) {
+                            callback.renderAStationToMap(station);
+                        }
+                    }
+                    double score = computeScore(station, location, globalCurrentStation, chaosFactor);
+                    if (score > highestScore) {
+                        highestScore = score;
+                        bestStation = station;
+                    } else {
+                        Log.e(TAG, "Result is null");
+                    }
+                }
+            }
+        }
+    }
+    private void handleBestStation(Station bestStation, Location location){
+        if (bestStation != null) {
+            Log.d(TAG, "nearest station: " + bestStation.getName());
+            if (distance(bestStation, location) <= STATION_DETECTION_RADIUS_METERS) {
+                for (StationController.StationControllerCallback callback : callbacks) {
+                    callback.onCaseValidNearestStation(location, bestStation, (globalCurrentStationExists() && !bestStation.getObjectId().equals(globalCurrentStation.getObjectId())));
+                }
+                return;
+            } else {
+                Log.d(TAG, "Nearest station is out of range");
+                for (StationController.StationControllerCallback callback : callbacks) {
+                    callback.onCaseNoNearbyStation(location);
+                }
+            }
+        } else {
+            Log.e(TAG, "Nearest station is null");
+            for (StationController.StationControllerCallback callback : callbacks) {
+                callback.onCaseNoNearbyStation(location);
+            }
+        }
     }
     private boolean shouldIncludeStationWithTag(String tag, Station station, JSONArray inputArray){
         if (station.getTags().toLowerCase().contains(tag.toLowerCase())){

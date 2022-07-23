@@ -1,19 +1,20 @@
 package com.example.janecapstoneproject;
 
 import static com.example.janecapstoneproject.MainActivity.KEY_GEOPOINT;
+import static com.example.janecapstoneproject.MainActivity.PRIVATE_TYPE;
+import static com.example.janecapstoneproject.MainActivity.PUBLIC_TYPE;
 import static com.example.janecapstoneproject.MainActivity.STATION_DETECTION_RADIUS_KILOMETERS;
 import static com.example.janecapstoneproject.MainActivity.STATION_DETECTION_RADIUS_METERS;
 import static com.example.janecapstoneproject.MapController.CURRENT_CIRCLE_RGB;
 import static com.example.janecapstoneproject.MapController.CURRENT_MARKER_COLOR;
-import static com.example.janecapstoneproject.MainActivity.PUBLIC_TYPE;
-import static com.example.janecapstoneproject.MainActivity.PRIVATE_TYPE;
 import static com.example.janecapstoneproject.MapController.PRIVATE_CIRCLE_RGB;
 import static com.example.janecapstoneproject.MapController.PUBLIC_CIRCLE_RGB;
 import static com.example.janecapstoneproject.Station.KEY_TYPE;
 import static com.example.janecapstoneproject.Station.KEY_USERSSHAREDSTATIONS;
+
 import android.content.Context;
 import android.location.Location;
-import android.util.Log;
+
 import com.google.android.gms.maps.model.Circle;
 import com.google.android.gms.maps.model.LatLng;
 import com.google.android.gms.maps.model.Marker;
@@ -22,8 +23,10 @@ import com.parse.ParseException;
 import com.parse.ParseGeoPoint;
 import com.parse.ParseQuery;
 import com.parse.ParseUser;
+
 import org.json.JSONArray;
 import org.json.JSONException;
+
 import java.io.IOException;
 import java.util.ArrayList;
 import java.util.List;
@@ -35,7 +38,6 @@ public class StationController {
     private double highestScore;
     private Station bestStation;
     private int publicPrivateSelection;
-
     public StationController(){
         publicPrivateSelection = -1;
     }
@@ -79,7 +81,6 @@ public class StationController {
             callback.updateUIToRenderClosestStationStream(closestStation);
         }
     }
-
     public void renderStation(Station station) {
         if (!station.hasMarker()){
             for (StationController.StationControllerCallback callback : callbacks) {
@@ -136,7 +137,6 @@ public class StationController {
             @Override
             public void done(List<Station> stations, ParseException e) {
                 if (e != null) {
-                    Log.e(TAG, "Issue with getting station", e);
                     return;
                 }
                 JSONArray usersStationsList = user.getJSONArray(KEY_USERSSHAREDSTATIONS);
@@ -192,7 +192,6 @@ public class StationController {
             highestScore = score;
             bestStation = station;
         } else {
-            Log.e(TAG, "Result is null");
         }
     }
     private void handleBestStation(Station bestStation, Location location){
@@ -308,12 +307,6 @@ public class StationController {
                 } catch (JSONException ex) {
                     ex.printStackTrace();
                 }
-            }
-            if (e != null) {
-                Log.e(TAG, "Error while saving", e);
-            }
-            else{
-                Log.d(TAG, "Station save was successful!");
             }
         });
     }

@@ -1,16 +1,17 @@
 package com.example.janecapstoneproject;
+
 import android.content.Context;
-import android.content.Intent;
-import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.ImageView;
 import android.widget.TextView;
+
 import androidx.recyclerview.widget.RecyclerView;
+
 import com.jakewharton.picasso.OkHttp3Downloader;
 import com.squareup.picasso.Picasso;
-import org.parceler.Parcels;
+
 import java.util.List;
 public class StationListAdapter extends RecyclerView.Adapter<StationListAdapter.CustomViewHolder> {
     private List<StationInfo> dataList;

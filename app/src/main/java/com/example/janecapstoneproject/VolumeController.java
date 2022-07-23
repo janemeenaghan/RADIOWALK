@@ -1,8 +1,9 @@
 package com.example.janecapstoneproject;
+
 import static android.content.Context.AUDIO_SERVICE;
+
 import android.content.Context;
 import android.media.AudioManager;
-import android.util.Log;
 
 import java.util.ArrayList;
 public class VolumeController {

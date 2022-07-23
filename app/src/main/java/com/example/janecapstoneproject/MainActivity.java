@@ -1,19 +1,9 @@
 package com.example.janecapstoneproject;
-import androidx.annotation.NonNull;
-import androidx.annotation.Nullable;
-import androidx.annotation.RequiresApi;
-import androidx.appcompat.app.AlertDialog;
-import androidx.appcompat.app.AppCompatActivity;
-import androidx.appcompat.content.res.AppCompatResources;
-import androidx.appcompat.widget.Toolbar;
 
 import android.annotation.SuppressLint;
 import android.content.Context;
 import android.content.DialogInterface;
 import android.content.Intent;
-import android.util.Log;
-import android.widget.RadioButton;
-import android.widget.SeekBar;
 import android.content.pm.PackageManager;
 import android.graphics.drawable.Drawable;
 import android.location.Location;
@@ -26,8 +16,19 @@ import android.view.View;
 import android.widget.EditText;
 import android.widget.ImageButton;
 import android.widget.ImageView;
+import android.widget.RadioButton;
+import android.widget.SeekBar;
 import android.widget.TextView;
 import android.widget.Toast;
+
+import androidx.annotation.NonNull;
+import androidx.annotation.Nullable;
+import androidx.annotation.RequiresApi;
+import androidx.appcompat.app.AlertDialog;
+import androidx.appcompat.app.AppCompatActivity;
+import androidx.appcompat.content.res.AppCompatResources;
+import androidx.appcompat.widget.Toolbar;
+
 import com.facebook.login.LoginManager;
 import com.google.android.gms.maps.GoogleMap;
 import com.google.android.gms.maps.MapView;
@@ -46,8 +47,10 @@ import com.rey.material.util.ViewUtil;
 import com.rey.material.widget.Slider;
 import com.squareup.picasso.Callback;
 import com.squareup.picasso.Picasso;
+
 import org.json.JSONException;
 import org.parceler.Parcels;
+
 import java.io.IOException;
 import java.util.Arrays;
 import java.util.Collection;
@@ -535,9 +538,6 @@ public class MainActivity extends AppCompatActivity implements OnMapReadyCallbac
     @RequiresApi(api = Build.VERSION_CODES.M)
     @Override
     public void onMapReady(GoogleMap map) {
-        /*ViewGroup parent = (ViewGroup) mMapView.findViewById(Integer.parseInt("1")).getParent();
-        View compassButton = parent.getChildAt(4);
-        compassButton.)*/
         mapController = new MapController(this, map);
         mapController.registerCallback(this);
         locationController.retrieveLocation(this);

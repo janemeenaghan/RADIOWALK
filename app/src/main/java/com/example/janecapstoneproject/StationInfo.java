@@ -1,6 +1,7 @@
 package com.example.janecapstoneproject;
+
 import com.google.gson.annotations.SerializedName;
-import java.net.URL;
+
 import java.util.UUID;
 public class StationInfo {
     @SerializedName("stationuuid")

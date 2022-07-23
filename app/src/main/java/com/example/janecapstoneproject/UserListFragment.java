@@ -1,4 +1,7 @@
 package com.example.janecapstoneproject;
+
+import static com.example.janecapstoneproject.MainActivity.MAPVIEW_BUNDLE_KEY;
+
 import android.Manifest;
 import android.content.pm.PackageManager;
 import android.os.Bundle;
@@ -6,25 +9,17 @@ import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 
-
-import com.google.android.gms.maps.CameraUpdateFactory;
-import com.google.android.gms.maps.GoogleMap;
-import com.google.android.gms.maps.MapView;
-import com.google.android.gms.maps.OnMapReadyCallback;
-import com.google.android.gms.maps.model.LatLng;
-import com.google.android.gms.maps.model.LatLngBounds;
-import com.google.android.gms.maps.model.MarkerOptions;
-import com.parse.ParseUser;
-
-import java.util.ArrayList;
-
-import static com.example.janecapstoneproject.MainActivity.MAPVIEW_BUNDLE_KEY;
-
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
 import androidx.core.app.ActivityCompat;
 import androidx.fragment.app.Fragment;
 import androidx.recyclerview.widget.RecyclerView;
+
+import com.google.android.gms.maps.GoogleMap;
+import com.google.android.gms.maps.MapView;
+import com.google.android.gms.maps.OnMapReadyCallback;
+import com.google.android.gms.maps.model.LatLng;
+import com.google.android.gms.maps.model.MarkerOptions;
 public class UserListFragment extends Fragment implements OnMapReadyCallback {
     private static final String TAG = "UserListFragment";
     private RecyclerView mUserListRecyclerView;

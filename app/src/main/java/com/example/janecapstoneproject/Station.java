@@ -1,35 +1,23 @@
 package com.example.janecapstoneproject;
-import static com.example.janecapstoneproject.LoginActivity.TAG;
-import android.graphics.Color;
-import android.os.Parcelable;
-import android.util.Log;
-import android.widget.RatingBar;
+
 import androidx.annotation.Nullable;
+
 import com.google.android.gms.maps.model.BitmapDescriptorFactory;
 import com.google.android.gms.maps.model.Circle;
 import com.google.android.gms.maps.model.LatLng;
 import com.google.android.gms.maps.model.Marker;
+import com.parse.ParseClassName;
 import com.parse.ParseException;
-import com.parse.ParseFile;
 import com.parse.ParseGeoPoint;
 import com.parse.ParseObject;
-import com.parse.ParseClassName;
 import com.parse.ParseQuery;
 import com.parse.ParseUser;
 import com.parse.SaveCallback;
+
 import org.json.JSONArray;
 import org.json.JSONException;
-import org.parceler.Parcel;
-import java.lang.reflect.Array;
+
 import java.util.Date;
-import androidx.appcompat.app.AppCompatActivity;
-import android.app.AlertDialog;
-import android.app.ProgressDialog;
-import android.content.Intent;
-import android.os.Bundle;
-import android.widget.Button;
-import com.facebook.login.LoginManager;
-import com.parse.ParseUser;
 //@Parcel(analyze= Station.class)
 @ParseClassName("Station")
 public class Station extends ParseObject {

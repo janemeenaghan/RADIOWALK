@@ -1,14 +1,14 @@
 package com.example.janecapstoneproject;
+
 import android.app.Application;
-import android.util.Log;
 
 import com.facebook.FacebookSdk;
 import com.facebook.appevents.AppEventsLogger;
-import com.parse.*;
 import com.parse.Parse;
+import com.parse.ParseInstallation;
+import com.parse.ParseObject;
 import com.parse.facebook.ParseFacebookUtils;
 import com.rey.material.app.ThemeManager;
-import okhttp3.*;
 public class ParseApplication extends Application {
     @Override
     public void onCreate() {

@@ -1,21 +1,22 @@
 package com.example.janecapstoneproject;
-import androidx.appcompat.app.AppCompatActivity;
+
 import android.content.Intent;
 import android.os.Bundle;
 import android.text.Editable;
 import android.text.TextWatcher;
-import android.util.Log;
 import android.view.View;
 import android.widget.Button;
 import android.widget.EditText;
 import android.widget.Toast;
 
+import androidx.appcompat.app.AppCompatActivity;
+
+import com.google.android.material.textfield.TextInputLayout;
 import com.parse.FindCallback;
 import com.parse.LogInCallback;
 import com.parse.ParseException;
 import com.parse.ParseQuery;
 import com.parse.ParseUser;
-import com.google.android.material.textfield.TextInputLayout;
 import com.parse.SignUpCallback;
 
 import org.json.JSONArray;
@@ -106,7 +107,6 @@ public class SignUpActivity extends AppCompatActivity {
             @Override
             public void done(List<ParseUser> users, ParseException e) {
                 if (e != null) {
-                    Log.e(TAG, "Issue with email portion of signup", e);
                     Toast.makeText(SignUpActivity.this, "EMAILkys"+e, Toast.LENGTH_LONG).show();
                     halted = false;
                 }
@@ -127,8 +127,6 @@ public class SignUpActivity extends AppCompatActivity {
             @Override
             public void done(List<ParseUser> users, ParseException e) {
                 if (e != null) {
-                    Log.e(TAG, "Issue with username portion of signup", e);
-                    Toast.makeText(SignUpActivity.this, "USERNAMEkys"+e, Toast.LENGTH_LONG).show();
                     halted = false;
                 }
                 else if (users.isEmpty()){

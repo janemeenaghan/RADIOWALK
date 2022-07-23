@@ -1,9 +1,16 @@
 package com.example.janecapstoneproject;
+
 import static com.example.janecapstoneproject.MainActivity.STATION_DETECTION_RADIUS_METERS;
 import static com.example.janecapstoneproject.StationController.DEFAULT_ZOOM;
+
+import android.annotation.SuppressLint;
+import android.content.Context;
+import android.content.res.Resources;
+import android.graphics.Color;
+import android.location.Location;
+
 import com.google.android.gms.maps.CameraUpdateFactory;
 import com.google.android.gms.maps.GoogleMap;
-import com.google.android.gms.maps.model.BitmapDescriptorFactory;
 import com.google.android.gms.maps.model.CameraPosition;
 import com.google.android.gms.maps.model.Circle;
 import com.google.android.gms.maps.model.CircleOptions;
@@ -11,12 +18,7 @@ import com.google.android.gms.maps.model.LatLng;
 import com.google.android.gms.maps.model.MapStyleOptions;
 import com.google.android.gms.maps.model.Marker;
 import com.google.android.gms.maps.model.MarkerOptions;
-import android.annotation.SuppressLint;
-import android.content.Context;
-import android.content.res.Resources;
-import android.graphics.Color;
-import android.location.Location;
-import android.util.Log;
+
 import java.io.IOException;
 import java.util.ArrayList;
 public class MapController {
@@ -24,12 +26,8 @@ public class MapController {
     public static final int PUBLIC_CIRCLE_RGB = Color.rgb(0, 233, 255);
     public static final int PRIVATE_CIRCLE_RGB = Color.rgb(255, 0, 233);
     public static final int CURRENT_CIRCLE_RGB = Color.rgb(0, 255, 22);
-    public static final int PUBLIC_MARKER_COLOR = 0;
-    public static final int PRIVATE_MARKER_COLOR = 1;
     public static final int CURRENT_MARKER_COLOR = 2;
     public static final int TILT_SETTING_ANGLED = 45;
-    public static final int TILT_SETTING_STREET = 90;
-    public static final int TILT_SETTING_GPS = 0;
     private GoogleMap map;
     private Context context;
     private boolean firstInstance;

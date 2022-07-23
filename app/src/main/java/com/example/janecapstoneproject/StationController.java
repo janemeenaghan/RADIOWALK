@@ -5,6 +5,7 @@ import static com.example.janecapstoneproject.MapController.CURRENT_MARKER_COLOR
 import static com.example.janecapstoneproject.MainActivity.PUBLIC_TYPE;
 import static com.example.janecapstoneproject.MainActivity.PRIVATE_TYPE;
 import static com.example.janecapstoneproject.MainActivity.STATION_INTERACTION_RADIUS_METERS;
+import static com.example.janecapstoneproject.Station.KEY_TYPE;
 import static com.example.janecapstoneproject.Station.KEY_USERSSHAREDSTATIONS;
 import android.content.Context;
 import android.location.Location;
@@ -29,6 +30,7 @@ public class StationController {
     public static final int DEFAULT_ZOOM = 15;
     private Station nearestStation;
     private float shortestDistance;
+    private int publicPrivateSelection;
     private ArrayList<StationController.StationControllerCallback> callbacks = new ArrayList<>();
 
     public Station getGlobalCurrentStation() {
@@ -41,6 +43,14 @@ public class StationController {
 
     public void setGlobalCurrentStationMarkerColor(int which) {
         globalCurrentStation.setMarkerColor(which);
+    }
+
+    public int getPublicPrivateSelection() {
+        return publicPrivateSelection;
+    }
+
+    public void setPublicPrivateSelection(int publicPrivateSelection) {
+        this.publicPrivateSelection = publicPrivateSelection;
     }
 
     public boolean globalCurrentStationExists() {
@@ -70,6 +80,11 @@ public class StationController {
         ParseQuery<Station> query = ParseQuery.getQuery(Station.class);
         //query.setLimit(20);
         query.whereWithinKilometers(KEY_GEOPOINT, new ParseGeoPoint(location.getLatitude(), location.getLongitude()), kiloRadius);
+        if (publicPrivateSelection == 0) {
+            query.whereEqualTo(KEY_TYPE, 0);
+        } else if (publicPrivateSelection == 1) {
+            query.whereEqualTo(KEY_TYPE, 1);
+        }
         nearestStation = null;
         shortestDistance = Integer.MAX_VALUE;
         query.findInBackground(new FindCallback<Station>() {

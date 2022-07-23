@@ -10,6 +10,9 @@ import android.annotation.SuppressLint;
 import android.content.Context;
 import android.content.DialogInterface;
 import android.content.Intent;
+import android.widget.RadioButton;
+import android.widget.Switch;
+import android.widget.CompoundButton;
 import android.content.pm.PackageManager;
 import android.graphics.drawable.Drawable;
 import android.location.Location;
@@ -23,6 +26,8 @@ import android.view.View;
 import android.widget.EditText;
 import android.widget.ImageButton;
 import android.widget.ImageView;
+import android.widget.RadioButton;
+import android.widget.RadioGroup;
 import android.widget.TextView;
 import android.widget.Toast;
 import com.facebook.login.LoginManager;
@@ -49,7 +54,7 @@ import java.io.IOException;
 import java.util.Arrays;
 import java.util.Collection;
 
-public class MainActivity extends AppCompatActivity implements OnMapReadyCallback, VolumeController.VolumeCallback, LocationController.LocationCallback, Station.StationCallback, StationController.StationControllerCallback, MediaPlayerController.MediaPlayerCallback, MapController.MapCallback {
+public class MainActivity extends AppCompatActivity implements OnMapReadyCallback, VolumeController.VolumeCallback, LocationController.LocationCallback, Station.StationCallback, StationController.StationControllerCallback, MediaPlayerController.MediaPlayerCallback, MapController.MapCallback{
     private boolean editButtonHasBeenInitialized, bypassFaviconChecks,bypassMapChecks;
     public int REQUEST_CODE = 1001;
     public static final int PUBLIC_TYPE = 0;
@@ -149,6 +154,31 @@ public class MainActivity extends AppCompatActivity implements OnMapReadyCallbac
         mMapView.onLowMemory();
     }
 
+    //LINKING AND LOGOUT CODE
+    private void linkUserToFB(){
+        Collection<String> permissions = Arrays.asList("public_profile", "email");
+        if (!ParseFacebookUtils.isLinked(ParseUser.getCurrentUser())) {
+            ParseFacebookUtils.linkWithReadPermissionsInBackground(ParseUser.getCurrentUser(), this, permissions, ex -> {
+                if (ParseFacebookUtils.isLinked(ParseUser.getCurrentUser())) {
+                    Toast.makeText(this, "Woohoo, user logged in with Facebook.", Toast.LENGTH_LONG).show();
+                    Log.d("FacebookLoginExample", "Woohoo, user logged in with Facebook!");
+                }
+            });
+        } else {
+            Toast.makeText(this, "You have already linked your account with Facebook.", Toast.LENGTH_LONG).show();
+        }
+    }
+    private void logoutUser() {
+        LoginManager.getInstance().logOut();
+        ParseUser.logOut();
+        ParseUser currentUser = ParseUser.getCurrentUser();
+        Toast.makeText(MainActivity.this, "Success!", Toast.LENGTH_SHORT);
+        onStop();
+        Intent i = new Intent(MainActivity.this, LoginActivity.class);
+        startActivity(i);
+        finish();
+    }
+
     //DRAWABLE CODE
     private void initDrawables() {
         dayIcon = AppCompatResources.getDrawable(this, R.drawable.daythemeicon_white);
@@ -201,29 +231,25 @@ public class MainActivity extends AppCompatActivity implements OnMapReadyCallbac
         return true;
     }
 
-    private void linkUserToFB(){
-        Collection<String> permissions = Arrays.asList("public_profile", "email");
-        if (!ParseFacebookUtils.isLinked(ParseUser.getCurrentUser())) {
-            ParseFacebookUtils.linkWithReadPermissionsInBackground(ParseUser.getCurrentUser(), this, permissions, ex -> {
-                if (ParseFacebookUtils.isLinked(ParseUser.getCurrentUser())) {
-                    Toast.makeText(this, "Woohoo, user logged in with Facebook.", Toast.LENGTH_LONG).show();
-                    Log.d("FacebookLoginExample", "Woohoo, user logged in with Facebook!");
-                }
-            });
-        } else {
-            Toast.makeText(this, "You have already linked your account with Facebook.", Toast.LENGTH_LONG).show();
+    //QUERYING FILTER UI CODE
+    public void onRadioButtonClicked(@NonNull View view) {
+        boolean checked = ((RadioButton) view).isChecked();
+        switch(view.getId()) {
+            case R.id.radio_public:
+                stationController.setPublicPrivateSelection(0);
+                break;
+            case R.id.radio_private:
+                stationController.setPublicPrivateSelection(1);
+                break;
+            case R.id.radio_both:
+                stationController.setPublicPrivateSelection(2);
+                break;
         }
+        locationController.retrieveLocation(MainActivity.this);
     }
-    private void logoutUser() {
-        LoginManager.getInstance().logOut();
-        ParseUser.logOut();
-        ParseUser currentUser = ParseUser.getCurrentUser();
-        Toast.makeText(MainActivity.this, "Success!", Toast.LENGTH_SHORT);
-        onStop();
-        Intent i = new Intent(MainActivity.this, LoginActivity.class);
-        startActivity(i);
-        finish();
-    }
+
+
+
     private void rotateTheme () {
         int theme = (ThemeManager.getInstance().getCurrentTheme() + 1) % ThemeManager.getInstance().getThemeCount();
         ThemeManager.getInstance().setCurrentTheme(theme);

@@ -73,4 +73,37 @@
         android:contentDescription="@string/app_name"
         android:gravity="center" />
 
+    <RadioGroup
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        app:layout_constraintTop_toTopOf="@id/mapGuidelineHoriz"
+        app:layout_constraintLeft_toLeftOf="parent"
+        android:id="@+id/radiogroup"
+        android:orientation="horizontal">
+
+        <RadioButton
+            android:id="@+id/radio_public"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:onClick="onRadioButtonClicked"
+            android:text="Public"
+            android:textSize="12sp" />
+
+        <RadioButton
+            android:id="@+id/radio_private"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:onClick="onRadioButtonClicked"
+            android:text="Private"
+            android:textSize="12sp" />
+
+        <RadioButton
+            android:id="@+id/radio_both"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:onClick="onRadioButtonClicked"
+            android:text="Both"
+            android:textSize="12sp" />
+    </RadioGroup>
+
 </androidx.constraintlayout.widget.ConstraintLayout>

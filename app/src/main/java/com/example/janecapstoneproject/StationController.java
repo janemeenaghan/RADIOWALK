@@ -77,7 +77,7 @@ public class StationController {
         }
     }
 
-    public void renderNearbyStations(ParseUser user, Context context, Location location, double kiloRadius) throws IOException {
+    public void renderNearbyStations(ParseUser user, Context context, Location location, double kiloRadius, double chaosFactor) throws IOException {
         ParseQuery<Station> query = ParseQuery.getQuery(Station.class);
         query.whereWithinKilometers(KEY_GEOPOINT, new ParseGeoPoint(location.getLatitude(), location.getLongitude()), kiloRadius);
         if (publicPrivateSelection == 0) {
@@ -101,7 +101,7 @@ public class StationController {
                                 callback.renderAStationToMap(station);
                             }
                         }
-                        double score = computeScore(station, location, kiloRadius, globalCurrentStation);
+                        double score = computeScore(station, location, kiloRadius, globalCurrentStation,chaosFactor);
                         if (score > highestScore) {
                             highestScore = score;
                             bestStation = station;
@@ -118,7 +118,7 @@ public class StationController {
                         }
                         return;
                     } else {
-                        Log.d(TAG, "Nearest station is now out of range!");
+                        Log.d(TAG, "Nearest station is out of range");
                         for (StationController.StationControllerCallback callback : callbacks) {
                             callback.onCaseNoNearbyStation(location);
                         }
@@ -159,11 +159,11 @@ public class StationController {
         }
         return includeStation;
     }
-    private double computeScore(Station station, Location location, double maxRadius, Station currentStation){
-        return (proximityScore(station,location,maxRadius) + likesScore(station) + stationTypeScore(station) + isCurrentStationScore(station,currentStation));
+    private double computeScore(Station station, Location location, double maxRadius, Station currentStation, double chaosFactor){
+        return (proximityScore(station,location,maxRadius) + likesScore(station) + stationTypeScore(station) + isCurrentStationScore(station,currentStation) + chaosScore(chaosFactor));
     }
     private double proximityScore(Station station, Location location, double maxRadius){
-        return 3 - (( distance(station,location) / maxRadius) * 3);
+        return 3.0*(1.0 - ((distance(station,location) / maxRadius)));
     }
     private double distance(Station a, Location b) {
         float[] result = new float[1];
@@ -187,6 +187,9 @@ public class StationController {
             return 0.5;
         }
         return 0;
+    }
+    private double chaosScore(double chaosFactor){
+        return Math.random()*chaosFactor;
     }
     public void addStation (String name,int type, LatLng coords, ParseUser user, String
             streamLink, String streamName, String favicon, Context context){

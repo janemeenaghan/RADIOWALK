@@ -1,5 +1,4 @@
 package com.example.janecapstoneproject;
-
 import static androidx.core.app.ActivityCompat.requestPermissions;
 import android.Manifest;
 import android.app.Activity;
@@ -19,7 +18,6 @@ import com.google.android.gms.location.Priority;
 import com.google.android.gms.tasks.Task;
 import java.io.IOException;
 import java.util.ArrayList;
-
 public class LocationController {
     private FusedLocationProviderClient fusedLocationProviderClient;
     LocationRequest locationRequest;
@@ -29,14 +27,11 @@ public class LocationController {
     private com.google.android.gms.location.LocationCallback androidLocationCallback = new com.google.android.gms.location.LocationCallback() {
         @Override
         public void onLocationAvailability(@NonNull LocationAvailability locationAvailability) {
-            Log.d("LocationController","LocationAvailability");
             super.onLocationAvailability(locationAvailability);
         }
-
         @Override
         public void onLocationResult(@NonNull LocationResult locationResult) {
             super.onLocationResult(locationResult);
-            Log.d("LocationController","onLocationResult");
             for(LocationCallback callback : callbacks) {
                 try {
                     callback.onLocationResult(locationResult.getLastLocation());
@@ -44,33 +39,25 @@ public class LocationController {
                     e.printStackTrace();
                 }
             }
-
         }
     };
-
     public LocationController(Context context){
         fusedLocationProviderClient = LocationServices.getFusedLocationProviderClient(context);
     }
-
     public void startLiveUpdates(Context context){
-        locationRequest = LocationRequest.create().setInterval(10).setFastestInterval(1).setSmallestDisplacement(1)/*.setMaxWaitTime(1000)*/.setPriority(Priority.PRIORITY_HIGH_ACCURACY);
-
+        locationRequest = LocationRequest.create().setInterval(1000).setFastestInterval(100).setSmallestDisplacement(5).setPriority(Priority.PRIORITY_HIGH_ACCURACY);
         if (checkForLocationPermission(context)) {
             fusedLocationProviderClient.requestLocationUpdates(locationRequest,
                     androidLocationCallback,
                     Looper.getMainLooper());
         }
     }
-
     public void stopLiveUpdates(){
         fusedLocationProviderClient.removeLocationUpdates(androidLocationCallback);
     }
-
     public boolean checkForLocationPermission(Context context){
-        //this.context = context;
         return ActivityCompat.checkSelfPermission(context, Manifest.permission.ACCESS_FINE_LOCATION) == PackageManager.PERMISSION_GRANTED && ActivityCompat.checkSelfPermission(context, Manifest.permission.ACCESS_COARSE_LOCATION) == PackageManager.PERMISSION_GRANTED;
     }
-
     public void requestPermission(Activity activity){
         requestPermissions(activity, new String[]{Manifest.permission.ACCESS_COARSE_LOCATION, Manifest.permission.ACCESS_FINE_LOCATION}, REQUEST_CODE);
     }
@@ -93,35 +80,28 @@ public class LocationController {
                             }
                         }
                     }
-                    else{
-                        //TODO: throw error, or try retrieving again
-                    }
                 });
             }
         } catch (SecurityException e)  {
             Log.e("Exception: %s", e.getMessage(), e);
         }
     }
-
     public void registerCallback(LocationController.LocationCallback locationCallback){
         if (!callbacks.contains(locationCallback)){
             callbacks.add(locationCallback);
         }
     }
-
     public void unRegisterCallback(LocationController.LocationCallback locationCallback){
         if (callbacks.contains(locationCallback)){
             callbacks.remove(locationCallback);
         }
     }
-
     public Location getGlobalLocation(){
         return globalLocation;
     }
     public void setGlobalLocation(Location globalLocation) {
         this.globalLocation = globalLocation;
     }
-
     public interface LocationCallback{
         void onRetrieveLocationResultAccompanyingBypass();
         void onLocationResult(Location location) throws IOException;

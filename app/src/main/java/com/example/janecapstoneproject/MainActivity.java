@@ -11,6 +11,7 @@ import android.content.Context;
 import android.content.DialogInterface;
 import android.content.Intent;
 import android.widget.RadioButton;
+import android.widget.SearchView;
 import android.widget.SeekBar;
 import android.content.pm.PackageManager;
 import android.graphics.drawable.Drawable;
@@ -69,15 +70,17 @@ public class MainActivity extends AppCompatActivity implements OnMapReadyCallbac
     private Drawable dayIcon, nightIcon, playIcon, pauseIcon;
     private Slider volControl;
     private SeekBar chaosMeter;
+    private androidx.appcompat.widget.SearchView stationSearch;
     private ImageButton playPauseButton;
     private com.rey.material.widget.FloatingActionButton addStationButton, editStationButton;
-    private double chaosFactor;
     private MapController mapController;
     private LocationController locationController;
     private VolumeController volumeController;
     private MediaPlayerController mediaPlayerController;
     private StationController stationController;
     private ToolbarManager mToolbarManager;
+    private double chaosFactor;
+    private String searchTag;
     @RequiresApi(api = Build.VERSION_CODES.M)
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -92,6 +95,7 @@ public class MainActivity extends AppCompatActivity implements OnMapReadyCallbac
         initLocation();
         initMap(savedInstanceState);
         initAddStationButton(ParseUser.getCurrentUser(), this);
+        initAlgoUIElements();
         initMediaPlayer();
         initVolume();
         initSlidingPanelElements();
@@ -221,14 +225,31 @@ public class MainActivity extends AppCompatActivity implements OnMapReadyCallbac
         return true;
     }
     //ALGO UI ELEMENTS CODE
-    private void initAlgoUIElements(){
+    private void initAlgoUIElements() {
+        initChaosMeter();
+        initStationSearch();
+    }
+    private void initChaosMeter(){
+        chaosFactor = 0;
         chaosMeter=findViewById(R.id.chaos_meter);
         chaosMeter.setMax(100);
         chaosMeterText=findViewById(R.id.chaos_meter_text);
         chaosMeter.setOnSeekBarChangeListener(new SeekBar.OnSeekBarChangeListener() {
             @Override
             public void onProgressChanged(SeekBar seekBar, int progress, boolean fromUser) {
-                String string = "Chaos Meter: "+ progress/seekBar.getProgress();
+                String string = "Chaos Meter: ";
+                if (progress > 75){
+                    string += "TOTAL CHAOS";
+                }
+                else if (progress > 50){
+                    string += "Wild";
+                }
+                else if (progress > 25){
+                    string += "Balanced";
+                }
+                else{
+                    string += "Tame";
+                }
                 chaosMeterText.setText(string);
                 chaosFactor = (double)(((double)(progress))/100.0);
             }
@@ -236,6 +257,23 @@ public class MainActivity extends AppCompatActivity implements OnMapReadyCallbac
             public void onStartTrackingTouch(SeekBar seekBar) {}
             @Override
             public void onStopTrackingTouch(SeekBar seekBar) {}
+        });
+    }
+    private void initStationSearch(){
+        searchTag = "";
+        stationSearch = findViewById(R.id.stationSearchBar);
+        stationSearch.setOnQueryTextListener(new androidx.appcompat.widget.SearchView.OnQueryTextListener() {
+            @Override
+            public boolean onQueryTextSubmit(String query) {
+                searchTag = query;
+                locationController.retrieveLocation(MainActivity.this);
+                return false;
+            }
+
+            @Override
+            public boolean onQueryTextChange(String newText) {
+                return false;
+            }
         });
     }
     public void onRadioButtonClicked(@NonNull View view) {
@@ -253,7 +291,7 @@ public class MainActivity extends AppCompatActivity implements OnMapReadyCallbac
         }
         locationController.retrieveLocation(MainActivity.this);
     }
-    //ALERTS AND POP UPS
+    //INSTRUCTIONS VIEW
     private void launchInfoPopUp() {
         View instructionsView = LayoutInflater.from(MainActivity.this).
                 inflate(R.layout.instructions_item, null);
@@ -399,21 +437,18 @@ public class MainActivity extends AppCompatActivity implements OnMapReadyCallbac
     @RequiresApi(api = Build.VERSION_CODES.M)
     @Override
     public void onPlayingChanged(int playingState) {
-        //isPlaying
         if (playingState == 0) {
             playPauseButton.setImageDrawable(pauseIcon);
             Log.e(TAG,"0");
             playPauseButton.setVisibility(View.VISIBLE);
             musicIcon.setVisibility(View.VISIBLE);
         }
-        //isPaused
         else if (playingState == 1) {
             playPauseButton.setImageDrawable(playIcon);
             playPauseButton.setVisibility(View.VISIBLE);
             musicIcon.setVisibility(View.VISIBLE);
             Log.e(TAG,"1");
         }
-        //isStopped
         else{
             playPauseButton.setVisibility(View.INVISIBLE);
             musicIcon.setVisibility(View.INVISIBLE);
@@ -443,7 +478,6 @@ public class MainActivity extends AppCompatActivity implements OnMapReadyCallbac
                 volumeController.setVolume(newValue);
             }
         });
-
     }
     @Override
     public void onVolumeChanged(int volume) {
@@ -484,7 +518,8 @@ public class MainActivity extends AppCompatActivity implements OnMapReadyCallbac
         locationController.setGlobalLocation(location);
         if (mapController.getMap() != null) {
             mapController.updateMapPositioning(location,bypassMapChecks);
-            stationController.renderNearbyStations(ParseUser.getCurrentUser(),MainActivity.this,location,STATION_DETECTION_RADIUS_KILOMETERS,chaosFactor);
+            stationController.renderNearbyStations(ParseUser.getCurrentUser(), MainActivity.this, location, STATION_DETECTION_RADIUS_KILOMETERS, chaosFactor, searchTag);
+            searchTag = "";
         }
     }
     @Override
@@ -574,7 +609,6 @@ public class MainActivity extends AppCompatActivity implements OnMapReadyCallbac
                         launchBrowseStationsActivityForResult(isNew, name, latLng);
                     }
                 });
-        // Configure dialog button (Cancel)
         alertDialog2.setButton(DialogInterface.BUTTON_NEGATIVE, "Cancel",
                 new DialogInterface.OnClickListener() {
                     public void onClick(DialogInterface dialog, int id) {
@@ -601,9 +635,12 @@ public class MainActivity extends AppCompatActivity implements OnMapReadyCallbac
             String streamName = data.getStringExtra("name");
             String favicon = data.getStringExtra("favicon");
             LatLng latLng = Parcels.unwrap(data.getParcelableExtra("latLng"));
+            String tags = data.getStringExtra("tags");
+            Log.e("Main",tags);
+            int likes = data.getIntExtra(("likes"),0);
             int isNew = data.getIntExtra("new", 2);
             if (isNew == 1) {
-                stationController.addStation(stationName, PRIVATE_TYPE, latLng, ParseUser.getCurrentUser(), streamLink, streamName, favicon, MainActivity.this);
+                stationController.addStation(stationName, PRIVATE_TYPE, latLng, ParseUser.getCurrentUser(), streamLink, streamName, favicon, MainActivity.this, tags, likes);
             } else if (isNew == 0) {
                 //Potential hazard
                 stationController.getGlobalCurrentStation().updateStationWithNewRadioToParse(streamLink, streamName, favicon);
@@ -659,7 +696,6 @@ public class MainActivity extends AppCompatActivity implements OnMapReadyCallbac
         user.saveInBackground();
         locationController.retrieveLocation(MainActivity.this);
     }
-
     public Marker onRequestMarkerAddedToClosestStation(Station closestStation) {
         return mapController.addMarker(new MarkerOptions()
                 .position(closestStation.getCoords())

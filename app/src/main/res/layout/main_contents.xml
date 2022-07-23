@@ -8,7 +8,6 @@
     android:layout_height="match_parent"
     android:orientation="horizontal"
     android:gravity="center">
-
     <androidx.appcompat.widget.Toolbar
         android:id="@+id/main_toolbar"
         android:layout_height="wrap_content"
@@ -16,34 +15,24 @@
         android:visibility="visible"
         android:minHeight="?attr/actionBarSize"
         app:theme="@style/AppBar"/>
-
     <androidx.constraintlayout.widget.Guideline
         android:id="@+id/fabGuidelineVert"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:orientation="vertical"
         app:layout_constraintGuide_percent="0.9" />
-
     <androidx.constraintlayout.widget.Guideline
         android:id="@+id/fabGuidelineHoriz"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:orientation="horizontal"
         app:layout_constraintGuide_percent="0.875" />
-
     <androidx.constraintlayout.widget.Guideline
         android:id="@+id/mapGuidelineHoriz"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:orientation="horizontal"
         app:layout_constraintGuide_percent="0.08" />
-    <androidx.constraintlayout.widget.Guideline
-        android:id="@+id/algoFactorsGuidelineHoriz"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:orientation="horizontal"
-        app:layout_constraintGuide_percent="0.18" />
-
     <com.rey.material.widget.FloatingActionButton
         android:id="@+id/editButton"
         android:layout_width="0dp"
@@ -56,7 +45,6 @@
         android:visibility="invisible"
         android:src="@drawable/ic_baseline_settings_24"
         app:v_styleId="@array/fab_line_green" />
-
     <com.rey.material.widget.FloatingActionButton
         android:id="@+id/createButton"
         android:layout_width="0dp"
@@ -69,7 +57,6 @@
         android:visibility="invisible"
         android:src="@drawable/ic_baseline_add_24"
         app:v_styleId="@array/fab_line_purple" />
-
     <com.google.android.gms.maps.MapView
         android:id="@+id/mapView"
         android:layout_width="match_parent"
@@ -79,15 +66,13 @@
         app:layout_constraintHeight_percent=".94"
         app:layout_constraintTop_toTopOf="@id/mapGuidelineHoriz"
         tools:layout_editor_absoluteX="0dp" />
-
     <RadioGroup
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        app:layout_constraintTop_toTopOf="@id/algoFactorsGuidelineHoriz"
+        app:layout_constraintTop_toBottomOf="@id/radioText"
         app:layout_constraintLeft_toLeftOf="parent"
         android:id="@+id/radiogroup"
         android:orientation="horizontal">
-
         <RadioButton
             android:id="@+id/radio_public"
             android:layout_width="wrap_content"
@@ -95,7 +80,6 @@
             android:onClick="onRadioButtonClicked"
             android:text="Public"
             android:textSize="12sp" />
-
         <RadioButton
             android:id="@+id/radio_private"
             android:layout_width="wrap_content"
@@ -112,32 +96,13 @@
             android:text="Both"
             android:textSize="12sp" />
     </RadioGroup>
-    <androidx.constraintlayout.widget.Guideline
-        android:id="@+id/chaosMeterGuideline"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:orientation="vertical"
-        app:layout_constraintGuide_percent="0.5" />
-
-    <SeekBar
-        android:id="@+id/chaos_meter"
-        style="@style/Material.Widget.Slider.Discrete"
-        android:layout_width="0dp"
-        android:layout_height="wrap_content"
-        app:layout_constraintWidth_percent="0.5"
-        app:v_styleId="@array/slider"
-        sothree:layout_constraintLeft_toRightOf="@id/chaosMeterGuideline"
-        sothree:layout_constraintTop_toTopOf="@id/radiogroup"
-        sothree:layout_constraintBottom_toBottomOf="@id/radiogroup"
-        />
-
     <TextView
-        android:id="@+id/showWhich"
+        android:id="@+id/radioText"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:layout_marginLeft="5dp"
         android:text="Show station types:"
-        sothree:layout_constraintBottom_toTopOf="@id/radiogroup"
+        sothree:layout_constraintTop_toBottomOf="@id/stationSearchBar"
         sothree:layout_constraintLeft_toLeftOf="@id/radiogroup" />
 
     <TextView
@@ -145,8 +110,27 @@
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:layout_marginLeft="7dp"
-        android:text="Chaos Meter: "
-        sothree:layout_constraintBottom_toBottomOf="@id/showWhich"
-        sothree:layout_constraintLeft_toLeftOf="@id/chaosMeterGuideline" />
+        android:text="Chaos Meter: Tame"
+        sothree:layout_constraintLeft_toLeftOf="@id/radiogroup"
+        sothree:layout_constraintTop_toBottomOf="@id/radiogroup" />
 
+    <SeekBar
+        android:id="@+id/chaos_meter"
+        style="@style/Material.Widget.Slider.Discrete"
+        android:layout_width="0dp"
+        android:layout_height="wrap_content"
+        android:max="100"
+        app:layout_constraintWidth_percent="0.5"
+        app:v_styleId="@array/slider"
+        sothree:layout_constraintLeft_toLeftOf="@id/radiogroup"
+        sothree:layout_constraintTop_toBottomOf="@id/chaos_meter_text" />
+    <androidx.appcompat.widget.SearchView
+        android:id="@+id/stationSearchBar"
+        android:layout_width="0dp"
+        android:layout_height="wrap_content"
+        android:paddingLeft="10dp"
+        android:paddingRight="10dp"
+        app:layout_constraintWidth_percent="0.5"
+        sothree:layout_constraintLeft_toLeftOf="@id/radiogroup"
+        sothree:layout_constraintTop_toBottomOf="@id/mapGuidelineHoriz" />
 </androidx.constraintlayout.widget.ConstraintLayout>

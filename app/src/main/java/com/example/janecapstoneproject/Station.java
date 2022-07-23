@@ -64,7 +64,7 @@ public class Station extends ParseObject {
     public double getLongitude(){ return getParseGeoPoint(KEY_GEOPOINT).getLongitude();}
     public LatLng getCoords(){ return new LatLng(getLatitude(),getLongitude());}
     public int getType(){ return (int)getNumber(KEY_TYPE); }
-    public int getLikes() { return (int) getNumber(KEY_TAGS); }
+    public int getLikes() { return (int) getNumber(KEY_LIKES); }
     public String getTags(){ return getString(KEY_TAGS); }
     public boolean isPublic(){ return getType() == 0; }
     public boolean isPrivate(){ return getType() == 1; }
@@ -93,7 +93,9 @@ public class Station extends ParseObject {
     public void setPublic(){ put(KEY_TYPE, PUBLIC_TYPE); }
     public void setPrivate(){ put(KEY_TYPE, PRIVATE_TYPE); }
     public void setType(int type){ put(KEY_TYPE, type);  }
-    public void setTags (String tags) { put (KEY_TAGS, tags); }
+    public void setTags (String tags) {
+        if (tags != null){put (KEY_TAGS, tags);}
+    }
     public void setLikes (int likes) { put (KEY_LIKES, likes); }
     public void setName(String name){ put(KEY_NAME, name);  }
     public void setStreamLink(String streamLink){ put(KEY_STREAMLINK, streamLink); }
@@ -211,9 +213,7 @@ public class Station extends ParseObject {
         }
         return "";
     }
-
     public interface StationCallback{
         void onSaveInBackground();
     }
-
 }

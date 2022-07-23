@@ -16,7 +16,6 @@ public class ParseApplication extends Application {
         ThemeManager.init(this, 2, 0, null);
         FacebookSdk.sdkInitialize(getApplicationContext());
         AppEventsLogger.activateApp(this);
-
         ParseObject.registerSubclass(Station.class);
         Parse.initialize(new Parse.Configuration.Builder(this)
                 .applicationId(getString(R.string.back4app_app_id))

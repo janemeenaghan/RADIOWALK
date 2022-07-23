@@ -17,7 +17,7 @@ import retrofit2.Response;
 
 public class BrowseStationsActivity extends AppCompatActivity implements StationListAdapter.OnStationListener {
     public static final String TAG = "BrowseStationsActivity";
-    private RecyclerView stationRecycler/*, tagsRecycler*/;
+    private RecyclerView stationRecycler;
     private StationListAdapter adapter;
     private SearchView searchView;
     private RecyclerView.LayoutManager layoutManager;
@@ -31,15 +31,6 @@ public class BrowseStationsActivity extends AppCompatActivity implements Station
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         isNew = getIntent().getIntExtra("new",2);
-        if (isNew==1) {
-            Log.e(TAG, "onCreate: New");
-        }
-        else if (isNew == 0){
-            Log.e(TAG, "onCreate: Not new");
-        }
-        else {
-            Log.e(TAG, "onCreate: new != 0 or 1, something is wrong (maybe add Parcels.unwrap?");
-        }
         latLng = Parcels.unwrap(getIntent().getParcelableExtra("latLng"));
         stationName = getIntent().getStringExtra("stationName");
         setContentView(R.layout.activity_browse_stations);
@@ -117,9 +108,8 @@ public class BrowseStationsActivity extends AppCompatActivity implements Station
         intent.putExtra("name", selectedStationInfo.getName());
         intent.putExtra("url",selectedStationInfo.getUrl());
         intent.putExtra("favicon",selectedStationInfo.getFavicon());
-        if (isNew != 0 && isNew != 1){
-            Log.e(TAG, "Returning new value != 0 or 1, was already this value when passed to Browse");
-        }
+        intent.putExtra("tags",selectedStationInfo.getTags());
+        intent.putExtra("likes",selectedStationInfo.getVotes());
         intent.putExtra("latLng",Parcels.wrap(latLng));
         setResult(RESULT_OK, intent);
         finish();

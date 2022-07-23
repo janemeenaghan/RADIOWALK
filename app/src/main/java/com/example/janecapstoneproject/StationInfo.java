@@ -9,7 +9,7 @@ public class StationInfo {
     @SerializedName("name")
     private String name;
     //will need additional work to separate tagsRecycler by commas into a list. or see if retrofit can separate for you
-    @SerializedName("tagsRecycler")
+    @SerializedName("tags")
     private String tags;
     @SerializedName("url_resolved")
     private String url;

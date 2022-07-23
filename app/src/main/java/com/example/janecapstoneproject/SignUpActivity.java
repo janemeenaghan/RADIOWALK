@@ -21,13 +21,10 @@ import com.parse.SignUpCallback;
 import org.json.JSONArray;
 
 import java.util.List;
-
 public class SignUpActivity extends AppCompatActivity {
     public static final String TAG = "SignUpActivity";
     private EditText etEmail, etUsername,etPassword,etConfirmPassword;
     TextInputLayout etEmailWrapper,etUsernameWrapper,etPasswordWrapper,etConfirmPasswordWrapper;
-    int returnValueEmail,returnValueUsername;
-    String email,username;
     boolean validUsername,validEmail,matchingPasswords;
     boolean halted;
     private Button signup;
@@ -144,38 +141,6 @@ public class SignUpActivity extends AppCompatActivity {
             }
         });
     }
-
-
-    /*public void queryUsersForParameterStatus(String key, String value) {
-        ParseQuery<ParseUser> query = ParseQuery.getQuery(ParseUser.class);
-        query.whereEqualTo(key,value);
-        query.findInBackground(new FindCallback<ParseUser>() {
-            @Override
-            public void done(List<ParseUser> objects, ParseException e) {
-                if (e != null) {
-                    Log.e(TAG, "Issue with signup", e);
-                    Toast.makeText(SignUpActivity.this, "KYS"+e, Toast.LENGTH_LONG);
-                }
-                else if (objects.isEmpty()){
-                    if (key.equals("username")) {
-                        returnValueUsername = 0;
-                    }
-                    else{
-                        returnValueEmail = 0;
-                    }
-                }
-                else{
-                    if (key.equals("username")) {
-                        returnValueUsername = 1;
-                    }
-                    else{
-                        returnValueEmail = 1;
-                    }
-                }
-            }
-        });
-    }*/
-
     private void attemptToRegisterUser(String email, String username, String password) {
         ParseUser user = new ParseUser();
         user.setEmail(email);

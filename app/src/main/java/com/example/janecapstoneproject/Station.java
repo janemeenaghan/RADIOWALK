@@ -1,5 +1,4 @@
 package com.example.janecapstoneproject;
-
 import static com.example.janecapstoneproject.LoginActivity.TAG;
 import android.graphics.Color;
 import android.os.Parcelable;
@@ -50,10 +49,7 @@ public class Station extends ParseObject {
     public static final int PRIVATE_TYPE = 1;
     private Circle circle;
     private Marker marker;
-
-    public Station(){
-
-    }
+    public Station(){}
     public Station(String objectId) throws ParseException {
         ParseQuery<Station> query = ParseQuery.getQuery(Station.class);
         query.whereEqualTo(KEY_OBJECTID,objectId);
@@ -79,13 +75,17 @@ public class Station extends ParseObject {
             return getString(KEY_FAVICON);
         }
     }
-
     public ParseUser getUser(){ return getParseUser(KEY_USER);}
     public JSONArray getUsersSharedWith(){
         return getJSONArray(KEY_USERSSHAREDWITH);
     }
     public Circle getCircle(){ return circle; }
+    public boolean hasMarker(){ return (!(marker == null)); }
+    public boolean hasCircle(){ return (!(circle == null)); }
     public Marker getMarker(){ return marker; }
+    public void removeMarker() { marker.remove();
+    marker = null;}
+    public void removeCircle() {circle.remove(); marker = null;}
     public void setGeoPoint(double latitude, double longitude){ put (KEY_GEOPOINT, new ParseGeoPoint(latitude,longitude));  }
     public void setGeoPoint(LatLng coords){ put (KEY_GEOPOINT, new ParseGeoPoint(coords.latitude,coords.longitude));  }
     public void setLatitude(double latitude){ put(KEY_GEOPOINT,new ParseGeoPoint(latitude,(getParseGeoPoint(KEY_GEOPOINT).getLongitude()))); }
@@ -114,32 +114,17 @@ public class Station extends ParseObject {
     public void setMarker(Marker marker) {
         this.marker = marker;
     }
-
     public void setMarkerColor(int which){
-        if (marker != null){
-            if (which == 0){
-                marker.setIcon(BitmapDescriptorFactory.fromResource(R.drawable.broadcastcyan));
-            }
-            else if (which == 1){
-                marker.setIcon(BitmapDescriptorFactory.fromResource(R.drawable.broadcastpurple));
-            }
-            else{
-                marker.setIcon(BitmapDescriptorFactory.fromResource(R.drawable.broadcastgreen));
-            }
+        if (which == 0){
+            marker.setIcon(BitmapDescriptorFactory.fromResource(R.drawable.broadcastcyan));
+        }
+        else if (which == 1){
+            marker.setIcon(BitmapDescriptorFactory.fromResource(R.drawable.broadcastpurple));
         }
         else{
-            if (which == 0){
-                marker.setIcon(BitmapDescriptorFactory.fromResource(R.drawable.broadcastcyan));
-            }
-            else if (which == 1){
-                marker.setIcon(BitmapDescriptorFactory.fromResource(R.drawable.broadcastpurple));
-            }
-            else{
-                marker.setIcon(BitmapDescriptorFactory.fromResource(R.drawable.broadcastgreen));
-            }
+            marker.setIcon(BitmapDescriptorFactory.fromResource(R.drawable.broadcastgreen));
         }
     }
-
     public void addUserToSharedList(ParseUser user) throws JSONException {
         if (getJSONArray(KEY_USERSSHAREDWITH)==null){
             JSONArray array = new JSONArray().put(user.getObjectId());
@@ -150,7 +135,6 @@ public class Station extends ParseObject {
             put(KEY_USERSSHAREDWITH, array);
         }
     }
-
     public void addThisToUsersSharedList(ParseUser user) throws JSONException {
         if (user.getJSONArray(KEY_USERSSHAREDSTATIONS)==null){
             JSONArray array = new JSONArray().put(this.getObjectId());
@@ -161,7 +145,6 @@ public class Station extends ParseObject {
             user.put(KEY_USERSSHAREDSTATIONS, array);
         }
     }
-
     public void updateStationWithNewRadioToParse(String streamLink, String streamName, String favicon){
         setStreamLink(streamLink);
         setStreamName(streamName);
@@ -169,11 +152,9 @@ public class Station extends ParseObject {
         saveInBackground(new SaveCallback() {
             @Override
             public void done(ParseException e) {
-
             }
         });
     }
-
     @Override
     public boolean equals(@Nullable Object obj) {
         if (obj instanceof Station) {
@@ -181,7 +162,6 @@ public class Station extends ParseObject {
         }
         return false;
     }
-
     public static String calculateTimeAgo(Date createdAt) {
         int SECOND_MILLIS = 1000;
         int MINUTE_MILLIS = 60 * SECOND_MILLIS;
@@ -208,7 +188,6 @@ public class Station extends ParseObject {
                 return diff / DAY_MILLIS + " d";
             }
         } catch (Exception e) {
-            Log.i("Error:", "getRelativeTimeAgo failed", e);
             e.printStackTrace();
         }
         return "";

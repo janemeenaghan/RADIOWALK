@@ -5,6 +5,7 @@ import androidx.annotation.RequiresApi;
 import androidx.appcompat.app.AlertDialog;
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.appcompat.content.res.AppCompatResources;
+import androidx.appcompat.widget.SearchView;
 import androidx.appcompat.widget.Toolbar;
 
 import android.annotation.SuppressLint;
@@ -273,6 +274,13 @@ public class MainActivity extends AppCompatActivity implements OnMapReadyCallbac
                 return false;
             }
         });
+        stationSearch.setOnCloseListener(new SearchView.OnCloseListener() {
+            @Override
+            public boolean onClose() {
+                searchTag = "";
+                return false;
+            }
+        });
     }
     public void onRadioButtonClicked(@NonNull View view) {
         boolean checked = ((RadioButton) view).isChecked();
@@ -510,7 +518,6 @@ public class MainActivity extends AppCompatActivity implements OnMapReadyCallbac
         if (mapController.getMap() != null) {
             mapController.updateMapPositioning(location,bypassMapChecks);
             stationController.queryAndRenderNearbyAndClosestStations(ParseUser.getCurrentUser(), location, STATION_DETECTION_RADIUS_KILOMETERS, chaosFactor, searchTag);
-            searchTag = "";
         }
     }
     @Override
@@ -549,7 +556,6 @@ public class MainActivity extends AppCompatActivity implements OnMapReadyCallbac
     //STATION BUTTONS CODE
     private void initAddStationButton(ParseUser user, Context context) {
         addStationButton = findViewById(R.id.createButton);
-        addStationButton.setVisibility(View.INVISIBLE);
         addStationButton.setOnClickListener(v -> {
             addStationButton.setLineMorphingState((addStationButton.getLineMorphingState() + 1) % 2, true);
             Location loc = locationController.getGlobalLocation();
@@ -644,7 +650,6 @@ public class MainActivity extends AppCompatActivity implements OnMapReadyCallbac
     }
     @Override
     public void onCaseNoNearbyStation (Location location){
-        addStationButton.setVisibility(View.VISIBLE);
         if (editButtonHasBeenInitialized) {
             editStationButton.setVisibility(View.INVISIBLE);
         }
@@ -661,7 +666,6 @@ public class MainActivity extends AppCompatActivity implements OnMapReadyCallbac
             stationController.renderStation(stationController.getGlobalCurrentStation());
             editButtonNeedsToBeRefreshed = true;
         }
-        addStationButton.setVisibility(View.INVISIBLE);
         stationController.renderClosestStation(newNearestStation);
         if (editButtonNeedsToBeRefreshed || !editButtonHasBeenInitialized) {
             initEditStationButton(newNearestStation, newNearestStation.getCoords(), ParseUser.getCurrentUser(), MainActivity.this);
@@ -705,5 +709,9 @@ public class MainActivity extends AppCompatActivity implements OnMapReadyCallbac
             mediaPlayerController.setURLAndPrepare(closestStation.getStreamLink());
         }
         stationController.setGlobalCurrentStation(closestStation);
+    }
+    @Override
+    public void tellMapToClear(){
+        mapController.clear();
     }
 }

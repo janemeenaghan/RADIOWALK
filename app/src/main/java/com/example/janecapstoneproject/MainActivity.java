@@ -253,7 +253,7 @@ public class MainActivity extends AppCompatActivity implements OnMapReadyCallbac
                     string += "Tame";
                 }
                 chaosMeterText.setText(string);
-                chaosFactor = (double)(((double)(progress))/100.0);
+                chaosFactor = 10*(double)(((double)(progress))/100.0);
             }
             @Override
             public void onStartTrackingTouch(SeekBar seekBar) {}
@@ -657,7 +657,9 @@ public class MainActivity extends AppCompatActivity implements OnMapReadyCallbac
         boolean editButtonNeedsToBeRefreshed = false;
         if (needToDeselectCurrentStation) {
             editButtonNeedsToBeRefreshed = true;
+            stationController.renderStationFromScratchIfRightType(stationController.getGlobalCurrentStation());
         }
+
         stationController.renderClosestStation(newNearestStation);
         if (editButtonNeedsToBeRefreshed || !editButtonHasBeenInitialized) {
             initEditStationButton(newNearestStation, newNearestStation.getCoords(), ParseUser.getCurrentUser(), MainActivity.this);

@@ -119,6 +119,21 @@ public class StationController {
             }
         }
     }
+    public void renderStationFromScratchIfRightType(Station station) {
+        if ( (station.isPublic() && publicPrivateSelection == 1) || (station.isPrivate() && publicPrivateSelection == 0) ){
+            return;
+        }
+        for (StationController.StationControllerCallback callback : callbacks) {
+            if (station.isPublic()) {
+                station.setMarker(callback.onRequestMarkerAddedToStation(station,0));
+                station.setCircle(callback.onRequestCircleAddedToStation(station,0));
+            }
+            else{
+                station.setMarker(callback.onRequestMarkerAddedToStation(station,1));
+                station.setCircle(callback.onRequestCircleAddedToStation(station,1));
+            }
+        }
+    }
     //Planned Problem aka Complex Feature #1
     public void queryAndRenderNearbyAndClosestStations(ParseUser user, Location location, double kiloRadius, double chaosFactor, String tag) throws IOException {
         ParseQuery<Station> query = ParseQuery.getQuery(Station.class);

@@ -83,9 +83,8 @@ public class Station extends ParseObject {
     public boolean hasMarker(){ return (!(marker == null)); }
     public boolean hasCircle(){ return (!(circle == null)); }
     public Marker getMarker(){ return marker; }
-    public void removeMarker() { marker.remove();
-    marker = null;}
-    public void removeCircle() {circle.remove(); marker = null;}
+    public void removeMarker() { marker.remove();}
+    public void removeCircle() {circle.remove(); }
     public void setGeoPoint(double latitude, double longitude){ put (KEY_GEOPOINT, new ParseGeoPoint(latitude,longitude));  }
     public void setGeoPoint(LatLng coords){ put (KEY_GEOPOINT, new ParseGeoPoint(coords.latitude,coords.longitude));  }
     public void setLatitude(double latitude){ put(KEY_GEOPOINT,new ParseGeoPoint(latitude,(getParseGeoPoint(KEY_GEOPOINT).getLongitude()))); }

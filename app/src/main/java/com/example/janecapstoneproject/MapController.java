@@ -49,6 +49,7 @@ public class MapController {
         if (bypassChecks) {
             map.setMyLocationEnabled(true);
             map.getUiSettings().setMyLocationButtonEnabled(true);
+            map.clear();
             if (firstInstance) {
                 map.moveCamera(CameraUpdateFactory.newCameraPosition(new CameraPosition(new LatLng(location.getLatitude(), location.getLongitude()),DEFAULT_ZOOM,TILT_SETTING_ANGLED, 0)));
                 firstInstance = false;

@@ -14,8 +14,6 @@ import static com.example.janecapstoneproject.Station.KEY_USERSSHAREDSTATIONS;
 import android.content.Context;
 import android.location.Location;
 import android.util.Log;
-
-import com.google.android.gms.maps.MapsInitializer;
 import com.google.android.gms.maps.model.Circle;
 import com.google.android.gms.maps.model.LatLng;
 import com.google.android.gms.maps.model.Marker;
@@ -37,6 +35,10 @@ public class StationController {
     private double highestScore;
     private Station bestStation;
     private int publicPrivateSelection;
+
+    public StationController(){
+        publicPrivateSelection = -1;
+    }
     private ArrayList<StationController.StationControllerCallback> callbacks = new ArrayList<>();
     public Station getGlobalCurrentStation() {
         return globalCurrentStation;
@@ -120,11 +122,14 @@ public class StationController {
     public void queryAndRenderNearbyAndClosestStations(ParseUser user, Location location, double kiloRadius, double chaosFactor, String tag) throws IOException {
         ParseQuery<Station> query = ParseQuery.getQuery(Station.class);
         query.whereWithinKilometers(KEY_GEOPOINT, new ParseGeoPoint(location.getLatitude(), location.getLongitude()), kiloRadius);
-        /*if (publicPrivateSelection == 0) {
+        if (publicPrivateSelection == -1){
+            return;
+        }
+        if (publicPrivateSelection == 0) {
             query.whereEqualTo(KEY_TYPE, 0);
         } else if (publicPrivateSelection == 1) {
             query.whereEqualTo(KEY_TYPE, 1);
-        }*/
+        }
         bestStation = null;
         highestScore = -1;
         query.findInBackground(new FindCallback<Station>() {

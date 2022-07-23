@@ -5,7 +5,6 @@ import androidx.annotation.RequiresApi;
 import androidx.appcompat.app.AlertDialog;
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.appcompat.content.res.AppCompatResources;
-import androidx.appcompat.widget.SearchView;
 import androidx.appcompat.widget.Toolbar;
 
 import android.annotation.SuppressLint;
@@ -274,13 +273,6 @@ public class MainActivity extends AppCompatActivity implements OnMapReadyCallbac
                 return false;
             }
         });
-        stationSearch.setOnCloseListener(new SearchView.OnCloseListener() {
-            @Override
-            public boolean onClose() {
-                searchTag = "";
-                return false;
-            }
-        });
     }
     public void onRadioButtonClicked(@NonNull View view) {
         boolean checked = ((RadioButton) view).isChecked();
@@ -518,6 +510,7 @@ public class MainActivity extends AppCompatActivity implements OnMapReadyCallbac
         if (mapController.getMap() != null) {
             mapController.updateMapPositioning(location,bypassMapChecks);
             stationController.queryAndRenderNearbyAndClosestStations(ParseUser.getCurrentUser(), location, STATION_DETECTION_RADIUS_KILOMETERS, chaosFactor, searchTag);
+            searchTag = "";
         }
     }
     @Override
@@ -663,7 +656,6 @@ public class MainActivity extends AppCompatActivity implements OnMapReadyCallbac
     public void onCaseValidNearestStation (Location location, Station newNearestStation, boolean needToDeselectCurrentStation){
         boolean editButtonNeedsToBeRefreshed = false;
         if (needToDeselectCurrentStation) {
-            stationController.renderStation(stationController.getGlobalCurrentStation());
             editButtonNeedsToBeRefreshed = true;
         }
         stationController.renderClosestStation(newNearestStation);

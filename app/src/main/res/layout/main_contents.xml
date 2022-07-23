@@ -8,7 +8,6 @@
     android:layout_height="match_parent"
     android:orientation="horizontal"
     android:gravity="center">
-
     <androidx.appcompat.widget.Toolbar
         android:id="@+id/main_toolbar"
         android:layout_height="wrap_content"
@@ -16,7 +15,6 @@
         android:visibility="visible"
         android:minHeight="?attr/actionBarSize"
         app:theme="@style/AppBar"/>
-
     <androidx.constraintlayout.widget.Guideline
         android:id="@+id/fabGuidelineVert"
         android:layout_width="wrap_content"
@@ -25,19 +23,30 @@
         app:layout_constraintGuide_percent="0.9" />
 
     <androidx.constraintlayout.widget.Guideline
+        android:id="@+id/chaosMeterGuidelineVert"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:orientation="vertical"
+        sothree:layout_constraintGuide_percent=".42" />
+
+    <androidx.constraintlayout.widget.Guideline
         android:id="@+id/fabGuidelineHoriz"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:orientation="horizontal"
         app:layout_constraintGuide_percent="0.875" />
-
     <androidx.constraintlayout.widget.Guideline
         android:id="@+id/mapGuidelineHoriz"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:orientation="horizontal"
+        app:layout_constraintGuide_percent="0.15" />
+    <androidx.constraintlayout.widget.Guideline
+        android:id="@+id/algoUIGuidelineHoriz"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:orientation="horizontal"
         app:layout_constraintGuide_percent="0.08" />
-
     <com.rey.material.widget.FloatingActionButton
         android:id="@+id/editButton"
         android:layout_width="0dp"
@@ -45,12 +54,11 @@
         app:layout_constraintWidth_percent="0.171"
         app:layout_constraintDimensionRatio="1:1"
         app:layout_constraintRight_toLeftOf="@id/fabGuidelineVert"
-        app:layout_constraintBottom_toBottomOf="@id/fabGuidelineHoriz"
-        android:elevation="1dp"
+        app:layout_constraintBottom_toTopOf="@id/createButton"
+        android:elevation=".5dp"
         android:visibility="invisible"
         android:src="@drawable/ic_baseline_settings_24"
         app:v_styleId="@array/fab_line_green" />
-
     <com.rey.material.widget.FloatingActionButton
         android:id="@+id/createButton"
         android:layout_width="0dp"
@@ -59,8 +67,7 @@
         app:layout_constraintDimensionRatio="1:1"
         app:layout_constraintRight_toLeftOf="@id/fabGuidelineVert"
         app:layout_constraintBottom_toBottomOf="@id/fabGuidelineHoriz"
-        android:elevation="1dp"
-        android:visibility="invisible"
+        android:elevation=".5dp"
         android:src="@drawable/ic_baseline_add_24"
         app:v_styleId="@array/fab_line_purple" />
 
@@ -68,9 +75,82 @@
         android:id="@+id/mapView"
         android:layout_width="match_parent"
         android:layout_height="0dp"
+        android:contentDescription="@string/app_name"
+        android:gravity="center"
         app:layout_constraintHeight_percent=".94"
         app:layout_constraintTop_toTopOf="@id/mapGuidelineHoriz"
-        android:contentDescription="@string/app_name"
-        android:gravity="center" />
+        tools:layout_editor_absoluteX="0dp" />
 
+    <RadioGroup
+        android:id="@+id/radiogroup"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:orientation="horizontal"
+        app:layout_constraintLeft_toLeftOf="parent"
+        app:layout_constraintTop_toBottomOf="@id/radioText">
+
+        <RadioButton
+            android:id="@+id/radioPublic"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:onClick="onRadioButtonClicked"
+            android:text="Public"
+            android:textSize="8sp" />
+
+        <RadioButton
+            android:id="@+id/radioPrivate"
+            android:layout_width="wrap_content"
+            android:layout_height="match_parent"
+            android:onClick="onRadioButtonClicked"
+            android:text="Private"
+            android:textSize="8sp" />
+
+        <RadioButton
+            android:id="@+id/radioBoth"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:onClick="onRadioButtonClicked"
+            android:text="Both"
+            android:textSize="8sp" />
+    </RadioGroup>
+
+    <TextView
+        android:id="@+id/radioText"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginLeft="5dp"
+        android:text="Show station types:"
+        android:textSize="12sp"
+        sothree:layout_constraintLeft_toLeftOf="@id/radiogroup"
+        sothree:layout_constraintTop_toBottomOf="@id/algoUIGuidelineHoriz" />
+
+    <TextView
+        android:id="@+id/chaosMeterText"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:text="Chaos Meter: Tame"
+        android:textSize="12sp"
+        sothree:layout_constraintLeft_toLeftOf="@id/chaosMeterGuidelineVert"
+        sothree:layout_constraintTop_toBottomOf="@id/algoUIGuidelineHoriz" />
+
+    <SeekBar
+        android:id="@+id/chaosMeter"
+        style="@style/Material.Widget.Slider.Discrete"
+        android:layout_width="0dp"
+        android:layout_height="wrap_content"
+        android:max="100"
+        app:layout_constraintWidth_percent="0.33"
+        app:v_styleId="@array/slider"
+        sothree:layout_constraintLeft_toLeftOf="@id/chaosMeterText"
+        sothree:layout_constraintTop_toBottomOf="@id/chaosMeterText" />
+
+    <androidx.appcompat.widget.SearchView
+        android:id="@+id/stationSearchBar"
+        android:layout_width="0dp"
+        android:layout_height="wrap_content"
+        android:paddingLeft="2dp"
+        android:paddingRight="2dp"
+        app:layout_constraintWidth_percent="0.3"
+        sothree:layout_constraintBottom_toBottomOf="@id/radiogroup"
+        sothree:layout_constraintRight_toRightOf="parent" />
 </androidx.constraintlayout.widget.ConstraintLayout>

@@ -1,33 +1,31 @@
 package com.example.janecapstoneproject;
-import androidx.appcompat.app.AppCompatActivity;
+
 import android.content.Intent;
 import android.os.Bundle;
 import android.text.Editable;
 import android.text.TextWatcher;
-import android.util.Log;
 import android.view.View;
 import android.widget.Button;
 import android.widget.EditText;
 import android.widget.Toast;
 
+import androidx.appcompat.app.AppCompatActivity;
+
+import com.google.android.material.textfield.TextInputLayout;
 import com.parse.FindCallback;
 import com.parse.LogInCallback;
 import com.parse.ParseException;
 import com.parse.ParseQuery;
 import com.parse.ParseUser;
-import com.google.android.material.textfield.TextInputLayout;
 import com.parse.SignUpCallback;
 
 import org.json.JSONArray;
 
 import java.util.List;
-
 public class SignUpActivity extends AppCompatActivity {
     public static final String TAG = "SignUpActivity";
     private EditText etEmail, etUsername,etPassword,etConfirmPassword;
     TextInputLayout etEmailWrapper,etUsernameWrapper,etPasswordWrapper,etConfirmPasswordWrapper;
-    int returnValueEmail,returnValueUsername;
-    String email,username;
     boolean validUsername,validEmail,matchingPasswords;
     boolean halted;
     private Button signup;
@@ -109,7 +107,6 @@ public class SignUpActivity extends AppCompatActivity {
             @Override
             public void done(List<ParseUser> users, ParseException e) {
                 if (e != null) {
-                    Log.e(TAG, "Issue with email portion of signup", e);
                     Toast.makeText(SignUpActivity.this, "EMAILkys"+e, Toast.LENGTH_LONG).show();
                     halted = false;
                 }
@@ -130,8 +127,6 @@ public class SignUpActivity extends AppCompatActivity {
             @Override
             public void done(List<ParseUser> users, ParseException e) {
                 if (e != null) {
-                    Log.e(TAG, "Issue with username portion of signup", e);
-                    Toast.makeText(SignUpActivity.this, "USERNAMEkys"+e, Toast.LENGTH_LONG).show();
                     halted = false;
                 }
                 else if (users.isEmpty()){
@@ -144,38 +139,6 @@ public class SignUpActivity extends AppCompatActivity {
             }
         });
     }
-
-
-    /*public void queryUsersForParameterStatus(String key, String value) {
-        ParseQuery<ParseUser> query = ParseQuery.getQuery(ParseUser.class);
-        query.whereEqualTo(key,value);
-        query.findInBackground(new FindCallback<ParseUser>() {
-            @Override
-            public void done(List<ParseUser> objects, ParseException e) {
-                if (e != null) {
-                    Log.e(TAG, "Issue with signup", e);
-                    Toast.makeText(SignUpActivity.this, "KYS"+e, Toast.LENGTH_LONG);
-                }
-                else if (objects.isEmpty()){
-                    if (key.equals("username")) {
-                        returnValueUsername = 0;
-                    }
-                    else{
-                        returnValueEmail = 0;
-                    }
-                }
-                else{
-                    if (key.equals("username")) {
-                        returnValueUsername = 1;
-                    }
-                    else{
-                        returnValueEmail = 1;
-                    }
-                }
-            }
-        });
-    }*/
-
     private void attemptToRegisterUser(String email, String username, String password) {
         ParseUser user = new ParseUser();
         user.setEmail(email);

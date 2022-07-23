@@ -1,10 +1,10 @@
 package com.example.janecapstoneproject;
 
 import static com.example.janecapstoneproject.MainActivity.KEY_GEOPOINT;
+import static com.example.janecapstoneproject.MainActivity.STATION_DETECTION_RADIUS_METERS;
 import static com.example.janecapstoneproject.MapController.CURRENT_MARKER_COLOR;
 import static com.example.janecapstoneproject.MainActivity.PUBLIC_TYPE;
 import static com.example.janecapstoneproject.MainActivity.PRIVATE_TYPE;
-import static com.example.janecapstoneproject.MainActivity.STATION_INTERACTION_RADIUS_METERS;
 import static com.example.janecapstoneproject.Station.KEY_TYPE;
 import static com.example.janecapstoneproject.Station.KEY_USERSSHAREDSTATIONS;
 import android.content.Context;
@@ -28,8 +28,9 @@ public class StationController {
     public static final String TAG = "StationController";
     private Station globalCurrentStation;
     public static final int DEFAULT_ZOOM = 15;
-    private Station nearestStation;
-    private float shortestDistance;
+    public static final int LIKES_CAP_FOR_ALGO = 100;
+    private double highestScore;
+    private Station bestStation;
     private int publicPrivateSelection;
     private ArrayList<StationController.StationControllerCallback> callbacks = new ArrayList<>();
 
@@ -78,15 +79,14 @@ public class StationController {
 
     public void renderNearbyStations(ParseUser user, Context context, Location location, double kiloRadius) throws IOException {
         ParseQuery<Station> query = ParseQuery.getQuery(Station.class);
-        //query.setLimit(20);
         query.whereWithinKilometers(KEY_GEOPOINT, new ParseGeoPoint(location.getLatitude(), location.getLongitude()), kiloRadius);
         if (publicPrivateSelection == 0) {
             query.whereEqualTo(KEY_TYPE, 0);
         } else if (publicPrivateSelection == 1) {
             query.whereEqualTo(KEY_TYPE, 1);
         }
-        nearestStation = null;
-        shortestDistance = Integer.MAX_VALUE;
+        bestStation = null;
+        highestScore = -1;
         query.findInBackground(new FindCallback<Station>() {
             @Override
             public void done(List<Station> stations, ParseException e) {
@@ -95,50 +95,30 @@ public class StationController {
                     return;
                 }
                 for (Station station : stations) {
-                    boolean includeStation = false;
-                    if (station.isPublic()) {
-                        includeStation = true;
-                    } else {
-                        String objId = station.getObjectId();
-                        JSONArray array = user.getJSONArray(KEY_USERSSHAREDSTATIONS);
-                        if (array != null) {
-                            for (int i = 0; i < array.length(); i++) {
-                                try {
-                                    if (objId.equals(array.get(i))) {
-                                        includeStation = true;
-                                    }
-                                } catch (JSONException ex) {
-                                    ex.printStackTrace();
-                                }
-                            }
-                        }
-                    }
-                    if (includeStation) {
-                        if ((globalCurrentStation == null || !station.getObjectId().equals(globalCurrentStation.getObjectId()))){
+                    if (shouldIncludeStation(station, user.getJSONArray(KEY_USERSSHAREDSTATIONS))) {
+                        if ((globalCurrentStation == null || !station.getObjectId().equals(globalCurrentStation.getObjectId()))) {
                             for (StationController.StationControllerCallback callback : callbacks) {
                                 callback.renderAStationToMap(station);
                             }
                         }
-                        float[] result = new float[1];
-                        android.location.Location.distanceBetween(location.getLatitude(), location.getLongitude(), station.getLatitude(), station.getLongitude(), result);
-                        //might crash here check if it's null before but I think I've been doing that wrong
-                        if (result[0] <= shortestDistance) {
-                            shortestDistance = result[0];
-                            nearestStation = station;
+                        double score = computeScore(station, location, kiloRadius, globalCurrentStation);
+                        if (score > highestScore) {
+                            highestScore = score;
+                            bestStation = station;
                         } else {
                             Log.e(TAG, "Result is null", e);
                         }
                     }
                 }
-                if (nearestStation != null) {
-                    Log.d(TAG, "nearest station: " + nearestStation.getName());
-                    if (shortestDistance <= STATION_INTERACTION_RADIUS_METERS) {
+                if (bestStation != null) {
+                    Log.d(TAG, "nearest station: " + bestStation.getName());
+                    if (distance(bestStation, location) <= STATION_DETECTION_RADIUS_METERS) {
                         for (StationController.StationControllerCallback callback : callbacks) {
-                            callback.onCaseValidNearestStation(location,nearestStation,(globalCurrentStationExists() && !nearestStation.getObjectId().equals(globalCurrentStation.getObjectId())));
+                            callback.onCaseValidNearestStation(location, bestStation, (globalCurrentStationExists() && !bestStation.getObjectId().equals(globalCurrentStation.getObjectId())));
                         }
                         return;
                     } else {
-                        Log.d(TAG, "Nearest station is too far!");
+                        Log.d(TAG, "Nearest station is now out of range!");
                         for (StationController.StationControllerCallback callback : callbacks) {
                             callback.onCaseNoNearbyStation(location);
                         }
@@ -152,7 +132,62 @@ public class StationController {
             }
         });
     }
-
+    private boolean shouldIncludeStationWithTag(String tag, Station station, JSONArray inputArray){
+        if (station.getTags().toLowerCase().contains(tag.toLowerCase())){
+            return shouldIncludeStation(station,inputArray);
+        }
+        return false;
+    }
+    private boolean shouldIncludeStation(Station station, JSONArray inputArray){
+        boolean includeStation = false;
+        if (station.isPublic() && publicPrivateSelection != 1) {
+            includeStation = true;
+        } else if (station.isPrivate() && publicPrivateSelection == 1) {
+            String objId = station.getObjectId();
+            JSONArray array = inputArray;
+            if (array != null) {
+                for (int i = 0; i < array.length(); i++) {
+                    try {
+                        if (objId.equals(array.get(i))) {
+                            includeStation = true;
+                        }
+                    } catch (JSONException ex) {
+                        ex.printStackTrace();
+                    }
+                }
+            }
+        }
+        return includeStation;
+    }
+    private double computeScore(Station station, Location location, double maxRadius, Station currentStation){
+        return (proximityScore(station,location,maxRadius) + likesScore(station) + stationTypeScore(station) + isCurrentStationScore(station,currentStation));
+    }
+    private double proximityScore(Station station, Location location, double maxRadius){
+        return 3 - (( distance(station,location) / maxRadius) * 3);
+    }
+    private double distance(Station a, Location b) {
+        float[] result = new float[1];
+        android.location.Location.distanceBetween(a.getLatitude(), a.getLongitude(), b.getLatitude(), b.getLongitude(), result);
+        return result[0];
+    }
+    private double likesScore(Station station){
+        if (station.getLikes()>=LIKES_CAP_FOR_ALGO){
+            return 2;
+        }
+        return (2 * ((double)((int)station.getLikes()))  / LIKES_CAP_FOR_ALGO);
+    }
+    private double stationTypeScore(Station station){
+        if (station.isPrivate()){
+            return 1;
+        }
+        return 0;
+    }
+    private double isCurrentStationScore(Station station, Station currentStation){
+        if (station.getObjectId().equals(currentStation.getObjectId())){
+            return 0.5;
+        }
+        return 0;
+    }
     public void addStation (String name,int type, LatLng coords, ParseUser user, String
             streamLink, String streamName, String favicon, Context context){
         try {
@@ -161,7 +196,6 @@ public class StationController {
             e.printStackTrace();
         }
     }
-
     private void saveStation(String name, int type, LatLng coords, ParseUser user, String streamLink, String streamName, String favicon, Context context) throws JSONException {
         Station station = new Station();
         station.setName(name);

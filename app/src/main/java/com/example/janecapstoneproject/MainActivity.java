@@ -59,8 +59,7 @@ public class MainActivity extends AppCompatActivity implements OnMapReadyCallbac
     public int REQUEST_CODE = 1001;
     public static final int PUBLIC_TYPE = 0;
     public static final int PRIVATE_TYPE = 1;
-    public static final double STATION_INTERACTION_RADIUS_METERS = 80;
-    public static final double STATION_DETECTION_RADIUS_METERS = 300;
+    public static final double STATION_DETECTION_RADIUS_METERS = 200;
     public static final double STATION_DETECTION_RADIUS_KILOMETERS = STATION_DETECTION_RADIUS_METERS * .001;
     public static final String KEY_GEOPOINT = "geopoint";
     public static final String TAG = "MainActivity";

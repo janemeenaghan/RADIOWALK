@@ -1,6 +1,6 @@
 package com.example.janecapstoneproject;
 
-import static com.example.janecapstoneproject.MainActivity.STATION_INTERACTION_RADIUS_METERS;
+import static com.example.janecapstoneproject.MainActivity.STATION_DETECTION_RADIUS_METERS;
 import static com.example.janecapstoneproject.StationController.DEFAULT_ZOOM;
 import com.google.android.gms.maps.CameraUpdateFactory;
 import com.google.android.gms.maps.GoogleMap;
@@ -114,9 +114,9 @@ public class MapController {
     //CIRCLE RENDERING ON MAP
     public Circle addCircleConventional(Station station, LatLng coords) {
         if (station.isPublic()) {
-            return addCircle(station, coords, PUBLIC_CIRCLE_RGB, STATION_INTERACTION_RADIUS_METERS);
+            return addCircle(station, coords, PUBLIC_CIRCLE_RGB, STATION_DETECTION_RADIUS_METERS);
         } else {
-            return addCircle(station, coords, PRIVATE_CIRCLE_RGB, STATION_INTERACTION_RADIUS_METERS);
+            return addCircle(station, coords, PRIVATE_CIRCLE_RGB, STATION_DETECTION_RADIUS_METERS);
         }
     }
     public Circle addCircle(Station station, LatLng coords, int strokeColor, double radiusMeters) {

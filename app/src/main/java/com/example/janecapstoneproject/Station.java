@@ -36,6 +36,7 @@ import com.parse.ParseUser;
 public class Station extends ParseObject {
     public static final String KEY_GEOPOINT = "geopoint";
     public static final String KEY_TYPE = "type";
+    public static final String KEY_TAGS = "tags";
     public static final String KEY_NAME = "name";
     public static final String KEY_STREAMLINK = "streamLink";
     public static final String KEY_STREAMNAME = "streamName";
@@ -44,6 +45,7 @@ public class Station extends ParseObject {
     public static final String KEY_USERSSHAREDWITH = "usersSharedWith";
     public static final String KEY_USERSSHAREDSTATIONS = "sharedStations";
     public static final String KEY_USER = "user";
+    public static final String KEY_LIKES = "likes";
     public static final int PUBLIC_TYPE = 0;
     public static final int PRIVATE_TYPE = 1;
     private Circle circle;
@@ -62,6 +64,8 @@ public class Station extends ParseObject {
     public double getLongitude(){ return getParseGeoPoint(KEY_GEOPOINT).getLongitude();}
     public LatLng getCoords(){ return new LatLng(getLatitude(),getLongitude());}
     public int getType(){ return (int)getNumber(KEY_TYPE); }
+    public int getLikes() { return (int) getNumber(KEY_TAGS); }
+    public String getTags(){ return getString(KEY_TAGS); }
     public boolean isPublic(){ return getType() == 0; }
     public boolean isPrivate(){ return getType() == 1; }
     public String getName(){ return getString(KEY_NAME); }
@@ -89,6 +93,8 @@ public class Station extends ParseObject {
     public void setPublic(){ put(KEY_TYPE, PUBLIC_TYPE); }
     public void setPrivate(){ put(KEY_TYPE, PRIVATE_TYPE); }
     public void setType(int type){ put(KEY_TYPE, type);  }
+    public void setTags (String tags) { put (KEY_TAGS, tags); }
+    public void setLikes (int likes) { put (KEY_LIKES, likes); }
     public void setName(String name){ put(KEY_NAME, name);  }
     public void setStreamLink(String streamLink){ put(KEY_STREAMLINK, streamLink); }
     public void setStreamName(String streamName){ put(KEY_STREAMNAME, streamName); }

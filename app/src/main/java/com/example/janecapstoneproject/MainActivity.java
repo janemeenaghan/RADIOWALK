@@ -6,19 +6,19 @@ import androidx.appcompat.app.AlertDialog;
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.appcompat.content.res.AppCompatResources;
 import androidx.appcompat.widget.Toolbar;
+
 import android.annotation.SuppressLint;
 import android.content.Context;
 import android.content.DialogInterface;
 import android.content.Intent;
+import android.util.Log;
 import android.widget.RadioButton;
-import android.widget.SearchView;
 import android.widget.SeekBar;
 import android.content.pm.PackageManager;
 import android.graphics.drawable.Drawable;
 import android.location.Location;
 import android.os.Build;
 import android.os.Bundle;
-import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.Menu;
 import android.view.MenuItem;
@@ -57,7 +57,7 @@ public class MainActivity extends AppCompatActivity implements OnMapReadyCallbac
     public int REQUEST_CODE = 1001;
     public static final int PUBLIC_TYPE = 0;
     public static final int PRIVATE_TYPE = 1;
-    public static final double STATION_DETECTION_RADIUS_METERS = 200;
+    public static final double STATION_DETECTION_RADIUS_METERS = 150;
     public static final double STATION_DETECTION_RADIUS_KILOMETERS = STATION_DETECTION_RADIUS_METERS * .001;
     public static final String KEY_GEOPOINT = "geopoint";
     public static final String TAG = "MainActivity";
@@ -157,7 +157,6 @@ public class MainActivity extends AppCompatActivity implements OnMapReadyCallbac
             ParseFacebookUtils.linkWithReadPermissionsInBackground(ParseUser.getCurrentUser(), this, permissions, ex -> {
                 if (ParseFacebookUtils.isLinked(ParseUser.getCurrentUser())) {
                     Toast.makeText(this, "Woohoo, user logged in with Facebook.", Toast.LENGTH_LONG).show();
-                    Log.d("FacebookLoginExample", "Woohoo, user logged in with Facebook!");
                 }
             });
         } else {
@@ -231,9 +230,9 @@ public class MainActivity extends AppCompatActivity implements OnMapReadyCallbac
     }
     private void initChaosMeter(){
         chaosFactor = 0;
-        chaosMeter=findViewById(R.id.chaos_meter);
+        chaosMeter=findViewById(R.id.chaosMeter);
         chaosMeter.setMax(100);
-        chaosMeterText=findViewById(R.id.chaos_meter_text);
+        chaosMeterText=findViewById(R.id.chaosMeterText);
         chaosMeter.setOnSeekBarChangeListener(new SeekBar.OnSeekBarChangeListener() {
             @Override
             public void onProgressChanged(SeekBar seekBar, int progress, boolean fromUser) {
@@ -269,7 +268,6 @@ public class MainActivity extends AppCompatActivity implements OnMapReadyCallbac
                 locationController.retrieveLocation(MainActivity.this);
                 return false;
             }
-
             @Override
             public boolean onQueryTextChange(String newText) {
                 return false;
@@ -279,13 +277,13 @@ public class MainActivity extends AppCompatActivity implements OnMapReadyCallbac
     public void onRadioButtonClicked(@NonNull View view) {
         boolean checked = ((RadioButton) view).isChecked();
         switch(view.getId()) {
-            case R.id.radio_public:
+            case R.id.radioPublic:
                 stationController.setPublicPrivateSelection(0);
                 break;
-            case R.id.radio_private:
+            case R.id.radioPrivate:
                 stationController.setPublicPrivateSelection(1);
                 break;
-            case R.id.radio_both:
+            case R.id.radioBoth:
                 stationController.setPublicPrivateSelection(2);
                 break;
         }
@@ -351,8 +349,6 @@ public class MainActivity extends AppCompatActivity implements OnMapReadyCallbac
 
         } else if (!favicon.equals(currentFavicon)) {
             proceed = true;
-        } else {
-
         }
         if (proceed) {
             if (favicon.isEmpty()) {
@@ -366,7 +362,6 @@ public class MainActivity extends AppCompatActivity implements OnMapReadyCallbac
 
                     @Override
                     public void onError() {
-                        Log.e(TAG, "Error loading favicon into musicIcon with Picasso");
                         musicIcon.setVisibility(View.INVISIBLE);
                     }
                 });
@@ -439,7 +434,6 @@ public class MainActivity extends AppCompatActivity implements OnMapReadyCallbac
     public void onPlayingChanged(int playingState) {
         if (playingState == 0) {
             playPauseButton.setImageDrawable(pauseIcon);
-            Log.e(TAG,"0");
             playPauseButton.setVisibility(View.VISIBLE);
             musicIcon.setVisibility(View.VISIBLE);
         }
@@ -447,12 +441,10 @@ public class MainActivity extends AppCompatActivity implements OnMapReadyCallbac
             playPauseButton.setImageDrawable(playIcon);
             playPauseButton.setVisibility(View.VISIBLE);
             musicIcon.setVisibility(View.VISIBLE);
-            Log.e(TAG,"1");
         }
         else{
             playPauseButton.setVisibility(View.INVISIBLE);
             musicIcon.setVisibility(View.INVISIBLE);
-            Log.e(TAG,"else");
         }
     }
     @Override
@@ -514,11 +506,10 @@ public class MainActivity extends AppCompatActivity implements OnMapReadyCallbac
     @SuppressLint("MissingPermission")
     @Override
     public void onLocationResult(Location location) throws IOException {
-        Log.d("MainActivity", "onLocationResult");
         locationController.setGlobalLocation(location);
         if (mapController.getMap() != null) {
             mapController.updateMapPositioning(location,bypassMapChecks);
-            stationController.renderNearbyStations(ParseUser.getCurrentUser(), MainActivity.this, location, STATION_DETECTION_RADIUS_KILOMETERS, chaosFactor, searchTag);
+            stationController.queryAndRenderNearbyAndClosestStations(ParseUser.getCurrentUser(), location, STATION_DETECTION_RADIUS_KILOMETERS, chaosFactor, searchTag);
             searchTag = "";
         }
     }
@@ -544,6 +535,9 @@ public class MainActivity extends AppCompatActivity implements OnMapReadyCallbac
     @RequiresApi(api = Build.VERSION_CODES.M)
     @Override
     public void onMapReady(GoogleMap map) {
+        /*ViewGroup parent = (ViewGroup) mMapView.findViewById(Integer.parseInt("1")).getParent();
+        View compassButton = parent.getChildAt(4);
+        compassButton.)*/
         mapController = new MapController(this, map);
         mapController.registerCallback(this);
         locationController.retrieveLocation(this);
@@ -627,8 +621,6 @@ public class MainActivity extends AppCompatActivity implements OnMapReadyCallbac
     @Override
     protected void onActivityResult ( int requestCode, int resultCode, @Nullable Intent data){
         super.onActivityResult(requestCode, resultCode, data);
-        Log.i(TAG, String.valueOf(requestCode));
-        Log.i(TAG, String.valueOf(resultCode));
         if ((requestCode == REQUEST_CODE) && (resultCode == RESULT_OK)) {
             String stationName = data.getStringExtra("stationName");
             String streamLink = data.getStringExtra("url");
@@ -636,17 +628,12 @@ public class MainActivity extends AppCompatActivity implements OnMapReadyCallbac
             String favicon = data.getStringExtra("favicon");
             LatLng latLng = Parcels.unwrap(data.getParcelableExtra("latLng"));
             String tags = data.getStringExtra("tags");
-            Log.e("Main",tags);
             int likes = data.getIntExtra(("likes"),0);
             int isNew = data.getIntExtra("new", 2);
             if (isNew == 1) {
                 stationController.addStation(stationName, PRIVATE_TYPE, latLng, ParseUser.getCurrentUser(), streamLink, streamName, favicon, MainActivity.this, tags, likes);
             } else if (isNew == 0) {
-                //Potential hazard
                 stationController.getGlobalCurrentStation().updateStationWithNewRadioToParse(streamLink, streamName, favicon);
-
-            } else {
-                Log.e(TAG, "Retrieving new value != 0 or 1");
             }
         }
     }
@@ -661,30 +648,21 @@ public class MainActivity extends AppCompatActivity implements OnMapReadyCallbac
         if (editButtonHasBeenInitialized) {
             editStationButton.setVisibility(View.INVISIBLE);
         }
-        if (stationController.globalCurrentStationExists()) {
-            if (stationController.getGlobalCurrentStation().getMarker() != null) {
-                if (stationController.getGlobalCurrentStation().isPublic()) {
-                    stationController.setGlobalCurrentStationMarkerColor(0);
-                } else {
-                    stationController.setGlobalCurrentStationMarkerColor(1);
-                }
-            }
-        }
-        mediaPlayerController.reset();//.setURLAndPrepare(null, true);
+        mapController.clear();
+        mediaPlayerController.reset();
         setStationNameText(getString(R.string.noStationFound));
         setNowPlayingText("", true);
         setMusicIcon(MainActivity.this, "", true);
-        //locationController.retrieveLocation(MainActivity.this);
     }
     @Override
     public void onCaseValidNearestStation (Location location, Station newNearestStation, boolean needToDeselectCurrentStation){
         boolean editButtonNeedsToBeRefreshed = false;
         if (needToDeselectCurrentStation) {
-            mapController.renderStation(stationController.getGlobalCurrentStation());
+            stationController.renderStation(stationController.getGlobalCurrentStation());
             editButtonNeedsToBeRefreshed = true;
         }
         addStationButton.setVisibility(View.INVISIBLE);
-        stationController.renderClosestStation(MainActivity.this, newNearestStation);
+        stationController.renderClosestStation(newNearestStation);
         if (editButtonNeedsToBeRefreshed || !editButtonHasBeenInitialized) {
             initEditStationButton(newNearestStation, newNearestStation.getCoords(), ParseUser.getCurrentUser(), MainActivity.this);
         }
@@ -696,24 +674,36 @@ public class MainActivity extends AppCompatActivity implements OnMapReadyCallbac
         user.saveInBackground();
         locationController.retrieveLocation(MainActivity.this);
     }
-    public Marker onRequestMarkerAddedToClosestStation(Station closestStation) {
-        return mapController.addMarker(new MarkerOptions()
-                .position(closestStation.getCoords())
-                .title(closestStation.getName())
-                .icon(BitmapDescriptorFactory.fromResource(R.drawable.broadcastgreen)));
+    @Override
+    public Marker onRequestMarkerAddedToStation(Station station, int which) {
+        if (which == 0){
+            return mapController.addMarker(new MarkerOptions()
+                    .position(station.getCoords())
+                    .title(station.getName())
+                    .icon(BitmapDescriptorFactory.fromResource(R.drawable.broadcastcyan)));
+        }
+        else if (which == 1){
+            return mapController.addMarker(new MarkerOptions()
+                    .position(station.getCoords())
+                    .title(station.getName())
+                    .icon(BitmapDescriptorFactory.fromResource(R.drawable.broadcastpurple)));
+        }
+        else {
+            return mapController.addMarker(new MarkerOptions()
+                    .position(station.getCoords())
+                    .title(station.getName())
+                    .icon(BitmapDescriptorFactory.fromResource(R.drawable.broadcastgreen)));
+        }
     }
-    public Circle onRequestCircleAddedToClosestStation(Station closestStation) {
-        return mapController.addCircleConventional(closestStation,closestStation.getCoords());
+    public Circle onRequestCircleAddedToStation(Station station, int which) {
+        return mapController.addCircleByInt(station, which);
     }
     @Override
-    public void updateUIToRenderClosestStation(Station closestStation) {
+    public void updateUIToRenderClosestStationStream(Station closestStation) {
         setSlidingPanelElements(MainActivity.this, closestStation.getFavicon(), closestStation.getName(), closestStation.getStreamName());
         if (!closestStation.getStreamLink().isEmpty()) {
             mediaPlayerController.setURLAndPrepare(closestStation.getStreamLink());
         }
         stationController.setGlobalCurrentStation(closestStation);
-    }
-    public void renderAStationToMap(Station station) {
-        mapController.renderStation(station);
     }
 }

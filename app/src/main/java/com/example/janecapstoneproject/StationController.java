@@ -3,9 +3,12 @@ package com.example.janecapstoneproject;
 import static com.example.janecapstoneproject.MainActivity.KEY_GEOPOINT;
 import static com.example.janecapstoneproject.MainActivity.STATION_DETECTION_RADIUS_KILOMETERS;
 import static com.example.janecapstoneproject.MainActivity.STATION_DETECTION_RADIUS_METERS;
+import static com.example.janecapstoneproject.MapController.CURRENT_CIRCLE_RGB;
 import static com.example.janecapstoneproject.MapController.CURRENT_MARKER_COLOR;
 import static com.example.janecapstoneproject.MainActivity.PUBLIC_TYPE;
 import static com.example.janecapstoneproject.MainActivity.PRIVATE_TYPE;
+import static com.example.janecapstoneproject.MapController.PRIVATE_CIRCLE_RGB;
+import static com.example.janecapstoneproject.MapController.PUBLIC_CIRCLE_RGB;
 import static com.example.janecapstoneproject.Station.KEY_TYPE;
 import static com.example.janecapstoneproject.Station.KEY_USERSSHAREDSTATIONS;
 import android.content.Context;
@@ -51,10 +54,10 @@ public class StationController {
     public boolean globalCurrentStationExists() {
         return globalCurrentStation != null;
     }
-    public void renderClosestStation(Context context, Station closestStation) {
+    public void renderClosestStation(Station closestStation) {
         if (closestStation.getMarker() == null){
             for (StationController.StationControllerCallback callback : callbacks) {
-                closestStation.setMarker(callback.onRequestMarkerAddedToClosestStation(closestStation));
+                closestStation.setMarker(callback.onRequestMarkerAddedToStation(closestStation,2));
             }
         }
         else {
@@ -62,14 +65,57 @@ public class StationController {
         }
         if(closestStation.getCircle() == null){
             for (StationController.StationControllerCallback callback : callbacks) {
-                closestStation.setCircle(callback.onRequestCircleAddedToClosestStation(closestStation));
+                closestStation.setCircle(callback.onRequestCircleAddedToStation(closestStation,2));
             }
         }
+        else{
+            closestStation.setCircleColor(CURRENT_CIRCLE_RGB);
+        }
         for (StationController.StationControllerCallback callback : callbacks) {
-            callback.updateUIToRenderClosestStation(closestStation);
+            callback.updateUIToRenderClosestStationStream(closestStation);
         }
     }
-    public void queryFilterAndRenderNearbyStations(ParseUser user, Location location, double kiloRadius, double chaosFactor, String tag) throws IOException {
+
+    public void renderStation(Station station) {
+        if (station.getMarker() == null){
+            for (StationController.StationControllerCallback callback : callbacks) {
+                if (station.isPublic()) {
+                    station.setMarker(callback.onRequestMarkerAddedToStation(station,0));
+                }
+                else{
+                    station.setMarker(callback.onRequestMarkerAddedToStation(station,1));
+                }
+            }
+        }
+        else {
+            if (station.isPublic()) {
+                station.setMarkerColor(0);
+            }
+            else{
+                station.setMarkerColor(1);
+            }
+        }
+        if(station.getCircle() == null){
+            for (StationController.StationControllerCallback callback : callbacks) {
+                if (station.isPublic()) {
+                    station.setCircle(callback.onRequestCircleAddedToStation(station,0));
+                }
+                else{
+                    station.setCircle(callback.onRequestCircleAddedToStation(station,1));
+                }
+            }
+        }
+        else{
+            if (station.isPublic()) {
+                station.setCircleColor(PUBLIC_CIRCLE_RGB);
+            }
+            else{
+                station.setCircleColor(PRIVATE_CIRCLE_RGB);
+            }
+        }
+    }
+    //Planned Problem aka Complex Feature #1
+    public void queryAndRenderNearbyAndClosestStations(ParseUser user, Location location, double kiloRadius, double chaosFactor, String tag) throws IOException {
         ParseQuery<Station> query = ParseQuery.getQuery(Station.class);
         query.whereWithinKilometers(KEY_GEOPOINT, new ParseGeoPoint(location.getLatitude(), location.getLongitude()), kiloRadius);
         if (publicPrivateSelection == 0) {
@@ -86,45 +132,41 @@ public class StationController {
                     Log.e(TAG, "Issue with getting station", e);
                     return;
                 }
-                computeBestStation(stations,user,location,kiloRadius,chaosFactor,tag);
+                JSONArray usersStationsList = user.getJSONArray(KEY_USERSSHAREDSTATIONS);
+                for (Station station : stations) {
+                    if (tag.isEmpty()) {
+                        renderFilteredNearbyStationsNoTag(station,location,usersStationsList,chaosFactor);
+                    }
+                    else{
+                        renderFilteredNearbyStationsMatchingTag(tag,station,location,usersStationsList,chaosFactor);
+                    }
+                    computeScoreAndHandle (station, location, chaosFactor);
+                }
                 handleBestStation(bestStation,location);
             }
         });
     }
-    private void computeBestStation(List<Station> stations, ParseUser user, Location location, double kiloRadius, double chaosFactor,String tag){
-        for (Station station : stations) {
-            if (tag.isEmpty()) {
-                if (shouldIncludeStation(station, user.getJSONArray(KEY_USERSSHAREDSTATIONS))) {
-                    if ((globalCurrentStation == null || !station.getObjectId().equals(globalCurrentStation.getObjectId()))) {
-                        for (StationController.StationControllerCallback callback : callbacks) {
-                            callback.renderAStationToMap(station);
-                        }
-                    }
-                    double score = computeScore(station, location, globalCurrentStation, chaosFactor);
-                    if (score > highestScore) {
-                        highestScore = score;
-                        bestStation = station;
-                    } else {
-                        Log.e(TAG, "Result is null");
-                    }
-                }
+    private void renderFilteredNearbyStationsNoTag(Station station, Location location, JSONArray usersStationsList, double chaosFactor){
+        if (shouldIncludeStation(station, usersStationsList)) {
+            if ((globalCurrentStation == null || !station.getObjectId().equals(globalCurrentStation.getObjectId()))) {
+                renderStation(station);
             }
-            else{
-                if (shouldIncludeStationWithTag(tag,station, user.getJSONArray(KEY_USERSSHAREDSTATIONS))) {
-                    if ((globalCurrentStation == null || !station.getObjectId().equals(globalCurrentStation.getObjectId()))) {
-                        for (StationController.StationControllerCallback callback : callbacks) {
-                            callback.renderAStationToMap(station);
-                        }
-                    }
-                    double score = computeScore(station, location, globalCurrentStation, chaosFactor);
-                    if (score > highestScore) {
-                        highestScore = score;
-                        bestStation = station;
-                    } else {
-                        Log.e(TAG, "Result is null");
-                    }
-                }
+        }
+    }
+    private void renderFilteredNearbyStationsMatchingTag(String tag, Station station, Location location, JSONArray usersStationsList, double chaosFactor){
+        if (shouldIncludeStationWithTag(tag,station, usersStationsList)){
+            if ((globalCurrentStation == null || !station.getObjectId().equals(globalCurrentStation.getObjectId()))) {
+                renderStation(station);
             }
+        }
+    }
+    private void computeScoreAndHandle(Station station, Location location, double chaosFactor){
+        double score = computeScore(station, location, globalCurrentStation, chaosFactor);
+        if (score > highestScore) {
+            highestScore = score;
+            bestStation = station;
+        } else {
+            Log.e(TAG, "Result is null");
         }
     }
     private void handleBestStation(Station bestStation, Location location){
@@ -286,9 +328,8 @@ public class StationController {
         void onCaseNoNearbyStation(Location location);
         void onCaseValidNearestStation(Location location, Station nearestStation, boolean needToDeselectCurrentStation);
         void onSaveStation(Station station,ParseUser user) throws JSONException;
-        Marker onRequestMarkerAddedToClosestStation(Station closestStation);
-        Circle onRequestCircleAddedToClosestStation(Station closestStation);
-        void updateUIToRenderClosestStation(Station station);
-        void renderAStationToMap(Station station);
+        Marker onRequestMarkerAddedToStation(Station station,int which);
+        Circle onRequestCircleAddedToStation(Station station,int which);
+        void updateUIToRenderClosestStationStream(Station station);
     }
 }

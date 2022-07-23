@@ -21,6 +21,14 @@
         android:layout_height="wrap_content"
         android:orientation="vertical"
         app:layout_constraintGuide_percent="0.9" />
+
+    <androidx.constraintlayout.widget.Guideline
+        android:id="@+id/chaosMeterGuidelineVert"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:orientation="vertical"
+        sothree:layout_constraintGuide_percent=".42" />
+
     <androidx.constraintlayout.widget.Guideline
         android:id="@+id/fabGuidelineHoriz"
         android:layout_width="wrap_content"
@@ -29,6 +37,12 @@
         app:layout_constraintGuide_percent="0.875" />
     <androidx.constraintlayout.widget.Guideline
         android:id="@+id/mapGuidelineHoriz"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:orientation="horizontal"
+        app:layout_constraintGuide_percent="0.15" />
+    <androidx.constraintlayout.widget.Guideline
+        android:id="@+id/algoUIGuidelineHoriz"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:orientation="horizontal"
@@ -41,7 +55,7 @@
         app:layout_constraintDimensionRatio="1:1"
         app:layout_constraintRight_toLeftOf="@id/fabGuidelineVert"
         app:layout_constraintBottom_toBottomOf="@id/fabGuidelineHoriz"
-        android:elevation="1dp"
+        android:elevation=".5dp"
         android:visibility="invisible"
         android:src="@drawable/ic_baseline_settings_24"
         app:v_styleId="@array/fab_line_green" />
@@ -53,7 +67,7 @@
         app:layout_constraintDimensionRatio="1:1"
         app:layout_constraintRight_toLeftOf="@id/fabGuidelineVert"
         app:layout_constraintBottom_toBottomOf="@id/fabGuidelineHoriz"
-        android:elevation="1dp"
+        android:elevation=".5dp"
         android:visibility="invisible"
         android:src="@drawable/ic_baseline_add_24"
         app:v_styleId="@array/fab_line_purple" />
@@ -66,71 +80,77 @@
         app:layout_constraintHeight_percent=".94"
         app:layout_constraintTop_toTopOf="@id/mapGuidelineHoriz"
         tools:layout_editor_absoluteX="0dp" />
+
     <RadioGroup
+        android:id="@+id/radiogroup"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        app:layout_constraintTop_toBottomOf="@id/radioText"
+        android:orientation="horizontal"
         app:layout_constraintLeft_toLeftOf="parent"
-        android:id="@+id/radiogroup"
-        android:orientation="horizontal">
+        app:layout_constraintTop_toBottomOf="@id/radioText">
+
         <RadioButton
-            android:id="@+id/radio_public"
+            android:id="@+id/radioPublic"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:onClick="onRadioButtonClicked"
             android:text="Public"
-            android:textSize="12sp" />
-        <RadioButton
-            android:id="@+id/radio_private"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:onClick="onRadioButtonClicked"
-            android:text="Private"
-            android:textSize="12sp" />
+            android:textSize="8sp" />
 
         <RadioButton
-            android:id="@+id/radio_both"
+            android:id="@+id/radioPrivate"
+            android:layout_width="wrap_content"
+            android:layout_height="match_parent"
+            android:onClick="onRadioButtonClicked"
+            android:text="Private"
+            android:textSize="8sp" />
+
+        <RadioButton
+            android:id="@+id/radioBoth"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:onClick="onRadioButtonClicked"
             android:text="Both"
-            android:textSize="12sp" />
+            android:textSize="8sp" />
     </RadioGroup>
+
     <TextView
         android:id="@+id/radioText"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:layout_marginLeft="5dp"
         android:text="Show station types:"
-        sothree:layout_constraintTop_toBottomOf="@id/stationSearchBar"
-        sothree:layout_constraintLeft_toLeftOf="@id/radiogroup" />
+        android:textSize="12sp"
+        sothree:layout_constraintLeft_toLeftOf="@id/radiogroup"
+        sothree:layout_constraintTop_toBottomOf="@id/algoUIGuidelineHoriz" />
 
     <TextView
-        android:id="@+id/chaos_meter_text"
+        android:id="@+id/chaosMeterText"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:layout_marginLeft="7dp"
         android:text="Chaos Meter: Tame"
-        sothree:layout_constraintLeft_toLeftOf="@id/radiogroup"
-        sothree:layout_constraintTop_toBottomOf="@id/radiogroup" />
+        android:textSize="12sp"
+        sothree:layout_constraintLeft_toLeftOf="@id/chaosMeterGuidelineVert"
+        sothree:layout_constraintTop_toBottomOf="@id/algoUIGuidelineHoriz" />
 
     <SeekBar
-        android:id="@+id/chaos_meter"
+        android:id="@+id/chaosMeter"
         style="@style/Material.Widget.Slider.Discrete"
         android:layout_width="0dp"
         android:layout_height="wrap_content"
         android:max="100"
-        app:layout_constraintWidth_percent="0.5"
+        app:layout_constraintWidth_percent="0.33"
         app:v_styleId="@array/slider"
-        sothree:layout_constraintLeft_toLeftOf="@id/radiogroup"
-        sothree:layout_constraintTop_toBottomOf="@id/chaos_meter_text" />
+        sothree:layout_constraintLeft_toLeftOf="@id/chaosMeterText"
+        sothree:layout_constraintTop_toBottomOf="@id/chaosMeterText" />
+
     <androidx.appcompat.widget.SearchView
         android:id="@+id/stationSearchBar"
         android:layout_width="0dp"
         android:layout_height="wrap_content"
-        android:paddingLeft="10dp"
-        android:paddingRight="10dp"
-        app:layout_constraintWidth_percent="0.5"
-        sothree:layout_constraintLeft_toLeftOf="@id/radiogroup"
-        sothree:layout_constraintTop_toBottomOf="@id/mapGuidelineHoriz" />
+        android:paddingLeft="2dp"
+        android:paddingRight="2dp"
+        app:layout_constraintWidth_percent="0.3"
+        sothree:layout_constraintBottom_toBottomOf="@id/radiogroup"
+        sothree:layout_constraintRight_toRightOf="parent" />
 </androidx.constraintlayout.widget.ConstraintLayout>

@@ -38,6 +38,7 @@ public class BrowseStationsActivity extends AppCompatActivity implements Station
         fetchAllStations();
         initSearchView();
     }
+    //Planned Problem aka Complex Feature #2
     public void fetchAllStations() {
         progressDialog = new ProgressDialog(BrowseStationsActivity.this);
         progressDialog.setMessage("Loading....");

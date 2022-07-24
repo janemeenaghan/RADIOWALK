@@ -3,6 +3,8 @@ package com.example.janecapstoneproject;
 import android.app.ProgressDialog;
 import android.content.Intent;
 import android.os.Bundle;
+import android.view.View;
+import android.widget.Button;
 import android.widget.SearchView;
 import android.widget.Toast;
 
@@ -22,33 +24,43 @@ import retrofit2.Response;
 
 public class BrowseStationsActivity extends AppCompatActivity implements StationListAdapter.OnStationListener {
     public static final String TAG = "BrowseStationsActivity";
+    public static final int RESULTS_PER_PAGE = 20;
+    public static final int FETCH_ALL_MODE = 0;
+    public static final int SEARCH_MODE = 1;
     private RecyclerView stationRecycler;
     private StationListAdapter adapter;
     private SearchView searchView;
     private RecyclerView.LayoutManager layoutManager;
     private GetDataService service;
     private List<StationInfo> stationInfoListStorage;
+    private int mode;
     private int isNew;
     private LatLng latLng;
+    private String globalTag;
     private String stationName;
     private ProgressDialog progressDialog, referenceToProgressDialogShow;
+    private Button nextButton,prevButton;
+    private int globalPage;
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
+        setContentView(R.layout.activity_browse_stations);
         isNew = getIntent().getIntExtra("new",2);
         latLng = Parcels.unwrap(getIntent().getParcelableExtra("latLng"));
         stationName = getIntent().getStringExtra("stationName");
-        setContentView(R.layout.activity_browse_stations);
+        globalPage = 0;
         service = RetrofitClientInstance.getRetrofitInstance().create(GetDataService.class);
-        fetchAllStations();
+        mode = FETCH_ALL_MODE;
+        fetchAllStations(globalPage);
         initSearchView();
+        initPaging();
     }
     //Planned Problem aka Complex Feature #2
-    public void fetchAllStations() {
+    public void fetchAllStations(int page) {
         progressDialog = new ProgressDialog(BrowseStationsActivity.this);
         progressDialog.setMessage("Loading....");
         referenceToProgressDialogShow =progressDialog.show(this, "Loading","Please wait a few seconds....");
-        Call<List<StationInfo>> call = service.getAllStations();
+        Call<List<StationInfo>> call = service.getAllStations(RESULTS_PER_PAGE,"votes",true,true,RESULTS_PER_PAGE*page);
         call.enqueue(new Callback<List<StationInfo>>() {
             @Override
             public void onResponse(Call<List<StationInfo>> call, Response<List<StationInfo>> response) {
@@ -66,8 +78,9 @@ public class BrowseStationsActivity extends AppCompatActivity implements Station
             }
         });
     }
-    public void fetchStationsByTag(String tag){
-        Call<List<StationInfo>> call = service.getStationsByTag(tag);
+    public void fetchStationsByTag(String tag, int page){
+        globalTag = tag;
+        Call<List<StationInfo>> call = service.getStationsByTag(tag,RESULTS_PER_PAGE,true,RESULTS_PER_PAGE*page);
         call.enqueue(new Callback<List<StationInfo>>() {
             @Override
             public void onResponse(Call<List<StationInfo>> call, Response<List<StationInfo>> response) {
@@ -92,10 +105,39 @@ public class BrowseStationsActivity extends AppCompatActivity implements Station
             }
             @Override
             public boolean onQueryTextSubmit(String query) {
-                fetchStationsByTag(query);
+                globalPage = 0;
+                fetchStationsByTag(query,globalPage);
                 return false;
             }
         });
+    }
+    private void initPaging(){
+        nextButton.findViewById(R.id.nextButtonBrowse);
+        nextButton.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                if (mode == FETCH_ALL_MODE){
+                    fetchAllStations(globalPage +1);
+                }
+                else if (mode == SEARCH_MODE){
+                    if (globalTag != null) {
+                        fetchStationsByTag(globalTag, globalPage + 1);
+                    }
+                }
+            }});
+        prevButton.findViewById(R.id.prevButtonBrowse);
+        prevButton.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                if (mode == FETCH_ALL_MODE && globalPage > 0){
+                    fetchAllStations(globalPage -1);
+                }
+                else if (mode == SEARCH_MODE) {
+                    if (globalTag != null && globalPage > 0) {
+                        fetchStationsByTag(globalTag, globalPage - 1);
+                    }
+                }
+            }});
     }
     private void generateDataList(List<StationInfo> stationList) {
         stationInfoListStorage = stationList;

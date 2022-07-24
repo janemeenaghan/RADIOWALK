@@ -5,7 +5,25 @@
     android:layout_width="match_parent"
     android:layout_height="match_parent"
     tools:context=".BrowseStationsActivity">
+    <Button
+        android:id="@+id/prevButtonBrowse"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:text="prev"
+        app:layout_constraintBottom_toBottomOf="parent"
+        app:layout_constraintEnd_toStartOf="@+id/chooseToSearchGuideline"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toBottomOf="@+id/stationRecycler" />
 
+    <Button
+        android:id="@+id/nextButtonBrowse"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:text="next"
+        app:layout_constraintBottom_toBottomOf="parent"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toStartOf="@+id/chooseToSearchGuideline"
+        app:layout_constraintTop_toBottomOf="@+id/stationRecycler" />
 
     <TextView
         android:id="@+id/chooseAStationTextView"
@@ -23,14 +41,21 @@
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:orientation="horizontal"
-        app:layout_constraintGuide_begin="59dp" />
+        app:layout_constraintGuide_percent="0.1"/>
+
+    <androidx.constraintlayout.widget.Guideline
+        android:id="@+id/aboveRecycler"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:orientation="horizontal"
+        app:layout_constraintGuide_percent="0.35"/>
 
     <androidx.constraintlayout.widget.Guideline
         android:id="@+id/chooseToSearchGuideline"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:orientation="vertical"
-        app:layout_constraintGuide_percent="0.6" />
+        app:layout_constraintGuide_percent="0.5" />
 
     <ImageView
         android:id="@+id/iconImageView"
@@ -46,24 +71,23 @@
     <androidx.recyclerview.widget.RecyclerView
         android:id="@+id/stationRecycler"
         android:layout_width="match_parent"
-        android:layout_height="485dp"
-        android:layout_marginTop="44dp"
+        android:layout_height="0dp"
         android:scrollbarAlwaysDrawVerticalTrack="true"
         android:scrollbars="vertical"
         app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintHeight_percent="0.5"
         app:layout_constraintHorizontal_bias="0.0"
         app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toBottomOf="@+id/chooseAStationTextView" />
+        app:layout_constraintTop_toTopOf="@+id/aboveRecycler" />
 
     <SearchView
         android:id="@+id/searchView"
         android:layout_width="0dp"
         android:layout_height="25dp"
         app:barrierMargin="10dp"
-        app:layout_constraintStart_toStartOf="@+id/chooseToSearchGuideline"
+        app:layout_constraintStart_toEndOf="@+id/chooseAStationTextView"
         app:layout_constraintTop_toTopOf="@+id/chooseAStationTextView"
         app:layout_constraintWidth_percent="0.4" />
-
 
 
 </androidx.constraintlayout.widget.ConstraintLayout>

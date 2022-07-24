@@ -11,36 +11,62 @@ roam a geographic area, listening to music and sounds that have been tailored to
 RADIOWALK envisions a more social kind of soundwalk that literally brings people together to create unique, immersive auditory experiences.
 
 Completed Features:
-- Retrofit HTTP client is used to interface with Radio-Browsers.info database to retrieve radio (Planned Problem #1)
-  - Request constructed from a base url and specific paths (specifically, to get all Stations vs. Stations with a user-entered tag) serialized into JSON by Gson
-  - Response deserialized into custom StationInfo model of mostly key-value pairs
+- User can create or edit geo-located "Station" Parse Objects stored in a back4app database and rendered on a GoogleMap that follows user's live-updating location
+- At any time when in range of station(s), live-streams audio from a selected station's radio source via the app's MediaPlayerController
+- Retrofit HTTP client constructed to interface with Radio-Browsers.info database to retrieve radio source when adding or editing a Station (Planned Problem #1)
+  - Request constructed from a base url and specific paths, serialized into JSON by Gson
+  - Response deserialized into custom StationInfo model of mostly key-value pairs,  packaged through activityResult back into the main code flow, formulated by the StationController into a Station ParseObject saved to back4app database
   - Handled by an adapter into a RecyclerView or into the back4app database via an intent callback back to the activity that handles Parse
-- User, 'Station', and retrieved radio metadata maintained through Parse requests to a database hosted by back4app
+  - Queried results rendered in a devoted activity with icons, names, tags, and like counts
+  - Initially queries the most popular stations (by retrieved likes data), also allows users to instead filter by tags through SearchView input, both safeguarding against 'broken' results and limiting at 20 results 
+- User, 'Station', and retrieved radio source data maintained through Parse requests to a database hosted by back4app
   - After a brief launch screen, user can sign up or log in, with basic enforcement of properly formatted email addresses, matching passwords, etc.
   - Backend completed to support basic sharing and revoking of access to Private Stations between users, front-end interface coming soon
-  - Querying/filtering algorithm (Planned Problem #2):
-    - Continually queries back4app for Stations geo-located within radius of user's live-updating location, filters further based on certain user-input fields (whether Station is Public/Private/Either at the moment, more parameters soon)
-    - (Coming soon, the user-input fields will include a tag (retrieved from a search bar) to compare to Radio-Browser tags data (fetched by Retrofit) associated with the radio link the Station is streaming)
-    - Lastly, after populating this filtered data to Station UI elements on Map, the algorithm computes the single station that best optimizes the aforementioned parameters and proximity and chooses it to begin listening to
-  - UI Design:
-    - Numerous animations using rey5137's Material Libary (external) (ex. one button animation rearranges the line segments of it's + icon into a ✓ icon)
-    - Maps seamlessly integrated across the main page, sandwiched between
-      - Toolbar overhead with:
-        - Dark/Light mode switch toggling styles/themes for text, widget, and even Map styles simultaneously (Complex Feature #3?)
-        - ? button offering instructions AlertDialog on how to use the app
-        - Logout button
-      - SlidingUpPanel on bottom with:
-        - radio favicon fetched with Retrofit client
-        - volume bar with unique custom animation when dragging to change value
-    - Station UI objects on map designed from color-coded, customized GMaps Markers and Circles
-    - Alternating FloatingActionButtons in bottom right corner to add a station or modify an existing one based on user circumstance
-
-Coming soon:
-- Query/filter database stations from back4app by the metadata (particularly tags) of the radio-browser radio that was linked into the Station data model
-- One-time operation to populate back4app with countless spread out Public Stations at provided by Retrofit HTTP handling of Places SDK's Nearby Search
-- Front-end interface to add/remove/view associated users (by username) starting from the Station marker on the Map
-- Link acounts to Facebook or Google, expand sharing functionality, otherwise make app more socially integrated
-- Refactor newer code in MainActivity into Modal Controller style design
+  - Querying/filtering/selecting algorithm (Planned Problem #2) (Stretch Feature):
+    a. Automatic, real-time querying of back4app database according to the user's live-updating location for nearby Station objects satisfying along 3 parameters:
+       1) if geo-located within a defined detection radius of user's location
+       2) if matching the user-inputted type preference (Private Stations, Public Stations, or Both)
+       3) if containing the user-inputted search string (from a SearchView) in its tags data (fetched from its radio-browser source into back4app by Retrofit when the radio-browser source was selected) (only factors this if the user made an input to the SearchView)
+    b. Selection from among these queried Stations for a station to according to a score computed according to:
+       1) proximity to user
+       2) popularity of station's radio source (according to likes data fetched from its radio-browser source into back4app by Retrofit at the time of source selection)
+       3) flat preference weights given to the already currently selected station (as an inertia)
+       4) randomness scaled by a user-inputted chaos factor to offer diversity in station selection at higher user input levels
+- UI Design:
+   - Queried/selected Stations rendered on a GoogleMap via color-coded custom markers and circles on map
+   - Extensive styling and numerous animations accessed from rey5137's Material Libary (external library)
+   - Maps seamlessly integrated across the main page
+     - Toolbar overhead with:
+       - Facebook Link Button
+       - Dark/Light mode toggle button
+       - ? button offering instructions AlertDialog on how to use the app
+       - Logout button
+     - Small panel underneath Toolbar with UI elements for controlling algorithm:
+       - Public/Private/Both radio group
+       - Chaos Meter
+       - SearchView to filter nearby by tag
+     - SlidingUpPanel from beneath maps displaying Station's stream information:
+       - Radio source's favicon (fetched with Retrofit client into back4app)
+       - Volume bar with unique custom animation when dragging to change value
+       - Play/pause button
+     - Station UI objects on map designed from color-coded, customized GMaps Markers and Circles
+     - Add and Edit FloatingActionButtons in bottom right area to add or modify station
+       - Add button click animation rearranges the line segments of it's + icon into a ✓ icon
+     - Dark/light mode toggled by Toolbar button encompassing styles/themes for text, widget, and even Map styles simultaneously (Complex Feature #3?)
+- Social Integration / Accounts (Stretch Feature):
+  - On Launch, after splash screen, user directed through signup/login flow UI if not already logged in
+  - Parse signup/login flow with option of linking to a Facebook profile at any time
+  - 'Continue through Facebook' Facebook-directed signup/login flow
+  
+Stretch features coming soon:
+- One-time operation to populate back4app with countless spread out Public Stations provided by Retrofit HTTP handling of Places SDK's Nearby Search
+- Social Integration:
+  - Front-end interface implemented onto SlidePanelLayout's empty space when swiped up:
+    - Add/remove/view associated users (by username) starting from the Station marker on the Map
+    - (Also display other information about the current station)
+  - Expand sharing functionality
+  - Expand Facebook integration
+  - Otherwise make app more socially integrated
 
 ## Video Walkthrough
 
@@ -50,14 +76,14 @@ Here's what the app might look like for a new user:
 Here's what the app might look like for an experienced user linked to Facebook and included in many private stations:
 <img src='ExperiencedUserDemo.gif' title='Video Walkthrough' width='' alt='Video Walkthrough' />
 
-GIF created with [ezgif](https://ezgif.com/video-to-gif).
-
 ## Credits
 
 List an 3rd party libraries, icons, graphics, or other assets you used in your app.
-
-- [Android Async Http Client](http://loopj.com/android-async-http/) - networking library
-
+- Retrofit - networking library
+- Material Design - UI icons, graphics, styles
+- Parse - networking Library
+- GoogleMaps, Places
+- Radio Browser - external database (not IN my app, but retrieved/logged data from it)
 
 ## Notes
 

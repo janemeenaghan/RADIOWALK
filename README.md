@@ -20,8 +20,8 @@ Completed Features:
   - Request constructed from a base url and specific paths, serialized into JSON by Gson
   - Response deserialized into custom StationInfo model of mostly key-value pairs,  packaged through activityResult back into the main code flow, formulated by the StationController into a Station ParseObject saved to back4app database
   - Handled by an adapter into a RecyclerView or into the back4app database via an intent callback back to the activity that handles Parse
-  - Queried results rendered in a devoted activity with icons, names, tags, and like counts
-  - Initially queries the most popular stations (by retrieved likes data), also allows users to instead filter by tags through SearchView input, both safeguarding against 'broken' results and limiting at 20 results 
+  - Queried results rendered in a devoted activity with icons, names, tags, and like counts, 20 results per page, with Next and Prev buttons to navigate
+  - Initially queries the most popular stations (by retrieved likes data), also allows users to instead filter by tags through SearchView input, both safeguarding against 'broken' results
 - User, 'Station', and retrieved radio source data maintained through Parse requests to a database hosted by back4app
   - After a brief launch screen, user can sign up or log in, with basic enforcement of properly formatted email addresses, matching passwords, etc.
   - Backend completed to support basic sharing and revoking of access to Private Stations between users, front-end interface coming soon

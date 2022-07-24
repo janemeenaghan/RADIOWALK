@@ -13,6 +13,9 @@ RADIOWALK envisions a more social kind of soundwalk that literally brings people
 Completed Features:
 - User can create or edit geo-located "Station" Parse Objects stored in a back4app database and rendered on a GoogleMap that follows user's live-updating location
 - At any time when in range of station(s), live-streams audio from a selected station's radio source via the app's MediaPlayerController
+  - Audio focus management with error management and pausing, playing, and stopping music if audio focus is lost/gained
+  - Pauses, resumes, stops in responds to activity live cycle events and is properly released on destroy or critical MediaPlayer.MEDIA_ERROR_SERVER_DIED error 
+  - Implemented via dynamic UI (play/pause button updates icon according to MediaPlayer Controller callback regarding playing state, play/pause button and radio favicon hide when no station is being played)
 - Retrofit HTTP client constructed to interface with Radio-Browsers.info database to retrieve radio source when adding or editing a Station (Planned Problem #1)
   - Request constructed from a base url and specific paths, serialized into JSON by Gson
   - Response deserialized into custom StationInfo model of mostly key-value pairs,  packaged through activityResult back into the main code flow, formulated by the StationController into a Station ParseObject saved to back4app database
@@ -52,13 +55,13 @@ Completed Features:
      - Station UI objects on map designed from color-coded, customized GMaps Markers and Circles
      - Add and Edit FloatingActionButtons in bottom right area to add or modify station
        - Add button click animation rearranges the line segments of it's + icon into a ✓ icon
-     - Dark/light mode toggled by Toolbar button encompassing styles/themes for text, widget, and even Map styles simultaneously (Complex Feature #3?)
+     - Dark/light mode toggled by Toolbar button encompassing styles/themes for text, widget, and even Map styles simultaneously (Complex Feature #3?) (Stretch Feature)
 - Social Integration / Accounts (Stretch Feature):
   - On Launch, after splash screen, user directed through signup/login flow UI if not already logged in
   - Parse signup/login flow with option of linking to a Facebook profile at any time
   - 'Continue through Facebook' Facebook-directed signup/login flow
   
-Stretch features coming soon:
+More stretch features coming soon:
 - One-time operation to populate back4app with countless spread out Public Stations provided by Retrofit HTTP handling of Places SDK's Nearby Search
 - Social Integration:
   - Front-end interface implemented onto SlidePanelLayout's empty space when swiped up:
@@ -67,6 +70,8 @@ Stretch features coming soon:
   - Expand sharing functionality
   - Expand Facebook integration
   - Otherwise make app more socially integrated
+- Include original plan of collaborative playlist streaming linked to stations
+- Dark/Light mode: automatically set based on current time?
 
 ## Video Walkthrough
 

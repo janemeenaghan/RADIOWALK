@@ -16,6 +16,18 @@ public class MediaPlayerController {
     public MediaPlayerController(Context context) {
         this.context = context;
         mediaPlayer = new MediaPlayer();
+        mediaPlayer.setOnErrorListener(new MediaPlayer.OnErrorListener() {
+            @Override
+            public boolean onError(MediaPlayer mp, int what, int extra) {
+                if (what == MediaPlayer.MEDIA_ERROR_SERVER_DIED){
+                    mediaPlayer.release();
+                }
+                else {
+                    mediaPlayer.reset();
+                }
+                return false;
+            }
+        });
     }
     public void terminatePlayer(){
         if (currentURI != null){
@@ -24,6 +36,14 @@ public class MediaPlayerController {
         if(mediaPlayer != null){
             reset();
             mediaPlayer.release();
+        }
+    }
+    public void resume() {
+        if(mediaPlayer == null){
+            return;
+        }
+        if (!mediaPlayer.isPlaying()){
+            mediaPlayer.start();
         }
     }
     public void reset(){

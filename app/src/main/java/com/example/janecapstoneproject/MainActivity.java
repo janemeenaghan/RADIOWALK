@@ -123,6 +123,7 @@ public class MainActivity extends AppCompatActivity implements OnMapReadyCallbac
     protected void onStart() {
         super.onStart();
         mMapView.onStart();
+        mediaPlayerController.resume();
         locationController.startLiveUpdates(this);
     }
     @Override
@@ -135,6 +136,7 @@ public class MainActivity extends AppCompatActivity implements OnMapReadyCallbac
     @Override
     protected void onPause() {
         mMapView.onPause();
+        mediaPlayerController.pause();
         super.onPause();
     }
     @Override
@@ -451,7 +453,9 @@ public class MainActivity extends AppCompatActivity implements OnMapReadyCallbac
         }
     }
     @Override
-    public void onMediaPlayerError() {}
+    public void onMediaPlayerError() {
+
+    }
     //VOLUME CONTROLLER
     private void initVolume() {
         plusText = findViewById(R.id.plusText);

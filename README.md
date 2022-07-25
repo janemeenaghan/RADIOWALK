@@ -1,14 +1,6 @@
 # Capstone MVP - RADIOWALK
 
-RADIOWALK is a prototypal location-based augmented reality platform based around Internet radio stations.
-Users of the app are invited to link radio broadcasts from across the web to in-app 'stations' they plant at their real-world locations.
-Users that come within range of a station's real-world location will automatically pick up on its broadcasts through the app. 
-RADIOWALK is a communal experience in which participants are encouraged, for best results, to walk around and experience the 
-diverse sonic world that will be collectively assembled through these functions by users in their area.
-
-The concept was inspired by the emerging artistic discipline of soundwalks - curated sonic experiences in which participants 
-roam a geographic area, listening to music and sounds that have been tailored to the place's features.
-RADIOWALK envisions a more social kind of soundwalk that literally brings people together to create unique, immersive auditory experiences.
+My project, RADIOWALK, is a location-based augmented reality platform based around Internet radio stations. Users of the app are invited to link radio broadcasts from across the web to in-app 'stations' they plant at their real-world locations. Users within range of stations’ real-world locations will automatically pick up on their broadcasts through the app. Thus, for best results, users are encouraged to walk around and experience the diverse sonic world collectively assembled by users throughout the places they visit. The concept was inspired by the emerging artistic discipline of soundwalks - curated sonic experiences in which participants roam a geographic area, listening to music and sounds that have been tailored to the place's features. RADIOWALK envisions a more social kind of soundwalk that literally brings people together to create unique, immersive auditory experiences.
 
 Completed Features:
 - User can create or edit geo-located "Station" Parse Objects stored in a back4app database and rendered on a GoogleMap that follows user's live-updating location

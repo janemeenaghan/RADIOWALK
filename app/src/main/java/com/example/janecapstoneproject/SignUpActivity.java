@@ -9,6 +9,7 @@ import android.widget.Button;
 import android.widget.EditText;
 import android.widget.Toast;
 
+import androidx.appcompat.app.AlertDialog;
 import androidx.appcompat.app.AppCompatActivity;
 
 import com.google.android.material.textfield.TextInputLayout;
@@ -159,24 +160,31 @@ public class SignUpActivity extends AppCompatActivity {
                     }
                     halted = false;
                 } else {
-                    attemptToLogInUser(username, password);
+                    ParseUser.logOut();
+                    showAlert("Account Created Successfully!", "Please verify your email before Login", false);
+                    //attemptToLogInUser(username, password);
                 }
             }
         });
     }
-    private void attemptToLogInUser(String username, String password){
-        ParseUser.logInInBackground(username, password, new LogInCallback() {
-            @Override
-            public void done(ParseUser user, ParseException e) {
-                halted = false;
-                if (e != null) {
-                    Toast.makeText(SignUpActivity.this, "Unknown error. Please try again or reinstall.", Toast.LENGTH_LONG).show();
-                } else {
-                    goMainActivity();
-                }
-            }
-        });
+
+    private void showAlert(String title, String message, boolean error) {
+        AlertDialog.Builder builder = new AlertDialog.Builder(SignUpActivity.this)
+                .setTitle(title)
+                .setMessage(message)
+                .setPositiveButton("OK", (dialog, which) -> {
+                    dialog.cancel();
+                    if (!error) {
+                        Intent intent = new Intent(SignUpActivity.this, LoginActivity.class);
+                        intent.addFlags(Intent.FLAG_ACTIVITY_CLEAR_TASK | Intent.FLAG_ACTIVITY_NEW_TASK);
+                        startActivity(intent);
+                    }
+                });
+        AlertDialog ok = builder.create();
+        ok.show();
     }
+
+
     private void goMainActivity() {
         Intent i = new Intent(SignUpActivity.this, MainActivity.class);
         startActivity(i);

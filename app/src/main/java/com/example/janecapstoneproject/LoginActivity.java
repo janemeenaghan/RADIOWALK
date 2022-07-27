@@ -4,8 +4,6 @@ import android.app.AlertDialog;
 import android.content.DialogInterface;
 import android.content.Intent;
 import android.os.Bundle;
-import android.text.Editable;
-import android.text.TextWatcher;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.widget.Button;
@@ -81,10 +79,28 @@ public class LoginActivity extends AppCompatActivity {
                     Toast.makeText(LoginActivity.this, "Incorrect username or password!", Toast.LENGTH_SHORT);
                     return;
                 }
+                if (!user.getBoolean("emailVerified")){
+                    ParseUser.logOut();
+                    showNotVerifiedAlert();
+                    return;
+                }
                 goMainActivity();
                 Toast.makeText(LoginActivity.this, "Success!", Toast.LENGTH_SHORT);
             }
         });
+    }
+
+    private void showNotVerifiedAlert() {
+        String title = "User email not verified";
+        String message = "Please check your inbox.";
+        androidx.appcompat.app.AlertDialog.Builder builder = new androidx.appcompat.app.AlertDialog.Builder(LoginActivity.this)
+                .setTitle(title)
+                .setMessage(message)
+                .setPositiveButton("OK", (dialog, which) -> {
+                    dialog.cancel();
+                });
+        androidx.appcompat.app.AlertDialog ok = builder.create();
+        ok.show();
     }
 
     private void launchForgotPasswordAlert(){

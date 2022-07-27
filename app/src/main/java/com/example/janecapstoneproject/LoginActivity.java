@@ -4,6 +4,7 @@ import android.app.AlertDialog;
 import android.content.DialogInterface;
 import android.content.Intent;
 import android.os.Bundle;
+import android.view.LayoutInflater;
 import android.view.View;
 import android.widget.Button;
 import android.widget.EditText;
@@ -19,6 +20,7 @@ import com.facebook.GraphResponse;
 import com.parse.LogInCallback;
 import com.parse.ParseException;
 import com.parse.ParseUser;
+import com.parse.RequestPasswordResetCallback;
 import com.parse.SaveCallback;
 import com.parse.facebook.ParseFacebookUtils;
 
@@ -30,11 +32,9 @@ import java.util.Collection;
 
 public class LoginActivity extends AppCompatActivity {
     public static final String TAG = "LoginActivity";
-    private EditText etUsername;
-    private EditText etPassword;
-    private Button login;
-    private TextView createAccount;
-    private Button fbLoginButton;
+    private EditText etUsername,etPassword,etResetEmail;
+    private Button login,fbLoginButton;
+    private TextView createAccount,forgotPassword;
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -57,9 +57,18 @@ public class LoginActivity extends AppCompatActivity {
                 goSignUpActivity();
             }
         });
+
+        forgotPassword = findViewById(R.id.forgotPassword);
+        forgotPassword.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                launchForgotPasswordAlert();
+            }
+        });
+
         initFBLogin();
         if (ParseUser.getCurrentUser() != null) {
-            goMainActivity();
+            //goMainActivity();
         }
     }
     private void loginUser(String username, String password) {
@@ -70,11 +79,68 @@ public class LoginActivity extends AppCompatActivity {
                     Toast.makeText(LoginActivity.this, "Incorrect username or password!", Toast.LENGTH_SHORT);
                     return;
                 }
+                if (!user.getBoolean("emailVerified")){
+                    ParseUser.logOut();
+                    showNotVerifiedAlert();
+                    return;
+                }
                 goMainActivity();
                 Toast.makeText(LoginActivity.this, "Success!", Toast.LENGTH_SHORT);
             }
         });
     }
+
+    private void showNotVerifiedAlert() {
+        String title = "User email not verified";
+        String message = "Please check your inbox.";
+        androidx.appcompat.app.AlertDialog.Builder builder = new androidx.appcompat.app.AlertDialog.Builder(LoginActivity.this)
+                .setTitle(title)
+                .setMessage(message)
+                .setPositiveButton("OK", (dialog, which) -> {
+                    dialog.cancel();
+                });
+        androidx.appcompat.app.AlertDialog ok = builder.create();
+        ok.show();
+    }
+
+    private void launchForgotPasswordAlert(){
+        View messageView = LayoutInflater.from(LoginActivity.this).inflate(R.layout.forgot_password_alert_dialog, null);
+        androidx.appcompat.app.AlertDialog.Builder alertDialogBuilder = new androidx.appcompat.app.AlertDialog.Builder(this);
+        alertDialogBuilder.setView(messageView);
+        final androidx.appcompat.app.AlertDialog alertDialog = alertDialogBuilder.create();
+        alertDialog.setButton(DialogInterface.BUTTON_POSITIVE, "OK",
+                new DialogInterface.OnClickListener() {
+                    @Override
+                    public void onClick(DialogInterface dialog, int which) {
+                        String name = ((EditText) etResetEmail).getText().toString();
+                        launchConfirmationAlert();
+                        dialog.cancel();
+                    }
+                });
+        alertDialog.setButton(DialogInterface.BUTTON_NEGATIVE, "Cancel",
+                new DialogInterface.OnClickListener() {
+                    public void onClick(DialogInterface dialog, int id) {
+                        dialog.cancel();
+                    }
+                });
+        alertDialog.show();
+    }
+
+    private void launchConfirmationAlert() {
+        View messageView = LayoutInflater.from(LoginActivity.this).inflate(R.layout.reset_password_confirmation_dialog, null);
+        androidx.appcompat.app.AlertDialog.Builder alertDialogBuilder = new androidx.appcompat.app.AlertDialog.Builder(this);
+        alertDialogBuilder.setView(messageView);
+        final androidx.appcompat.app.AlertDialog alertDialog = alertDialogBuilder.create();
+        alertDialog.setButton(DialogInterface.BUTTON_POSITIVE, "OK",
+                new DialogInterface.OnClickListener() {
+                    @Override
+                    public void onClick(DialogInterface dialog, int which) {
+                        dialog.cancel();
+                    }
+                });
+    }
+
+
     private void goMainActivity() {
         Intent i = new Intent(LoginActivity.this, MainActivity.class);
         startActivity(i);
@@ -133,6 +199,19 @@ public class LoginActivity extends AppCompatActivity {
         AlertDialog ok = builder.create();
         ok.show();
     }
+    private void requestPasswordReset(String email){
+        ParseUser.requestPasswordResetInBackground(email,
+                new RequestPasswordResetCallback() {
+                    public void done(ParseException e) {
+                        if (e == null) {
+                            // An email was successfully sent with reset instructions.
+                        } else {
+                            // Something went wrong. Look at the ParseException to see what's up.
+                        }
+                    }
+                });
+    }
+
     private void getUserDetailFromFB() {
         GraphRequest request = GraphRequest.newMeRequest(AccessToken.getCurrentAccessToken(), new GraphRequest.GraphJSONObjectCallback() {
             @Override

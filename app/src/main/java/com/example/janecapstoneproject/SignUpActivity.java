@@ -107,7 +107,6 @@ public class SignUpActivity extends AppCompatActivity {
             @Override
             public void done(List<ParseUser> users, ParseException e) {
                 if (e != null) {
-                    Toast.makeText(SignUpActivity.this, "EMAILkys"+e, Toast.LENGTH_LONG).show();
                     halted = false;
                 }
                 else if (users.isEmpty()){

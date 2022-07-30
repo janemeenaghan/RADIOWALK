@@ -27,7 +27,6 @@ public class StationListAdapter extends RecyclerView.Adapter<StationListAdapter.
         ImageView faviconImageView;
         android.widget.TextView nameTextView;
         TextView tagsTextView;
-        ImageView likeCountImageView;
         TextView likeCountTextView;
         OnStationListener onStationListener;
         CustomViewHolder(View itemView, OnStationListener onStationListener) {
@@ -36,7 +35,6 @@ public class StationListAdapter extends RecyclerView.Adapter<StationListAdapter.
             faviconImageView = mView.findViewById(R.id.faviconImageView);
             nameTextView = mView.findViewById(R.id.nameTextView);
             tagsTextView = mView.findViewById(R.id.tagsTextView);
-            likeCountImageView = mView.findViewById(R.id.likeCountImageView);
             likeCountTextView = mView.findViewById(R.id.likeCountTextView);
             this.onStationListener = onStationListener;
             itemView.setOnClickListener(this);
@@ -61,21 +59,21 @@ public class StationListAdapter extends RecyclerView.Adapter<StationListAdapter.
         holder.tagsTextView.setText(dataList.get(position).getTags());
         StationInfo stationInfo = dataList.get(position);
         int i = stationInfo.getVotes();
-        String string = ""+i;
+        String string = ""+i+" likes";
         holder.likeCountTextView.setText(string);
         Picasso.Builder builder = new Picasso.Builder(context);
         builder.downloader(new OkHttp3Downloader(context));
         String favicon = dataList.get(position).getFavicon();
         if (favicon != null && !favicon.trim().isEmpty()){
             builder.build().load(favicon)
-                    .placeholder((R.drawable.ic_launcher_background))
-                    .error(R.drawable.ic_launcher_background)
+                    .placeholder((R.drawable.newiconblackfinal))
+                    .error(R.drawable.newiconblackfinal)
                     .into(holder.faviconImageView);
         }
         else {
-            builder.build().load(R.drawable.ic_launcher_background)
-                    .placeholder((R.drawable.ic_launcher_background))
-                    .error(R.drawable.ic_launcher_background)
+            builder.build().load(R.drawable.newiconblackfinal)
+                    .placeholder((R.drawable.newiconblackfinal))
+                    .error(R.drawable.newiconblackfinal)
                     .into(holder.faviconImageView);
         }
     }

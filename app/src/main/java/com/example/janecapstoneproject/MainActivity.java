@@ -14,6 +14,8 @@ import android.view.LayoutInflater;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
+import android.view.animation.Animation;
+import android.view.animation.AnimationUtils;
 import android.widget.EditText;
 import android.widget.ImageButton;
 import android.widget.ImageView;
@@ -60,8 +62,12 @@ import org.parceler.Parcels;
 import java.io.IOException;
 import java.util.Arrays;
 import java.util.Collection;
+import java.util.List;
 
-public class MainActivity extends AppCompatActivity implements OnMapReadyCallback, VolumeController.VolumeCallback, LocationController.LocationCallback, Station.StationCallback, StationController.StationControllerCallback, MediaPlayerController.MediaPlayerCallback, MapController.MapCallback{
+import retrofit2.Call;
+import retrofit2.Response;
+
+public class MainActivity extends AppCompatActivity implements OnMapReadyCallback, VolumeController.VolumeCallback, LocationController.LocationCallback, Station.StationCallback, StationController.StationControllerCallback, MediaPlayerController.MediaPlayerCallback, MapController.MapCallback, StationUserListAdapter.OnStationUserListener{
     private boolean editButtonHasBeenInitialized, bypassFaviconChecks,bypassMapChecks;
     public int REQUEST_CODE = 1001;
     public static final int PUBLIC_TYPE = 0;
@@ -93,6 +99,10 @@ public class MainActivity extends AppCompatActivity implements OnMapReadyCallbac
     private double chaosFactor;
     private String searchTag;
     private GetDataService service;
+    private RecyclerView.LayoutManager layoutManager;
+    private List<PlaceForStation> placeForStationInfoListStorage;
+    private StationUserListAdapter stationUserListAdapter;
+
     @RequiresApi(api = Build.VERSION_CODES.M)
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -111,7 +121,54 @@ public class MainActivity extends AppCompatActivity implements OnMapReadyCallbac
         initMediaPlayer();
         initVolume();
         initSlidingPanelElements();
+        //service = RetrofitClientInstanceForPlace.getRetrofitInstanceForPlace().create(GetDataService.class);
+        //retrieveStations();
+
     }
+
+
+    public void retrieveStations() {
+        Log.e(TAG, "retrieveStations()");
+        Call<PlaceForStation> call = service.getAllPlacesInArea();
+        call.enqueue(new retrofit2.Callback<PlaceForStation>() {
+            @Override
+            public void onResponse(Call<PlaceForStation> call, Response<PlaceForStation> response) {
+                Log.e(TAG, "onresponse");
+                List<PlaceForStation.Result> list = response.body().getResults();
+                for (PlaceForStation.Result result : list) {
+                    createAndPopulateStationFromPlace(result.getName(), result.getGeometry());
+                }
+                // generateDataList(response.body());
+            }
+
+            @Override
+            public void onFailure(Call<PlaceForStation> call, Throwable t) {
+                Log.e(TAG, "onFailure "+t);
+            }
+        });
+    }
+
+    public void createAndPopulateStationFromPlace(String name, PlaceForStation.Geometry geometry){
+        Log.e(TAG, "Logging "+name +" at "+ geometry.getLocation());
+        Station station = new Station();
+        station.setName(name);
+        station.setGeoPoint(new LatLng(geometry.getLocation().getLatitude(),geometry.getLocation().getLongitude()));
+        station.setType(0);
+        //station.setStreamName();
+        //station.setFavicon();
+        //station.setStreamName()
+        //station.setTags()
+        //station.setLikes();
+        try {
+            Log.e(TAG,"try");
+            station.save();
+        } catch (ParseException e) {
+            e.printStackTrace();
+            Log.e(TAG,""+e);
+        }
+    }
+
+
     //LIFECYCLE EVENTS
     @Override
     public void onSaveInstanceState(Bundle outState) {

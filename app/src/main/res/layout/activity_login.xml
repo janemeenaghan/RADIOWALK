@@ -4,25 +4,30 @@
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
+    android:background="@color/colorTan"
     tools:context=".LoginActivity">
 
-    <Button
+    <com.rey.material.widget.Button
         android:id="@+id/signup"
         android:layout_width="0dp"
         android:layout_height="0dp"
-        app:layout_constraintWidth_percent=".85"
-        app:layout_constraintHeight_percent=".07"
+        android:background="@drawable/rounded_corners_drawable_cyan"
         android:text="Login"
+        android:textColor="@color/colorTan"
         app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintHeight_percent=".07"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toBottomOf="@+id/tilWrapper2"
-        app:layout_constraintVertical_bias="0.067" />
+        app:layout_constraintVertical_bias="0.1"
+        app:layout_constraintWidth_percent=".85" />
 
     <com.google.android.material.textfield.TextInputLayout
         android:id="@+id/tilWrapper2"
         android:layout_width="0dp"
         android:layout_height="0dp"
+        app:boxCornerRadiusTopEnd="4dp"
+        app:boxCornerRadiusBottomStart="4dp"
         app:layout_constraintWidth_percent=".85"
         app:layout_constraintHeight_percent=".07"
         android:layout_alignParentStart="true"
@@ -31,6 +36,8 @@
         android:layout_marginTop="20dp"
         app:counterEnabled="false"
         app:layout_constraintEnd_toEndOf="parent"
+        android:textColor="@color/colorCyanDark"
+        android:textColorHint="@color/colorCyan"
         app:layout_constraintHorizontal_bias="0.428"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toBottomOf="@+id/tilWrapper1">
@@ -41,20 +48,32 @@
             android:layout_height="match_parent"
             android:layout_marginLeft="10dp"
             android:layout_marginRight="10dp"
-            android:hint="password"
+            android:hint="PASSWORD"
             android:inputType="textPassword"
+            android:background="@drawable/rounded_corners_drawable"
+            android:padding="15dp"
+            android:textColor="@color/colorCyanDark"
+            android:textColorHint="@color/colorCyan"
             android:textStyle="bold"
             app:layout_constraintEnd_toEndOf="parent"
             app:layout_constraintHorizontal_bias="0.497"
             app:layout_constraintStart_toStartOf="parent"
             app:layout_constraintTop_toTopOf="@+id/tilWrapper2" />
     </com.google.android.material.textfield.TextInputLayout>
+
+    <androidx.constraintlayout.widget.Guideline
+        android:id="@+id/aboveLoginGuidelineLogin"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:orientation="horizontal"
+        app:layout_constraintGuide_percent="0.3" />
+
     <androidx.constraintlayout.widget.Guideline
         android:id="@+id/aboveIconGuidelineLogin"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:orientation="horizontal"
-        app:layout_constraintGuide_percent="0.08" />
+        app:layout_constraintGuide_percent="0.0" />
 
     <ImageView
         android:id="@+id/iconImageViewLogin"
@@ -64,24 +83,26 @@
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toTopOf="@+id/aboveIconGuidelineLogin"
-        app:layout_constraintWidth_percent="0.25"
-        app:srcCompat="@drawable/launchicon" />
+        app:layout_constraintWidth_percent="0.75"
+        app:srcCompat="@drawable/facebook_profile_image" />
 
     <com.google.android.material.textfield.TextInputLayout
         android:id="@+id/tilWrapper1"
         android:layout_width="0dp"
         android:layout_height="0dp"
-        app:layout_constraintWidth_percent=".85"
-        app:layout_constraintHeight_percent=".07"
         android:layout_alignParentStart="true"
         android:layout_alignParentTop="true"
         android:layout_centerInParent="true"
+        android:textColor="@color/colorCyanDark"
+        android:textColorHint="@color/colorCyan"
         android:layout_marginTop="32dp"
         app:counterEnabled="false"
         app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintHeight_percent=".07"
         app:layout_constraintHorizontal_bias="0.428"
         app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toBottomOf="@+id/iconImageViewLogin">
+        app:layout_constraintTop_toBottomOf="@+id/aboveLoginGuidelineLogin"
+        app:layout_constraintWidth_percent=".85">
 
         <EditText
             android:id="@+id/username"
@@ -90,8 +111,12 @@
             android:layout_marginLeft="10dp"
             android:layout_marginRight="10dp"
             android:gravity="start|top"
-            android:hint="username"
+            android:hint="USERNAME"
             android:inputType="text"
+            android:background="@drawable/rounded_corners_drawable"
+            android:padding="15dp"
+            android:textColor="@color/colorCyanDark"
+            android:textColorHint="@color/colorCyan"
             android:textStyle="bold"
             app:layout_constraintEnd_toEndOf="parent"
             app:layout_constraintStart_toStartOf="parent"
@@ -102,8 +127,10 @@
         android:id="@+id/createAccountButton"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:layout_marginTop="6dp"
+        android:layout_marginTop="8dp"
         android:text="Create Account"
+        android:textAllCaps="true"
+        android:textColor="@color/colorCyanDark"
         app:layout_constraintEnd_toEndOf="@+id/signup"
         app:layout_constraintTop_toBottomOf="@+id/signup" />
 
@@ -113,6 +140,8 @@
         android:layout_height="wrap_content"
         android:layout_marginTop="6dp"
         android:text="Forgot Password?"
+        android:textAllCaps="true"
+        android:textColor="@color/colorCyanDark"
         app:layout_constraintEnd_toEndOf="@+id/createAccountButton"
         app:layout_constraintTop_toBottomOf="@+id/createAccountButton" />
 
@@ -121,6 +150,7 @@
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:text="OR"
+        android:textColor="@color/colorCyanDark"
         app:layout_constraintBottom_toTopOf="@+id/fbLoginButton"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintHorizontal_bias="0.498"
@@ -132,7 +162,13 @@
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:layout_gravity="center_horizontal"
+        android:background="@drawable/rounded_corners_drawable_primary_dark"
+        android:drawableLeft="@drawable/com_facebook_button_icon"
+        android:drawablePadding="10dp"
+        android:paddingLeft="10dp"
+        android:paddingRight="10dp"
         android:text="Continue with Facebook"
+        android:textColor="@color/colorTan"
         app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"

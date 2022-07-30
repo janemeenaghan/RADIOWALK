@@ -5,6 +5,7 @@
     xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
+    app:v_styleId="@array/bg_window_mine"
     android:layout_height="match_parent"
     android:orientation="horizontal"
     android:gravity="center">
@@ -92,6 +93,7 @@
         <RadioButton
             android:id="@+id/radioPublic"
             android:layout_width="wrap_content"
+            app:v_styleId="@array/radio_button"
             android:layout_height="wrap_content"
             android:onClick="onRadioButtonClicked"
             android:text="Public"
@@ -101,6 +103,7 @@
             android:id="@+id/radioPrivate"
             android:layout_width="wrap_content"
             android:layout_height="match_parent"
+            app:v_styleId="@array/radio_button"
             android:onClick="onRadioButtonClicked"
             android:text="Private"
             android:textSize="8sp" />
@@ -108,15 +111,17 @@
         <RadioButton
             android:id="@+id/radioBoth"
             android:layout_width="wrap_content"
+            app:v_styleId="@array/radio_button"
             android:layout_height="wrap_content"
             android:onClick="onRadioButtonClicked"
             android:text="Both"
             android:textSize="8sp" />
     </RadioGroup>
 
-    <TextView
+    <com.rey.material.widget.TextView
         android:id="@+id/radioText"
         android:layout_width="wrap_content"
+        app:v_styleId="@array/text_body"
         android:layout_height="wrap_content"
         android:layout_marginLeft="5dp"
         android:text="Show station types:"
@@ -124,18 +129,18 @@
         sothree:layout_constraintLeft_toLeftOf="@id/radiogroup"
         sothree:layout_constraintTop_toBottomOf="@id/algoUIGuidelineHoriz" />
 
-    <TextView
+    <com.rey.material.widget.TextView
         android:id="@+id/chaosMeterText"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
+        app:v_styleId="@array/text_body"
         android:text="Chaos Meter: Tame"
         android:textSize="12sp"
         sothree:layout_constraintLeft_toLeftOf="@id/chaosMeterGuidelineVert"
         sothree:layout_constraintTop_toBottomOf="@id/algoUIGuidelineHoriz" />
 
-    <SeekBar
+    <com.rey.material.widget.Slider
         android:id="@+id/chaosMeter"
-        style="@style/Material.Widget.Slider.Discrete"
         android:layout_width="0dp"
         android:layout_height="wrap_content"
         android:max="100"

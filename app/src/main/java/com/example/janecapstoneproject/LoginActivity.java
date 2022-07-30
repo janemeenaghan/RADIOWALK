@@ -3,6 +3,7 @@ package com.example.janecapstoneproject;
 import android.app.AlertDialog;
 import android.content.DialogInterface;
 import android.content.Intent;
+import android.os.Build;
 import android.os.Bundle;
 import android.view.LayoutInflater;
 import android.view.View;
@@ -12,7 +13,10 @@ import android.widget.TextView;
 import android.widget.Toast;
 
 import androidx.annotation.Nullable;
+import androidx.annotation.RequiresApi;
 import androidx.appcompat.app.AppCompatActivity;
+import androidx.constraintlayout.widget.ConstraintLayout;
+import androidx.constraintlayout.widget.ConstraintSet;
 
 import com.facebook.AccessToken;
 import com.facebook.GraphRequest;
@@ -35,9 +39,17 @@ public class LoginActivity extends AppCompatActivity {
     private EditText etUsername,etPassword,etResetEmail;
     private Button login,fbLoginButton;
     private TextView createAccount,forgotPassword;
+    private EditText etUsername;
+    private EditText etPassword;
+    private Button login;
+    private TextView createAccount;
+    private Button fbLoginButton;
+    private ConstraintLayout layout;
+    @RequiresApi(api = Build.VERSION_CODES.M)
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
+        layout = (ConstraintLayout)findViewById(R.layout.activity_login);
         setContentView(R.layout.activity_login);
         etUsername = findViewById(R.id.username);
         etPassword = findViewById(R.id.password);
@@ -197,6 +209,7 @@ public class LoginActivity extends AppCompatActivity {
                     }
                 });
         AlertDialog ok = builder.create();
+        ok.getWindow().setBackgroundDrawableResource(R.drawable.rounded_corners_drawable);
         ok.show();
     }
     private void requestPasswordReset(String email){

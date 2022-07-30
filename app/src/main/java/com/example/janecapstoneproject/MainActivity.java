@@ -360,6 +360,7 @@ public class MainActivity extends AppCompatActivity implements OnMapReadyCallbac
         AlertDialog.Builder alertDialogBuilder = new AlertDialog.Builder(this);
         alertDialogBuilder.setView(instructionsView);
         final AlertDialog alertDialog = alertDialogBuilder.create();
+        alertDialog.getWindow().setBackgroundDrawableResource(R.drawable.rounded_corners_drawable);
         alertDialog.setButton(DialogInterface.BUTTON_POSITIVE, "OK",
                 new DialogInterface.OnClickListener() {
                     @Override
@@ -489,7 +490,8 @@ public class MainActivity extends AppCompatActivity implements OnMapReadyCallbac
     //NOW PLAYING TEXT CODE
     private void initNowPlayingText() {
         nowPlayingText = findViewById(R.id.nowPlayingText);
-        }
+        nowPlayingText.startAnimation((Animation) AnimationUtils.loadAnimation(this,R.anim.scrolling_text));
+    }
     private String currentNowPlayingText;
     private void setNowPlayingText(String nowPlayingText, boolean bypass) {
         boolean proceed = false;
@@ -657,6 +659,7 @@ public class MainActivity extends AppCompatActivity implements OnMapReadyCallbac
         AlertDialog.Builder alertDialogBuilder = new AlertDialog.Builder(this);
         alertDialogBuilder.setView(messageView);
         final AlertDialog alertDialog = alertDialogBuilder.create();
+        alertDialog.getWindow().setBackgroundDrawableResource(R.drawable.rounded_corners_drawable);
         alertDialog.setButton(DialogInterface.BUTTON_POSITIVE, "OK",
                 new DialogInterface.OnClickListener() {
                     @Override
@@ -692,6 +695,7 @@ public class MainActivity extends AppCompatActivity implements OnMapReadyCallbac
         AlertDialog.Builder alertDialogBuilder2 = new AlertDialog.Builder(this);
         alertDialogBuilder2.setView(messageView2);
         final AlertDialog alertDialog2 = alertDialogBuilder2.create();
+        alertDialog2.getWindow().setBackgroundDrawableResource(R.drawable.rounded_corners_drawable);
         alertDialog2.setButton(DialogInterface.BUTTON_POSITIVE, "YES",
                 new DialogInterface.OnClickListener() {
                     @Override
@@ -821,6 +825,7 @@ public class MainActivity extends AppCompatActivity implements OnMapReadyCallbac
         AlertDialog.Builder alertDialogBuilder = new AlertDialog.Builder(this);
         alertDialogBuilder.setView(messageView);
         final AlertDialog alertDialog = alertDialogBuilder.create();
+        alertDialog.getWindow().setBackgroundDrawableResource(R.drawable.rounded_corners_drawable);
         alertDialog.setButton(DialogInterface.BUTTON_POSITIVE, "OK",
                 new DialogInterface.OnClickListener() {
                     @Override

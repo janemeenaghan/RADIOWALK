@@ -5,6 +5,7 @@
     xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
+    style="@style/Material"
     android:layout_height="match_parent"
     android:orientation="horizontal"
     android:gravity="center|top">
@@ -15,11 +16,11 @@
         app:layout_constraintWidth_percent="0.17"
         android:layout_height="0dp"
         app:layout_constraintDimensionRatio="1:1"
+        android:paddingLeft="5dp"
         sothree:layout_constraintLeft_toLeftOf="parent"
         sothree:layout_constraintTop_toTopOf="parent"
         android:visibility="visible"
-        sothree:srcCompat="@drawable/tempmusicicon"
-        tools:srcCompat="@tools:sample/avatars" />
+        sothree:srcCompat="@drawable/newiconblackfinal" />
 
     <ImageButton
         android:id="@+id/playPauseButton"
@@ -36,16 +37,18 @@
     <com.rey.material.widget.TextView
         android:id="@+id/stationNameText"
         android:layout_width="0dp"
-        app:layout_constraintWidth_percent="0.3"
         android:layout_height="0dp"
-        app:layout_constraintHeight_percent="0.025"
         android:layout_weight="1"
-        android:singleLine="true"
+        android:textSize="6sp"
         android:focusable="true"
         android:focusableInTouchMode="true"
         android:scrollHorizontally="true"
+        android:singleLine="true"
         android:text="@string/noStationFound"
-        android:textSize="8sp"
+        android:textColor="@color/colorCyanDark"
+        android:textColorHint="@color/colorCyan"
+        app:layout_constraintHeight_percent="0.025"
+        app:layout_constraintWidth_percent="0.3"
         app:v_styleId="@array/text_body"
         sothree:layout_constraintLeft_toRightOf="@+id/playPauseButton"
         sothree:layout_constraintTop_toTopOf="@+id/musicIcon" />
@@ -55,6 +58,8 @@
         android:text="-"
         android:textSize="12sp"
         app:v_styleId="@array/text_title"
+        android:textColor="@color/colorCyanDark"
+        android:textColorHint="@color/colorCyan"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:paddingLeft="10dp"
@@ -77,10 +82,10 @@
 
     <com.rey.material.widget.TextView
         android:id="@+id/nowPlayingText"
-        android:layout_width="0dp"
-        app:layout_constraintWidth_percent="0.3"
         android:layout_height="0dp"
+        android:layout_width="0dp"
         app:layout_constraintHeight_percent="0.025"
+        app:layout_constraintWidth_percent="0.2"
         android:layout_weight="1"
         android:ellipsize="marquee"
         android:focusable="true"
@@ -89,9 +94,10 @@
         android:scrollHorizontally="true"
         android:singleLine="true"
         android:text=""
-        android:textSize="8sp"
+        android:textSize="6sp"
         app:v_styleId="@array/text_body"
-        sothree:layout_constraintLeft_toRightOf="@+id/guidelineVertForNowPlayingText"
+        sothree:layout_constraintLeft_toRightOf="@id/stationNameText"
+        android:paddingLeft="5dp"
         sothree:layout_constraintTop_toTopOf="@+id/musicIcon" />
 
     <com.rey.material.widget.Slider
@@ -103,11 +109,33 @@
         android:paddingLeft="10dp"
         android:paddingTop="0dip"
         app:layout_constraintWidth_percent="0.6"
-        sothree:sl_maxValue="15"
-        sothree:sl_minValue="0"
         app:v_styleId="@array/slider"
         sothree:layout_constraintBottom_toBottomOf="@+id/playPauseButton"
-        sothree:layout_constraintLeft_toRightOf="@id/playPauseButton" />
+        sothree:layout_constraintLeft_toRightOf="@id/playPauseButton"
+        sothree:sl_maxValue="15"
+        sothree:sl_minValue="0"/>
+
+    <com.rey.material.widget.Button
+        android:id="@+id/addUser"
+        style="@style/Widget.AppCompat.Button.Borderless"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:drawableLeft="@drawable/ic_baseline_add_24"
+        android:text="Add a user"
+        android:visibility="invisible"
+        app:v_styleId="@array/button_flat"
+        sothree:layout_constraintLeft_toLeftOf="@id/musicIcon"
+        sothree:layout_constraintTop_toBottomOf="@id/musicIcon" />
+
+    <androidx.recyclerview.widget.RecyclerView
+        android:id="@+id/stationUserRecycler"
+        android:layout_width="match_parent"
+        android:layout_height="0dp"
+        android:layout_marginLeft="30dp"
+        android:layout_marginRight="30dp"
+        app:layout_constraintHeight_percent="0.6"
+        sothree:layout_constraintTop_toBottomOf="@+id/addUser"
+        tools:layout_editor_absoluteX="0dp" />
 
     <androidx.constraintlayout.widget.Guideline
         android:id="@+id/guidelineVertForImage"
@@ -128,7 +156,7 @@
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:orientation="vertical"
-        sothree:layout_constraintGuide_percent="0.66" />
+        sothree:layout_constraintGuide_percent="0.62" />
 
     <androidx.constraintlayout.widget.Guideline
         android:id="@+id/guidelineHorizForImage"

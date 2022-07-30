@@ -328,7 +328,8 @@ public class StationController {
     private void addStationToAUsersSharedList (Station station, ParseUser user){
         try {
             station.addThisToUsersSharedList(user);
-            station.saveInBackground();
+            user.saveInBackground();
+
         } catch (JSONException ex) {
             ex.printStackTrace();
         }
@@ -336,7 +337,7 @@ public class StationController {
     private void addUserToAStationsSharedList (Station station, ParseUser user){
         try {
             station.addUserToSharedList(user);
-            user.saveInBackground();
+            station.saveInBackground();
         } catch (JSONException ex) {
             ex.printStackTrace();
         }
@@ -344,6 +345,26 @@ public class StationController {
     public void shareStationWithUser (Station station, ParseUser user){
         addStationToAUsersSharedList(station, user);
         addUserToAStationsSharedList(station, user);
+    }
+    public void unShareStationWithUser (Station station, ParseUser user){
+        removeStationFromAUsersSharedList(station, user);
+        removeUserFromAStationsSharedList(station, user);
+    }
+    private void removeStationFromAUsersSharedList (Station station, ParseUser user){
+        try {
+            station.removeThisFromUsersSharedList(user);
+            station.saveInBackground();
+        } catch (JSONException ex) {
+            ex.printStackTrace();
+        }
+    }
+    private void removeUserFromAStationsSharedList (Station station, ParseUser user){
+        try {
+            station.removeUserFromSharedList(user);
+            user.saveInBackground();
+        } catch (JSONException ex) {
+            ex.printStackTrace();
+        }
     }
     public void registerCallback(StationController.StationControllerCallback stationControllerCallback){
         if (!callbacks.contains(stationControllerCallback)){

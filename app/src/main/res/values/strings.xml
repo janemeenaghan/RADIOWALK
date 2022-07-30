@@ -36,4 +36,8 @@
     <string name="rd_events">events</string>
     <string name="noStationFound">No nearby station.</string>
 
+    <string name="facebook_app_id">781703019501036</string>
+    <string name="fb_login_protocol_scheme">fb781703019501036</string>
+    <string name="facebook_client_token">40f4430047522c9039ca99d6afd5ede9</string>
+
 </resources>

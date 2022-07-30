@@ -1,13 +1,20 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
 
-    <color name="colorPrimary">#03A9F4</color>
+    <color name="colorTan">#F0EEC9</color>
+    <color name="colorCyan">#4FC9BA</color>
+    <color name="colorCyanDark">#41A598</color>
+
+    <color name="colorBlack">#3A4750</color>
+    <color name="colorMagenta">#F64E8B</color>
+    <color name="colorMagentaDark">#CC4374</color>
+    <color name="colorPrimary">#4FC9BA</color>
     <color name="colorPrimaryDark">#ff0171c9</color>
-    <color name="colorPurplePrimary">#AC009D</color>
-    <color name="colorPurpleAccent">#FF00E9</color>
+    <color name="colorPurplePrimary">#CC4374</color>
+    <color name="colorPurpleAccent">#F64E8B</color>
     <color name="colorGreenPrimary">#01BC11</color>
     <color name="colorGreenAccent">#00FF16</color>
-    <color name="colorAccent">#FF00E5FF</color>
+    <color name="colorAccent">#F64E8B</color>
     <color name="colorControlNormal">#FF78909C</color>
     <color name="colorControlActivated">#FF03A9F4</color>
     <color name="colorSwitchThumbNormal">#FF78909C</color>

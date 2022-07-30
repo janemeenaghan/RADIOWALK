@@ -97,7 +97,7 @@ public class BrowseStationsActivity extends AppCompatActivity implements Station
         });
     }
     public void initSearchView(){
-        searchView = findViewById(R.id.searchView);
+        searchView = findViewById(R.id.searchViewBrowse);
         searchView.setOnQueryTextListener(new SearchView.OnQueryTextListener() {
             @Override
             public boolean onQueryTextChange(String newText) {
@@ -112,7 +112,7 @@ public class BrowseStationsActivity extends AppCompatActivity implements Station
         });
     }
     private void initPaging(){
-        nextButton.findViewById(R.id.nextButtonBrowse);
+        nextButton = findViewById(R.id.nextButtonBrowse);
         nextButton.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
@@ -125,7 +125,7 @@ public class BrowseStationsActivity extends AppCompatActivity implements Station
                     }
                 }
             }});
-        prevButton.findViewById(R.id.prevButtonBrowse);
+        prevButton = findViewById(R.id.prevButtonBrowse);
         prevButton.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {

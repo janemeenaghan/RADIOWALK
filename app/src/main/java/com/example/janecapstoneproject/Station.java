@@ -53,7 +53,13 @@ public class Station extends ParseObject {
     public boolean isPublic(){ return getType() == 0; }
     public boolean isPrivate(){ return getType() == 1; }
     public String getName(){ return getString(KEY_NAME); }
-    public String getStreamLink(){ return getString(KEY_STREAMLINK); }
+    public String getStreamLink(){
+        if (getString(KEY_STREAMLINK) == null){
+            return "";
+        }
+        else {
+            return getString(KEY_STREAMLINK);
+        }}
     public String getStreamName(){ return getString(KEY_STREAMNAME); }
     public String getFavicon(){
         if (getString(KEY_FAVICON) == null){
@@ -132,6 +138,35 @@ public class Station extends ParseObject {
             user.put(KEY_USERSSHAREDSTATIONS, array);
         }
     }
+
+    public void removeUserFromSharedList(ParseUser user) throws JSONException {
+        if (this.getJSONArray(KEY_USERSSHAREDWITH)==null){
+            return;
+        }
+        boolean arrayContains = false;
+        JSONArray jsonArray = getJSONArray(KEY_USERSSHAREDWITH);
+        JSONArray jsonArray2 = new JSONArray(jsonArray.length()-1);
+        for (int i = 0; i < jsonArray.length() ; i ++){
+            if (!jsonArray.get(i).equals(user.getObjectId())){
+                jsonArray2.put(jsonArray.get(i));
+            }
+        }
+        put(KEY_USERSSHAREDWITH, jsonArray2);
+    }
+    public void removeThisFromUsersSharedList(ParseUser user) throws JSONException {
+        if (user.getJSONArray(KEY_USERSSHAREDSTATIONS)==null){
+            return;
+        }
+        JSONArray jsonArray = user.getJSONArray(KEY_USERSSHAREDSTATIONS);
+        JSONArray jsonArray2 = new JSONArray(jsonArray.length()-1);
+        for (int i = 0; i < jsonArray.length() ; i ++){
+            if (!jsonArray.get(i).equals(this.getObjectId())){
+                jsonArray2.put(jsonArray.get(i));
+            }
+        }
+        user.put(KEY_USERSSHAREDSTATIONS, jsonArray2);
+    }
+
     public void updateStationWithNewRadioToParse(String streamLink, String streamName, String favicon){
         setStreamLink(streamLink);
         setStreamName(streamName);

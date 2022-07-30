@@ -9,6 +9,7 @@ import android.graphics.drawable.Drawable;
 import android.location.Location;
 import android.os.Build;
 import android.os.Bundle;
+import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.Menu;
 import android.view.MenuItem;
@@ -18,7 +19,6 @@ import android.widget.ImageButton;
 import android.widget.ImageView;
 import android.widget.RadioButton;
 import android.widget.SeekBar;
-import android.widget.TextView;
 import android.widget.Toast;
 
 import androidx.annotation.NonNull;
@@ -28,6 +28,8 @@ import androidx.appcompat.app.AlertDialog;
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.appcompat.content.res.AppCompatResources;
 import androidx.appcompat.widget.Toolbar;
+import androidx.recyclerview.widget.LinearLayoutManager;
+import androidx.recyclerview.widget.RecyclerView;
 
 import com.facebook.login.LoginManager;
 import com.google.android.gms.maps.GoogleMap;
@@ -38,13 +40,17 @@ import com.google.android.gms.maps.model.Circle;
 import com.google.android.gms.maps.model.LatLng;
 import com.google.android.gms.maps.model.Marker;
 import com.google.android.gms.maps.model.MarkerOptions;
+import com.parse.ParseException;
+import com.parse.ParseQuery;
 import com.parse.ParseUser;
 import com.parse.facebook.ParseFacebookUtils;
 import com.rey.material.app.ThemeManager;
 import com.rey.material.app.ToolbarManager;
 import com.rey.material.drawable.ThemeDrawable;
 import com.rey.material.util.ViewUtil;
+import com.rey.material.widget.Button;
 import com.rey.material.widget.Slider;
+import com.rey.material.widget.TextView;
 import com.squareup.picasso.Callback;
 import com.squareup.picasso.Picasso;
 
@@ -72,10 +78,12 @@ public class MainActivity extends AppCompatActivity implements OnMapReadyCallbac
     private TextView nowPlayingText, stationNameText,minusText,plusText,chaosMeterText;
     private Drawable dayIcon, nightIcon, playIcon, pauseIcon;
     private Slider volControl;
-    private SeekBar chaosMeter;
+    private Slider chaosMeter;
     private androidx.appcompat.widget.SearchView stationSearch;
     private ImageButton playPauseButton;
     private com.rey.material.widget.FloatingActionButton addStationButton, editStationButton;
+    private Button addUser;
+    private RecyclerView stationUserRecycler;
     private MapController mapController;
     private LocationController locationController;
     private VolumeController volumeController;
@@ -84,6 +92,7 @@ public class MainActivity extends AppCompatActivity implements OnMapReadyCallbac
     private ToolbarManager mToolbarManager;
     private double chaosFactor;
     private String searchTag;
+    private GetDataService service;
     @RequiresApi(api = Build.VERSION_CODES.M)
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -236,31 +245,24 @@ public class MainActivity extends AppCompatActivity implements OnMapReadyCallbac
     private void initChaosMeter(){
         chaosFactor = 0;
         chaosMeter=findViewById(R.id.chaosMeter);
-        chaosMeter.setMax(100);
+        chaosMeter.setValueRange(0,100,false);
         chaosMeterText=findViewById(R.id.chaosMeterText);
-        chaosMeter.setOnSeekBarChangeListener(new SeekBar.OnSeekBarChangeListener() {
+        chaosMeter.setOnPositionChangeListener(new Slider.OnPositionChangeListener() {
             @Override
-            public void onProgressChanged(SeekBar seekBar, int progress, boolean fromUser) {
+            public void onPositionChanged(Slider view, boolean fromUser, float oldPos, float newPos, int oldValue, int newValue) {
                 String string = "Chaos Meter: ";
-                if (progress > 75){
+                if (newValue > 75) {
                     string += "TOTAL CHAOS";
-                }
-                else if (progress > 50){
+                } else if (newValue > 50) {
                     string += "Wild";
-                }
-                else if (progress > 25){
+                } else if (newValue > 25) {
                     string += "Balanced";
-                }
-                else{
+                } else {
                     string += "Tame";
                 }
                 chaosMeterText.setText(string);
-                chaosFactor = 10*(double)(((double)(progress))/100.0);
+                chaosFactor = 10 * (double) (((double) (newValue)) / 100.0);
             }
-            @Override
-            public void onStartTrackingTouch(SeekBar seekBar) {}
-            @Override
-            public void onStopTrackingTouch(SeekBar seekBar) {}
         });
     }
     private void initStationSearch(){
@@ -316,13 +318,13 @@ public class MainActivity extends AppCompatActivity implements OnMapReadyCallbac
         mapController.updateMapStyle(theme);
         updateThemeButtonIcon(theme);
     }
-    private void retrieveCurrentTheme () {
-        int theme = (ThemeManager.getInstance().getCurrentTheme()) % ThemeManager.getInstance().getThemeCount();
+    private void retrieveCurrentTheme() {
+        int theme = getCurrentTheme();
         ThemeManager.getInstance().setCurrentTheme(theme);
         mapController.updateMapStyle(theme);
         updateThemeButtonIcon(theme);
     }
-    private int getCurrentTheme () {
+    public static int getCurrentTheme(){
         return (ThemeManager.getInstance().getCurrentTheme()) % ThemeManager.getInstance().getThemeCount();
     }
     //SLIDING PANEL ELEMENTS
@@ -331,16 +333,49 @@ public class MainActivity extends AppCompatActivity implements OnMapReadyCallbac
         initStationNameText();
         initMusicIcon();
     }
-    private void setSlidingPanelElements(Context context, String favicon, String name, String streamName) {
+    private void setSlidingPanelElements(Context context, String favicon, String name, String streamName,Station closestStation) {
         setMusicIcon(context, favicon, bypassFaviconChecks);
         setStationNameText(name);
         setNowPlayingText(streamName, false);
+        if (closestStation.isPrivate()) {
+            try {
+                setStationUserList(closestStation);
+            } catch (JSONException e) {
+                e.printStackTrace();
+            } catch (ParseException e) {
+                e.printStackTrace();
+            }
+        }
+    }
+    private void setStationUserList(Station closestStation) throws JSONException, ParseException {
+        addUser = findViewById(R.id.addUser);
+        addUser.setVisibility(View.INVISIBLE);
+        if (closestStation.getUser().getObjectId().equals(ParseUser.getCurrentUser().getObjectId())) {
+            addUser.setVisibility(View.VISIBLE);
+            initStationUserList(closestStation,true);
+        }
+        initStationUserList(closestStation,false);
+        addUser.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                onAddUserToStationClick(closestStation);
+            }
+        });
     }
     //MUSIC ICON CODE
     private void initMusicIcon() {
         musicIcon = findViewById(R.id.musicIcon);
         musicIcon.setVisibility(View.INVISIBLE);
     }
+
+    private void initStationUserList(Station station, boolean isOwner) throws JSONException, ParseException {
+        stationUserRecycler = findViewById(R.id.stationUserRecycler);
+        stationUserListAdapter = new StationUserListAdapter(this,station,this, isOwner);
+        layoutManager = new LinearLayoutManager(MainActivity.this);
+        stationUserRecycler.setAdapter(stationUserListAdapter);
+        stationUserRecycler.setLayoutManager(layoutManager);
+    }
+
     private String currentFavicon;
     private void setMusicIcon(Context context, String favicon, boolean bypass) {
         boolean proceed = false;
@@ -397,7 +432,7 @@ public class MainActivity extends AppCompatActivity implements OnMapReadyCallbac
     //NOW PLAYING TEXT CODE
     private void initNowPlayingText() {
         nowPlayingText = findViewById(R.id.nowPlayingText);
-    }
+        }
     private String currentNowPlayingText;
     private void setNowPlayingText(String nowPlayingText, boolean bypass) {
         boolean proceed = false;
@@ -550,6 +585,7 @@ public class MainActivity extends AppCompatActivity implements OnMapReadyCallbac
     public void turnOffBypass() {
         bypassMapChecks = false;
     }
+
     //STATION BUTTONS CODE
     private void initAddStationButton(ParseUser user, Context context) {
         addStationButton = findViewById(R.id.createButton);
@@ -568,7 +604,7 @@ public class MainActivity extends AppCompatActivity implements OnMapReadyCallbac
                 new DialogInterface.OnClickListener() {
                     @Override
                     public void onClick(DialogInterface dialog, int which) {
-                        String name = ((EditText) alertDialog.findViewById(R.id.etTitle)).
+                        String name = ((EditText) alertDialog.findViewById(R.id.nameStationText)).
                                 getText().toString();
                         launchBrowseStationsActivityForResult(1, name, latLng);
                         addStationButton.setLineMorphingState((addStationButton.getLineMorphingState() + 1) % 2, true);
@@ -702,7 +738,7 @@ public class MainActivity extends AppCompatActivity implements OnMapReadyCallbac
     }
     @Override
     public void updateUIToRenderClosestStationStream(Station closestStation) {
-        setSlidingPanelElements(MainActivity.this, closestStation.getFavicon(), closestStation.getName(), closestStation.getStreamName());
+        setSlidingPanelElements(MainActivity.this, closestStation.getFavicon(), closestStation.getName(), closestStation.getStreamName(),closestStation);
         if (!closestStation.getStreamLink().isEmpty()) {
             mediaPlayerController.setURLAndPrepare(closestStation.getStreamLink());
         }
@@ -712,4 +748,55 @@ public class MainActivity extends AppCompatActivity implements OnMapReadyCallbac
     public void tellMapToClear(){
         mapController.clear();
     }
+
+    @Override
+    public void onStationUserClick(int position) {
+    }
+
+    @Override
+    public void onStationUserRemoveClick(ParseUser user, Station station) {
+        stationController.unShareStationWithUser(station,user);
+        stationUserListAdapter.notifyDataSetChanged();
+    }
+
+    private void onAddUserToStationClick(Station station){
+        View messageView = LayoutInflater.from(MainActivity.this).inflate(R.layout.alert_add_user_to_station_item, null);
+        AlertDialog.Builder alertDialogBuilder = new AlertDialog.Builder(this);
+        alertDialogBuilder.setView(messageView);
+        final AlertDialog alertDialog = alertDialogBuilder.create();
+        alertDialog.setButton(DialogInterface.BUTTON_POSITIVE, "OK",
+                new DialogInterface.OnClickListener() {
+                    @Override
+                    public void onClick(DialogInterface dialog, int which) {
+                        String name = ((EditText) alertDialog.findViewById(R.id.nameStationText)).
+                                getText().toString();
+                        ParseQuery<ParseUser> query = ParseQuery.getQuery(ParseUser.class);
+                        query.whereEqualTo("username",name);
+                        try {
+                            ParseUser user = query.getFirst();
+                            addUserToStation(user, station);
+                            Toast.makeText(MainActivity.this, "User successfully added!", Toast.LENGTH_LONG).show();
+                            dialog.dismiss();
+                        } catch (ParseException e) {
+                            e.printStackTrace();
+                            Toast.makeText(MainActivity.this, "User not found.", Toast.LENGTH_LONG).show();
+                        }
+                    }
+                });
+        alertDialog.setButton(DialogInterface.BUTTON_NEGATIVE, "Cancel",
+                new DialogInterface.OnClickListener() {
+                    public void onClick(DialogInterface dialog, int id) {
+                        dialog.cancel();
+                        //addStationButton.setLineMorphingState((addStationButton.getLineMorphingState() + 1) % 2, true);
+                    }
+                });
+        alertDialog.show();
+    }
+    private void addUserToStation(ParseUser user, Station station){
+        stationController.shareStationWithUser(station,user);
+        stationUserListAdapter.notifyDataSetChanged();
+        locationController.retrieveLocation(MainActivity.this);
+    }
+
+
 }

@@ -5,7 +5,8 @@
     android:id="@+id/layout_root"
     android:layout_width="wrap_content"
     android:layout_height="wrap_content"
-    android:padding="10dp"
+    android:background="@drawable/rounded_corners_drawable"
+    android:padding="15dp"
     tools:layout_editor_absoluteX="0dp"
     tools:layout_editor_absoluteY="5dp">
 
@@ -15,6 +16,7 @@
         android:layout_height="wrap_content"
         android:orientation="vertical"
         app:layout_constraintGuide_percent="0.2" />
+
     <androidx.constraintlayout.widget.Guideline
         android:id="@+id/guidelineIconToInstruction2"
         android:layout_width="wrap_content"
@@ -71,7 +73,6 @@
     <TextView
         android:id="@+id/privateInstructionText"
         android:layout_width="0dp"
-        app:layout_constraintWidth_percent=".7"
         android:layout_height="wrap_content"
         android:text="These stations are created by a user and manually shared with others. If you are seeing one, it means you either created it or it has been shared with you. You may share it with another user by pressing on the station and entering a username “Share Station”."
         android:textAppearance="@style/TextAppearance.AppCompat.Small"
@@ -80,12 +81,12 @@
         app:layout_constraintBottom_toBottomOf="@+id/privateStationInstructionsView"
         app:layout_constraintLeft_toRightOf="@+id/guidelineIconToInstruction2"
         app:layout_constraintTop_toTopOf="@+id/privateStationInstructionsView"
-        app:layout_constraintVertical_bias="0.7" />
+        app:layout_constraintVertical_bias="0.7"
+        app:layout_constraintWidth_percent=".7" />
 
     <TextView
         android:id="@+id/publicInstructionText"
         android:layout_width="0dp"
-        app:layout_constraintWidth_percent=".7"
         android:layout_height="wrap_content"
         android:text="These stations are found at particular landmarks. They are visible and accessible to everyone."
         android:textAppearance="@style/TextAppearance.AppCompat.Small"
@@ -94,7 +95,8 @@
         app:layout_constraintBottom_toBottomOf="@+id/publicStationInstructionsView"
         app:layout_constraintLeft_toRightOf="@+id/guidelineIconToInstruction2"
         app:layout_constraintTop_toTopOf="@+id/publicStationInstructionsView"
-        app:layout_constraintVertical_bias="0.666" />
+        app:layout_constraintVertical_bias="0.666"
+        app:layout_constraintWidth_percent=".7" />
 
     <TextView
         android:id="@+id/currentInstructionText"

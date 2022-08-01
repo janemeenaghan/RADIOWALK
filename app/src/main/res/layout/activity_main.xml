@@ -13,7 +13,8 @@
         android:id="@+id/framelayout"
         android:orientation="horizontal"
         android:gravity="center">
-        <include layout="@layout/main_contents"/>
+
+        <include layout="@layout/main_contents" />
     </FrameLayout>
     <FrameLayout
         android:layout_width="match_parent"

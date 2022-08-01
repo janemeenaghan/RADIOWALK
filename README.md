@@ -13,7 +13,7 @@ Completed Features:
   - Response deserialized into custom StationInfo model of mostly key-value pairs,  packaged through activityResult back into the main code flow, formulated by the StationController into a Station ParseObject saved to back4app database
   - Handled by an adapter into a RecyclerView or into the back4app database via an intent callback back to the activity that handles Parse
   - Queried results rendered in a devoted activity with icons, names, tags, and like counts, 20 results per page, with Next and Prev buttons to navigate
-  - Initially queries the most popular stations (by retrieved likes data), also allows users to instead filter by tags through SearchView input, both safeguarding against 'broken' results
+  - Initially queries the most popular stations (by retrieved likes data), also allows users to instead filter by tags through SearchView input, both safeguarding against 'broken' results and 
 - User, 'Station', and retrieved radio source data maintained through Parse requests to a database hosted by back4app
   - After a brief launch screen, user can sign up or log in, with basic enforcement of properly formatted email addresses, matching passwords, etc.
   - Backend completed to support basic sharing and revoking of access to Private Stations between users, front-end interface coming soon
@@ -29,7 +29,7 @@ Completed Features:
        4) randomness scaled by a user-inputted chaos factor to offer diversity in station selection at higher user input levels
 - UI Design:
    - Queried/selected Stations rendered on a GoogleMap via color-coded custom markers and circles on map
-   - Extensive styling and numerous animations accessed from rey5137's Material Libary (external library)
+   - Extensive styling and numerous animations accessed from rey5137's Material Library (external library)
    - Maps seamlessly integrated across the main page
      - Toolbar overhead with:
        - Facebook Link Button
@@ -44,6 +44,7 @@ Completed Features:
        - Radio source's favicon (fetched with Retrofit client into back4app)
        - Volume bar with unique custom animation when dragging to change value
        - Play/pause button
+       - If private station, list of shared users, UI to add/remove users
      - Station UI objects on map designed from color-coded, customized GMaps Markers and Circles
      - Add and Edit FloatingActionButtons in bottom right area to add or modify station
        - Add button click animation rearranges the line segments of it's + icon into a ✓ icon
@@ -52,26 +53,16 @@ Completed Features:
   - On Launch, after splash screen, user directed through signup/login flow UI if not already logged in
   - Parse signup/login flow with option of linking to a Facebook profile at any time
   - 'Continue through Facebook' Facebook-directed signup/login flow
-  
-More stretch features coming soon:
-- One-time operation to populate back4app with countless spread out Public Stations provided by Retrofit HTTP handling of Places SDK's Nearby Search
-- Social Integration:
-  - Front-end interface implemented onto SlidePanelLayout's empty space when swiped up:
-    - Add/remove/view associated users (by username) starting from the Station marker on the Map
-    - (Also display other information about the current station)
-  - Expand sharing functionality
-  - Expand Facebook integration
-  - Otherwise make app more socially integrated
-- Include original plan of collaborative playlist streaming linked to stations
-- Dark/Light mode: automatically set based on current time?
+  - Sharing system for private stations; owner has the ability to add or remove users, only shared users have access to the station and the list of other shared users
+- For developer only: code operation to populate back4app with countless spread out Public Stations provided by Retrofit HTTP handling of Places SDK's Nearby Search
+
+- More stretch features coming soon:
+None - done for now...
 
 ## Video Walkthrough
 
-Here's what the app might look like for a new user:
-<img src='NewUserDemo.gif' title='Video Walkthrough' width='' alt='Video Walkthrough' />
-
-Here's what the app might look like for an experienced user linked to Facebook and included in many private stations:
-<img src='ExperiencedUserDemo.gif' title='Video Walkthrough' width='' alt='Video Walkthrough' />
+Here's what the app looks like for an experienced user linked to Facebook and included in many private stations:
+<img src='demoInTwoMins.gif' title='Video Walkthrough' width='' alt='Video Walkthrough' />
 
 ## Credits
 

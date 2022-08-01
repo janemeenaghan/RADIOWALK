@@ -30,7 +30,8 @@
         <item name="rd_cornerRadius">4dp</item>
         <item name="rd_delayClick">afterRelease</item>
         <item name="android:textAppearance">@style/Base.TextAppearance.AppCompat.Button</item>
-        <item name="android:textColor">@color/colorPrimary</item>
+        <item name="android:colorBackground">@color/colorCyan</item>
+        <item name="android:textColor">@color/colorTan</item>
     </style>
 
     <style name="LightFlatWaveButtonRippleStyle" parent="Material.Drawable.Ripple.Wave.Light">
@@ -46,7 +47,8 @@
         <item name="rd_cornerRadius">4dp</item>
         <item name="rd_delayClick">afterRelease</item>
         <item name="android:textAppearance">@style/Base.TextAppearance.AppCompat.Button</item>
-        <item name="android:textColor">@color/colorPrimary</item>
+        <item name="android:colorBackground">@color/colorCyan</item>
+        <item name="android:textColor">@color/colorTan</item>
     </style>
 
     <style name="LightRaiseButtonRippleStyle" parent="Material.Drawable.Ripple.Touch.Light">
@@ -97,11 +99,17 @@
 
     <style name="LightRadioButtonDrawable" parent="Material.Drawable.RadioButton">
         <item name="android:textAppearance">@style/Base.TextAppearance.AppCompat.Body1</item>
+        <item name="android:colorControlActivated">@color/colorCyanDark</item>
+        <item name="android:colorControlNormal">@color/colorCyan</item>
+        <item name="android:buttonTint">@color/colorCyanDark</item>
         <item name="android:textColor">#FF000000</item>
     </style>
 
     <style name="LightCheckBoxDrawable" parent="Material.Drawable.CheckBox">
         <item name="android:textAppearance">@style/Base.TextAppearance.AppCompat.Body1</item>
+        <item name="android:colorControlActivated">@color/colorCyanDark</item>
+        <item name="android:colorControlNormal">@color/colorCyan</item>
+        <item name="android:buttonTint">@color/colorCyanDark</item>
         <item name="android:textColor">#FF000000</item>
     </style>
 
@@ -197,7 +205,7 @@
         <item name="spn_arrowSwitchMode">true</item>
         <item name="spn_arrowAnimDuration">@android:integer/config_shortAnimTime</item>
         <item name="spn_arrowInterpolator">@android:anim/decelerate_interpolator</item>
-        <item name="spn_arrowColor">@color/colorControlNormal</item>
+        <item name="spn_arrowColor">@color/colorCyan</item>
         <item name="android:popupBackground">@drawable/abc_popup_background_mtrl_mult</item>
     </style>
 
@@ -245,8 +253,8 @@
 
     <style  name="LightEditText"  parent="Material.Widget.EditText.Light">
         <item name="android:textAppearance">@style/Base.TextAppearance.AppCompat.Body1</item>
-        <item name="android:textColor">@color/abc_primary_text_material_light</item>
-        <item name="android:textColorHint">@color/abc_secondary_text_material_light</item>
+        <item name="android:textColor">@color/colorCyanDark</item>
+        <item name="android:textColorHint">@color/colorCyan</item>
         <item name="et_dividerColor">@drawable/color_divider_light</item>
         <item name="et_labelTextColor">@drawable/color_label_light</item>
         <item name="et_supportTextErrorColor">#FFFF0000</item>
@@ -272,7 +280,7 @@
     <!-- Circular Progress Style -->
 
     <style name="LightCircularProgressDrawable" parent="Material.Drawable.CircularProgress">
-        <item name="cpd_strokeColor">@color/colorPrimary</item>
+        <item name="cpd_strokeColor">@color/colorCyan</item>
     </style>
 
     <style name="LightColorCircularProgressDrawable" parent="Material.Drawable.CircularProgress">
@@ -280,7 +288,7 @@
     </style>
 
     <style name="LightInCircularProgressDrawable" parent="Material.Drawable.CircularProgress">
-        <item name="cpd_strokeColor">@color/colorPrimary</item>
+        <item name="cpd_strokeColor">@color/colorCyan</item>
         <item name="cpd_inAnimDuration">800</item>
         <item name="cpd_inStepPercent">0.5</item>
         <item name="cpd_inStepColors">@array/in_colors_light</item>
@@ -292,7 +300,7 @@
     </style>
 
     <style name="LightDeterminateCircularProgressDrawable" parent="Material.Drawable.CircularProgress.Determinate">
-        <item name="cpd_strokeColor">@color/colorPrimary</item>
+        <item name="cpd_strokeColor">@color/colorCyan</item>
         <item name="cpd_inAnimDuration">0</item>
         <item name="cpd_outAnimDuration">0</item>
         <item name="cpd_initialAngle">-90</item>
@@ -384,7 +392,7 @@
     <!-- ListView Style -->
 
     <style name="LightListView" >
-        <item name="android:background">@color/background_floating_material_light</item>
+        <item name="android:background">@color/colorCyan</item>
     </style>
 
     <!-- Navigator Drawable Style -->
@@ -392,7 +400,7 @@
     <style name="LightNavigatorDrawableIcon" parent="Material.Drawable.NavigationDrawerIcon">
         <item name="lmd_strokeSize">3dp</item>
         <item name="lmd_padding">18dp</item>
-        <item name="lmd_strokeColor">@color/primary_text_default_material_dark</item>
+        <item name="lmd_strokeColor">@color/colorCyan</item>
     </style>
 
     <style name="LightNavigationDrawerDrawable">

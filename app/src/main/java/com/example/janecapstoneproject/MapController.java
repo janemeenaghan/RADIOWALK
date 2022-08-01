@@ -73,8 +73,6 @@ public class MapController {
                         MapStyleOptions.loadRawResourceStyle(
                                 context, R.raw.map_night_theme_json));
             }
-            if (!success) {
-            }
         } catch (Resources.NotFoundException e) {
         }
     }

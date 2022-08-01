@@ -7,6 +7,7 @@
         <item name="rd_cornerRadius">0dp</item>
     </style>
 
+
     <!-- AppBar Style -->
     
     <style name="AppBar" parent="@style/ThemeOverlay.AppCompat.Dark.ActionBar">

@@ -1,10 +1,10 @@
 <?xml version="1.0" encoding="utf-8"?>
-<androidx.constraintlayout.widget.ConstraintLayout
-    xmlns:android="http://schemas.android.com/apk/res/android"
+<androidx.constraintlayout.widget.ConstraintLayout xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto"
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
+    android:background="@color/colorTan"
     tools:context=".LoginActivity">
 
     <androidx.constraintlayout.widget.Guideline
@@ -12,7 +12,14 @@
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:orientation="horizontal"
-        app:layout_constraintGuide_percent="0.08" />
+        app:layout_constraintGuide_percent="0.00" />
+
+    <androidx.constraintlayout.widget.Guideline
+        android:id="@+id/aboveSignupGuidelineSignup"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:orientation="horizontal"
+        app:layout_constraintGuide_percent="0.3" />
 
     <androidx.constraintlayout.widget.Guideline
         android:id="@+id/signupAtMidpointGuideline"
@@ -23,26 +30,34 @@
 
     <ImageView
         android:id="@+id/iconImageViewSignup"
-        app:layout_constraintWidth_percent="0.25"
+        android:layout_width="0dp"
+        android:layout_height="0dp"
         app:layout_constraintDimensionRatio="1:1"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"
+        android:textColor="@color/colorCyanDark"
+        android:textColorHint="@color/colorCyan"
         app:layout_constraintTop_toTopOf="@+id/aboveIconGuidelineSignup"
-        app:srcCompat="@drawable/launchicon"  android:layout_width="0dp" android:layout_height="0dp"/>
+        app:layout_constraintWidth_percent="0.75"
+        app:srcCompat="@drawable/facebook_profile_image" />
+
     <com.google.android.material.textfield.TextInputLayout
         android:id="@+id/tilWrapper1"
         android:layout_width="0dp"
         android:layout_height="0dp"
-        app:layout_constraintWidth_percent=".85"
-        app:layout_constraintHeight_percent=".07"
         android:layout_alignParentStart="true"
         android:layout_alignParentTop="true"
         android:layout_centerInParent="true"
-        android:layout_marginTop="32dp"
+        android:layout_marginTop="60dp"
+        android:background="@drawable/rounded_corners_drawable"
+        android:textColor="@color/colorCyanDark"
+        android:textColorHint="@color/colorCyan"
         app:counterEnabled="false"
         app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintHeight_percent=".07"
         app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toBottomOf="@+id/iconImageViewSignup">
+        app:layout_constraintTop_toBottomOf="@+id/aboveSignupGuidelineSignup"
+        app:layout_constraintWidth_percent=".85">
 
         <EditText
             android:id="@+id/email"
@@ -51,8 +66,11 @@
             android:layout_marginLeft="10dp"
             android:layout_marginRight="10dp"
             android:gravity="start|top"
-            android:hint="Email address"
+            android:hint="EMAIL ADDRESS"
             android:inputType="text"
+            android:padding="5dp"
+            android:textColor="@color/colorCyanDark"
+            android:textColorHint="@color/colorCyan"
             android:textStyle="bold"
             app:layout_constraintEnd_toEndOf="parent"
             app:layout_constraintStart_toStartOf="parent"
@@ -63,15 +81,20 @@
         android:id="@+id/tilWrapper2"
         android:layout_width="0dp"
         android:layout_height="0dp"
-        app:layout_constraintWidth_percent=".85"
-        app:layout_constraintHeight_percent=".07"
         android:layout_alignParentStart="true"
         android:layout_alignParentTop="true"
         android:layout_centerInParent="true"
         app:counterEnabled="false"
+        android:layout_marginTop="12dp"
         app:layout_constraintEnd_toEndOf="parent"
+        android:textColor="@color/colorCyanDark"
+        android:background="@drawable/rounded_corners_drawable"
+        android:textColorHint="@color/colorCyan"
+        app:layout_constraintHeight_percent=".07"
         app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toBottomOf="@+id/tilWrapper1">
+        app:layout_constraintTop_toBottomOf="@+id/tilWrapper1"
+        app:layout_constraintWidth_percent=".85">
+
         <EditText
             android:id="@+id/username"
             android:layout_width="match_parent"
@@ -79,34 +102,45 @@
             android:layout_marginLeft="10dp"
             android:layout_marginRight="10dp"
             android:gravity="start|top"
-            android:hint="Username"
+            android:padding="5dp"
+            android:hint="USERNAME"
             android:inputType="text"
+            android:textColor="@color/colorCyanDark"
+            android:textColorHint="@color/colorCyan"
             android:textStyle="bold"
             app:layout_constraintEnd_toEndOf="parent"
             app:layout_constraintStart_toStartOf="parent" />
     </com.google.android.material.textfield.TextInputLayout>
+
     <com.google.android.material.textfield.TextInputLayout
         android:id="@+id/tilWrapper3"
         android:layout_width="0dp"
         android:layout_height="0dp"
-        app:layout_constraintWidth_percent=".85"
-        app:layout_constraintHeight_percent=".07"
         android:layout_alignParentStart="true"
         android:layout_alignParentTop="true"
         android:layout_centerInParent="true"
-        android:hint="Password"
+        android:hint="PASSWORD"
+        android:textColor="@color/colorCyanDark"
+        android:layout_marginTop="12dp"
+        android:textColorHint="@color/colorCyan"
         app:counterEnabled="false"
         app:layout_constraintEnd_toEndOf="parent"
+        android:background="@drawable/rounded_corners_drawable"
+        app:layout_constraintHeight_percent=".07"
         app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toBottomOf="@+id/tilWrapper2">
+        app:layout_constraintTop_toBottomOf="@+id/tilWrapper2"
+        app:layout_constraintWidth_percent=".85">
 
         <EditText
             android:id="@+id/password"
             android:layout_width="match_parent"
             android:layout_height="match_parent"
+            android:padding="5dp"
             android:layout_marginLeft="10dp"
             android:layout_marginRight="10dp"
             android:inputType="textPassword"
+            android:textColor="@color/colorCyanDark"
+            android:textColorHint="@color/colorCyan"
             android:textStyle="bold"
             app:layout_constraintEnd_toEndOf="parent"
             app:layout_constraintStart_toStartOf="parent"
@@ -117,24 +151,31 @@
         android:id="@+id/tilWrapper4"
         android:layout_width="0dp"
         android:layout_height="0dp"
-        app:layout_constraintWidth_percent=".85"
-        app:layout_constraintHeight_percent=".07"
         android:layout_alignParentStart="true"
         android:layout_alignParentTop="true"
         android:layout_centerInParent="true"
+        android:textColor="@color/colorCyanDark"
+        android:background="@drawable/rounded_corners_drawable"
+        android:textColorHint="@color/colorCyan"
         app:counterEnabled="false"
+        android:layout_marginTop="12dp"
         app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintHeight_percent=".07"
         app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toBottomOf="@+id/tilWrapper3">
+        app:layout_constraintTop_toBottomOf="@+id/tilWrapper3"
+        app:layout_constraintWidth_percent=".85">
 
         <EditText
             android:id="@+id/passwordConfirm"
+            android:padding="5dp"
             android:layout_width="match_parent"
             android:layout_height="match_parent"
             android:layout_marginLeft="10dp"
             android:layout_marginRight="10dp"
-            android:hint="Confirm password"
+            android:hint="CONFIRM PASSWORD"
             android:inputType="textPassword"
+            android:textColor="@color/colorCyanDark"
+            android:textColorHint="@color/colorCyan"
             android:textStyle="bold"
             app:layout_constraintEnd_toEndOf="parent"
             app:layout_constraintStart_toStartOf="parent"
@@ -145,11 +186,14 @@
         android:id="@+id/signup"
         android:layout_width="0dp"
         android:layout_height="0dp"
-        app:layout_constraintWidth_percent=".85"
-        app:layout_constraintHeight_percent=".07"
+        android:layout_marginTop="12dp"
+        android:background="@drawable/rounded_corners_drawable_cyan"
         android:text="Sign up"
-        app:layout_constraintTop_toBottomOf="@+id/tilWrapper4"
-        app:layout_constraintRight_toRightOf="parent"
+        android:textColor="@color/colorTan"
+        app:layout_constraintBottom_toBottomOf="@+id/signupAtMidpointGuideline"
+        app:layout_constraintHeight_percent=".07"
         app:layout_constraintLeft_toLeftOf="parent"
-        app:layout_constraintBottom_toBottomOf="@+id/signupAtMidpointGuideline" />
+        app:layout_constraintRight_toRightOf="parent"
+        app:layout_constraintTop_toBottomOf="@+id/tilWrapper4"
+        app:layout_constraintWidth_percent=".85" />
 </androidx.constraintlayout.widget.ConstraintLayout>

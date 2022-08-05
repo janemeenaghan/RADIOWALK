@@ -21,6 +21,7 @@ import androidx.constraintlayout.widget.ConstraintSet;
 import com.facebook.AccessToken;
 import com.facebook.GraphRequest;
 import com.facebook.GraphResponse;
+import com.google.android.material.textfield.TextInputLayout;
 import com.parse.LogInCallback;
 import com.parse.ParseException;
 import com.parse.ParseUser;
@@ -39,21 +40,17 @@ public class LoginActivity extends AppCompatActivity {
     private EditText etUsername,etPassword,etResetEmail;
     private Button login,fbLoginButton;
     private TextView createAccount,forgotPassword;
-    private EditText etUsername;
-    private EditText etPassword;
-    private Button login;
-    private TextView createAccount;
-    private Button fbLoginButton;
-    private ConstraintLayout layout;
+    private TextInputLayout tilWrapper1,tilWrapper2;
     @RequiresApi(api = Build.VERSION_CODES.M)
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        layout = (ConstraintLayout)findViewById(R.layout.activity_login);
         setContentView(R.layout.activity_login);
         etUsername = findViewById(R.id.username);
         etPassword = findViewById(R.id.password);
-        login = findViewById(R.id.signup);
+        login = findViewById(R.id.loginButtonOnLogin);
+        tilWrapper1 = findViewById(R.id.tilWrapper1);
+        tilWrapper2 = findViewById(R.id.tilWrapper2);
         login.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
@@ -80,7 +77,7 @@ public class LoginActivity extends AppCompatActivity {
 
         initFBLogin();
         if (ParseUser.getCurrentUser() != null) {
-            //goMainActivity();
+            goMainActivity();
         }
     }
     private void loginUser(String username, String password) {
@@ -88,7 +85,8 @@ public class LoginActivity extends AppCompatActivity {
             @Override
             public void done(ParseUser user, ParseException e){
                 if (e != null){
-                    Toast.makeText(LoginActivity.this, "Incorrect username or password!", Toast.LENGTH_SHORT);
+                    tilWrapper1.setError("Incorrect username or password.");
+                    tilWrapper2.setError("Incorrect username or password.");
                     return;
                 }
                 if (!user.getBoolean("emailVerified")){
@@ -96,6 +94,8 @@ public class LoginActivity extends AppCompatActivity {
                     showNotVerifiedAlert();
                     return;
                 }
+                tilWrapper1.setErrorEnabled(false);
+                tilWrapper2.setErrorEnabled(false);
                 goMainActivity();
                 Toast.makeText(LoginActivity.this, "Success!", Toast.LENGTH_SHORT);
             }

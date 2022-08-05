@@ -14,7 +14,6 @@ import androidx.appcompat.app.AppCompatActivity;
 
 import com.google.android.material.textfield.TextInputLayout;
 import com.parse.FindCallback;
-import com.parse.LogInCallback;
 import com.parse.ParseException;
 import com.parse.ParseQuery;
 import com.parse.ParseUser;
@@ -86,7 +85,7 @@ public class SignUpActivity extends AppCompatActivity {
                 }
             }
         });
-        signup = findViewById(R.id.signup);
+        signup = findViewById(R.id.loginButtonOnLogin);
         signup.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {

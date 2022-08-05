@@ -1,5 +1,4 @@
 package com.example.janecapstoneproject;
-
 import android.annotation.SuppressLint;
 import android.content.Context;
 import android.content.DialogInterface;
@@ -473,6 +472,7 @@ public class MainActivity extends AppCompatActivity implements OnMapReadyCallbac
     //STATION NAME TEXT CODE
     private void initStationNameText() {
         stationNameText = findViewById(R.id.stationNameText);
+        stationNameText.setTextSize(12);
     }
     private String currentStationName;
     private void setStationNameText(String stationName) {
@@ -484,13 +484,14 @@ public class MainActivity extends AppCompatActivity implements OnMapReadyCallbac
                 string = stationName + ":";
             }
             stationNameText.setText(string);
+            stationNameText.setTextSize(12);
             currentStationName = stationName;
         }
     }
     //NOW PLAYING TEXT CODE
     private void initNowPlayingText() {
         nowPlayingText = findViewById(R.id.nowPlayingText);
-        nowPlayingText.startAnimation((Animation) AnimationUtils.loadAnimation(this,R.anim.scrolling_text));
+        nowPlayingText.setTextSize(12);
     }
     private String currentNowPlayingText;
     private void setNowPlayingText(String nowPlayingText, boolean bypass) {
@@ -512,6 +513,7 @@ public class MainActivity extends AppCompatActivity implements OnMapReadyCallbac
             this.nowPlayingText.setText(nowPlayingText);
             currentNowPlayingText = nowPlayingText;
         }
+        this.nowPlayingText.setTextSize(12);
     }
     //MEDIA CONTROLLER
     private void initMediaPlayer() {

@@ -5,50 +5,34 @@
       <map>
         <entry key="../../.gradle/caches/transforms-3/02213d641e372013482fb1ed7569e3a9/transformed/jetified-facebook-share-5.1.0/res/drawable/com_facebook_button_send_background.xml" value="0.3505" />
         <entry key="app/src/main/res/drawable-v24/bg_toolbar_light.xml" value="0.3515" />
-        <entry key="app/src/main/res/drawable-v24/bg_window_dark.xml" value="0.282" />
-        <entry key="app/src/main/res/drawable-v24/bg_window_light.xml" value="0.282" />
         <entry key="app/src/main/res/drawable-v24/color_divider_dark.xml" value="0.3515" />
         <entry key="app/src/main/res/drawable-v24/color_switch_dark.xml" value="0.3515" />
         <entry key="app/src/main/res/drawable-v24/color_wv_text.xml" value="0.3515" />
         <entry key="app/src/main/res/drawable-v24/ic_launcher_foreground.xml" value="0.2005" />
-        <entry key="app/src/main/res/drawable/bg_window_dark_mine.xml" value="0.282" />
-        <entry key="app/src/main/res/drawable/bg_window_light_mine.xml" value="0.282" />
         <entry key="app/src/main/res/drawable/ic_baseline_add_24.xml" value="0.3515" />
         <entry key="app/src/main/res/drawable/ic_baseline_add_circle_outline_24.xml" value="0.2005" />
         <entry key="app/src/main/res/drawable/ic_baseline_settings_24.xml" value="0.3515" />
         <entry key="app/src/main/res/drawable/ic_launcher_background.xml" value="0.1" />
-        <entry key="app/src/main/res/drawable/rounded_corners_drawable.xml" value="0.282" />
-        <entry key="app/src/main/res/drawable/rounded_corners_drawable_cyan.xml" value="0.282" />
-        <entry key="app/src/main/res/drawable/rounded_corners_drawable_cyan_dark.xml" value="0.282" />
-        <entry key="app/src/main/res/drawable/rounded_corners_drawable_magenta.xml" value="0.282" />
-        <entry key="app/src/main/res/drawable/rounded_corners_drawable_magenta_dark.xml" value="0.282" />
-        <entry key="app/src/main/res/drawable/rounded_corners_drawable_primary_dark.xml" value="0.282" />
         <entry key="app/src/main/res/layout/aaa.xml" value="0.3494791666666667" />
-        <entry key="app/src/main/res/layout/activity_browse_stations.xml" value="0.323907470703125" />
-        <entry key="app/src/main/res/layout/activity_launch.xml" value="0.2388092041015625" />
-        <entry key="app/src/main/res/layout/activity_login.xml" value="0.31912384033203123" />
-        <entry key="app/src/main/res/layout/activity_main.xml" value="0.34730529785156244" />
+        <entry key="app/src/main/res/layout/activity_browse_stations.xml" value="0.27807988347233936" />
+        <entry key="app/src/main/res/layout/activity_launch.xml" value="0.24866180419921874" />
+        <entry key="app/src/main/res/layout/activity_login.xml" value="0.4327392578125" />
+        <entry key="app/src/main/res/layout/activity_main.xml" value="0.2871658325195312" />
         <entry key="app/src/main/res/layout/activity_main2.xml" value="0.35052083333333334" />
-        <entry key="app/src/main/res/layout/activity_signup.xml" value="0.14880981445312494" />
-        <entry key="app/src/main/res/layout/alert_add_user_to_station_item.xml" value="0.3489583333333333" />
-        <entry key="app/src/main/res/layout/confirm_edit_item.xml" value="0.6168273534530249" />
-        <entry key="app/src/main/res/layout/forgot_password_alert_dialog.xml" value="0.34791666666666665" />
+        <entry key="app/src/main/res/layout/activity_signup.xml" value="0.25116271972656257" />
+        <entry key="app/src/main/res/layout/confirm_edit_item.xml" value="0.3435897435897436" />
         <entry key="app/src/main/res/layout/fragment_user_list.xml" value="0.3494791666666667" />
-        <entry key="app/src/main/res/layout/instructions_item.xml" value="0.48741933969350926" />
-        <entry key="app/src/main/res/layout/main_contents.xml" value="0.3607833862304688" />
-        <entry key="app/src/main/res/layout/message_item.xml" value="0.7552062988281252" />
+        <entry key="app/src/main/res/layout/instructions_item.xml" value="0.3806352820763218" />
+        <entry key="app/src/main/res/layout/main_contents.xml" value="0.34791666666666665" />
+        <entry key="app/src/main/res/layout/message_item.xml" value="0.2997039794921876" />
         <entry key="app/src/main/res/layout/message_item2.xml" value="0.34564102564102567" />
         <entry key="app/src/main/res/layout/message_item_old.xml" value="0.34564102564102567" />
-        <entry key="app/src/main/res/layout/panel_contents.xml" value="0.3264419555664065" />
-        <entry key="app/src/main/res/layout/reset_password_confirmation_dialog.xml" value="0.34791666666666665" />
-        <entry key="app/src/main/res/layout/station_option_item.xml" value="0.5393310546875" />
-        <entry key="app/src/main/res/layout/station_user_item.xml" value="0.6310572306315105" />
+        <entry key="app/src/main/res/layout/panel_contents.xml" value="0.363965352376302" />
+        <entry key="app/src/main/res/layout/station_option_item.xml" value="0.7841690063476563" />
         <entry key="app/src/main/res/layout/tutorial_item.xml" value="0.3446153846153846" />
         <entry key="app/src/main/res/menu/menu_main.xml" value="0.2982940673828125" />
         <entry key="app/src/main/res/mipmap-anydpi-v26/ic_launcher.xml" value="0.3515" />
         <entry key="app/src/main/res/mipmap-anydpi-v26/ic_launcher_round.xml" value="0.3525" />
-        <entry key="app/src/main/res/mipmap-anydpi-v26/thumbsup.xml" value="0.1" />
-        <entry key="app/src/main/res/mipmap-anydpi-v26/thumbsup_round.xml" value="0.1855" />
       </map>
     </option>
   </component>
@@ -57,12 +41,5 @@
   </component>
   <component name="ProjectType">
     <option name="id" value="Android" />
-  </component>
-  <component name="VisualizationToolProject">
-    <option name="state">
-      <ProjectState>
-        <option name="scale" value="0.45726165771484373" />
-      </ProjectState>
-    </option>
   </component>
 </project>

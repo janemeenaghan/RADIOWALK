@@ -36,20 +36,20 @@
 
     <com.rey.material.widget.TextView
         android:id="@+id/stationNameText"
-        android:layout_width="0dp"
-        android:layout_height="0dp"
+        android:layout_width="91dp"
+        android:layout_height="18dp"
         android:layout_weight="1"
-        android:textSize="6sp"
         android:focusable="true"
         android:focusableInTouchMode="true"
         android:scrollHorizontally="true"
         android:singleLine="true"
-        android:text="@string/noStationFound"
+        android:text=""
         android:textColor="@color/colorCyanDark"
         android:textColorHint="@color/colorCyan"
         app:layout_constraintHeight_percent="0.025"
         app:layout_constraintWidth_percent="0.3"
         app:v_styleId="@array/text_body"
+        android:textSize="4sp"
         sothree:layout_constraintLeft_toRightOf="@+id/playPauseButton"
         sothree:layout_constraintTop_toTopOf="@+id/musicIcon" />
 
@@ -82,23 +82,24 @@
 
     <com.rey.material.widget.TextView
         android:id="@+id/nowPlayingText"
-        android:layout_height="0dp"
-        android:layout_width="0dp"
-        app:layout_constraintHeight_percent="0.025"
-        app:layout_constraintWidth_percent="0.2"
+        android:layout_width="179dp"
+        android:layout_height="19dp"
         android:layout_weight="1"
         android:ellipsize="marquee"
         android:focusable="true"
         android:focusableInTouchMode="true"
         android:marqueeRepeatLimit="marquee_forever"
+        android:paddingLeft="5dp"
         android:scrollHorizontally="true"
         android:singleLine="true"
         android:text=""
-        android:textSize="6sp"
+        android:textSize="4sp"
+        app:layout_constraintHeight_percent="0.025"
+        app:layout_constraintWidth_percent="0.2"
         app:v_styleId="@array/text_body"
-        sothree:layout_constraintLeft_toRightOf="@id/stationNameText"
-        android:paddingLeft="5dp"
-        sothree:layout_constraintTop_toTopOf="@+id/musicIcon" />
+        sothree:layout_constraintLeft_toRightOf="@id/guidelineVertForNowPlayingText"
+        sothree:layout_constraintTop_toTopOf="@+id/musicIcon"
+        tools:ignore="SmallSp" />
 
     <com.rey.material.widget.Slider
         android:id="@+id/volumebar"
@@ -156,7 +157,7 @@
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:orientation="vertical"
-        sothree:layout_constraintGuide_percent="0.62" />
+        sothree:layout_constraintGuide_percent="0.54" />
 
     <androidx.constraintlayout.widget.Guideline
         android:id="@+id/guidelineHorizForImage"

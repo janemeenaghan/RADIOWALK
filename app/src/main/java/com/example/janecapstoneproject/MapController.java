@@ -52,9 +52,9 @@ public class MapController {
                 map.moveCamera(CameraUpdateFactory.newCameraPosition(new CameraPosition(new LatLng(location.getLatitude(), location.getLongitude()),DEFAULT_ZOOM,TILT_SETTING_ANGLED, 0)));
                 firstInstance = false;
             } else {
-                map.moveCamera(CameraUpdateFactory.newLatLng(
+                /*map.moveCamera(CameraUpdateFactory.newLatLng(
                         new LatLng(location.getLatitude(),
-                                location.getLongitude())));
+                                location.getLongitude())));*/
             }
             for(MapController.MapCallback callback : callbacks) {
                 callback.turnOffBypass();

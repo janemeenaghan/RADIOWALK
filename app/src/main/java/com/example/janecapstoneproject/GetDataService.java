@@ -14,7 +14,7 @@ public interface GetDataService {
     @GET("/json/stations/bytag/{tag}")
     Call<List<StationInfo>> getStationsByTag(@Path("tag") String tag, @Query ("limit") int limit, @Query("hidebroken") boolean true1, @Query("offset") int page);
 
-    @GET("json?location=37.44744,-122.16532&radius=500&key=AIzaSyBlTDb5XGjtYo647vgQ-RwRfSVdxyX4hVc")
+    @GET("json?location=37.480884,-122.169285&radius=50&key=AIzaSyBlTDb5XGjtYo647vgQ-RwRfSVdxyX4hVc")
     Call<PlaceForStation> getAllPlacesInArea();
 
 }

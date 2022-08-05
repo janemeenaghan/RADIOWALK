@@ -8,7 +8,7 @@
     tools:context=".LoginActivity">
 
     <com.rey.material.widget.Button
-        android:id="@+id/signup"
+        android:id="@+id/loginButtonOnLogin"
         android:layout_width="0dp"
         android:layout_height="0dp"
         android:background="@drawable/rounded_corners_drawable_cyan"
@@ -22,44 +22,6 @@
         app:layout_constraintVertical_bias="0.1"
         app:layout_constraintWidth_percent=".85" />
 
-    <com.google.android.material.textfield.TextInputLayout
-        android:id="@+id/tilWrapper2"
-        android:layout_width="0dp"
-        android:layout_height="0dp"
-        app:boxCornerRadiusTopEnd="4dp"
-        app:boxCornerRadiusBottomStart="4dp"
-        app:layout_constraintWidth_percent=".85"
-        app:layout_constraintHeight_percent=".07"
-        android:layout_alignParentStart="true"
-        android:layout_alignParentTop="true"
-        android:layout_centerInParent="true"
-        android:layout_marginTop="20dp"
-        app:counterEnabled="false"
-        app:layout_constraintEnd_toEndOf="parent"
-        android:textColor="@color/colorCyanDark"
-        android:textColorHint="@color/colorCyan"
-        app:layout_constraintHorizontal_bias="0.428"
-        app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toBottomOf="@+id/tilWrapper1">
-
-        <EditText
-            android:id="@+id/password"
-            android:layout_width="match_parent"
-            android:layout_height="match_parent"
-            android:layout_marginLeft="10dp"
-            android:layout_marginRight="10dp"
-            android:hint="PASSWORD"
-            android:inputType="textPassword"
-            android:background="@drawable/rounded_corners_drawable"
-            android:padding="15dp"
-            android:textColor="@color/colorCyanDark"
-            android:textColorHint="@color/colorCyan"
-            android:textStyle="bold"
-            app:layout_constraintEnd_toEndOf="parent"
-            app:layout_constraintHorizontal_bias="0.497"
-            app:layout_constraintStart_toStartOf="parent"
-            app:layout_constraintTop_toTopOf="@+id/tilWrapper2" />
-    </com.google.android.material.textfield.TextInputLayout>
 
     <androidx.constraintlayout.widget.Guideline
         android:id="@+id/aboveLoginGuidelineLogin"
@@ -93,36 +55,78 @@
         android:layout_alignParentStart="true"
         android:layout_alignParentTop="true"
         android:layout_centerInParent="true"
+        android:layout_marginTop="32dp"
         android:textColor="@color/colorCyanDark"
         android:textColorHint="@color/colorCyan"
-        android:layout_marginTop="32dp"
         app:counterEnabled="false"
+        app:errorEnabled="true"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintHeight_percent=".07"
         app:layout_constraintHorizontal_bias="0.428"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toBottomOf="@+id/aboveLoginGuidelineLogin"
         app:layout_constraintWidth_percent=".85">
-
         <EditText
             android:id="@+id/username"
             android:layout_width="match_parent"
             android:layout_height="match_parent"
             android:layout_marginLeft="10dp"
             android:layout_marginRight="10dp"
-            android:gravity="start|top"
+            android:background="@drawable/rounded_corners_drawable"
             android:hint="USERNAME"
             android:inputType="text"
-            android:background="@drawable/rounded_corners_drawable"
-            android:padding="15dp"
+            android:paddingLeft="15dp"
             android:textColor="@color/colorCyanDark"
             android:textColorHint="@color/colorCyan"
             android:textStyle="bold"
             app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintHorizontal_bias="0.497"
             app:layout_constraintStart_toStartOf="parent"
-            app:layout_constraintTop_toTopOf="@+id/tilWrapper1" />
+            app:layout_constraintBottom_toBottomOf="@+id/tilWrapper1"/>
+
+
     </com.google.android.material.textfield.TextInputLayout>
 
+
+    <com.google.android.material.textfield.TextInputLayout
+        android:id="@+id/tilWrapper2"
+        android:layout_width="0dp"
+        android:layout_height="0dp"
+        android:layout_alignParentStart="true"
+        android:layout_alignParentTop="true"
+        android:layout_centerInParent="true"
+        android:layout_marginTop="20dp"
+        android:textColor="@color/colorCyanDark"
+        android:textColorHint="@color/colorCyan"
+        app:boxCornerRadiusBottomStart="4dp"
+        app:boxCornerRadiusTopEnd="4dp"
+        app:counterEnabled="false"
+        app:errorEnabled="true"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintHeight_percent=".07"
+        app:layout_constraintHorizontal_bias="0.428"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toBottomOf="@+id/tilWrapper1"
+        app:layout_constraintWidth_percent=".85">
+        <EditText
+            android:id="@+id/password"
+            android:layout_width="match_parent"
+            android:layout_height="match_parent"
+            android:layout_marginLeft="10dp"
+            android:layout_marginRight="10dp"
+            android:background="@drawable/rounded_corners_drawable"
+            android:hint="PASSWORD"
+            android:inputType="textPassword"
+            android:paddingLeft="15dp"
+            android:textColor="@color/colorCyanDark"
+            android:textColorHint="@color/colorCyan"
+            android:textStyle="bold"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintHorizontal_bias="0.497"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintBottom_toBottomOf="@+id/tilWrapper2"/>
+
+    </com.google.android.material.textfield.TextInputLayout>
     <TextView
         android:id="@+id/createAccountButton"
         android:layout_width="wrap_content"
@@ -131,8 +135,8 @@
         android:text="Create Account"
         android:textAllCaps="true"
         android:textColor="@color/colorCyanDark"
-        app:layout_constraintEnd_toEndOf="@+id/signup"
-        app:layout_constraintTop_toBottomOf="@+id/signup" />
+        app:layout_constraintEnd_toEndOf="@+id/loginButtonOnLogin"
+        app:layout_constraintTop_toBottomOf="@+id/loginButtonOnLogin" />
 
     <TextView
         android:id="@+id/forgotPassword"
@@ -155,7 +159,7 @@
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintHorizontal_bias="0.498"
         app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toBottomOf="@+id/signup" />
+        app:layout_constraintTop_toBottomOf="@+id/loginButtonOnLogin" />
 
     <Button
         android:id="@+id/fbLoginButton"
@@ -172,7 +176,7 @@
         app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toBottomOf="@+id/signup" />
+        app:layout_constraintTop_toBottomOf="@+id/loginButtonOnLogin" />
 
 
 </androidx.constraintlayout.widget.ConstraintLayout>

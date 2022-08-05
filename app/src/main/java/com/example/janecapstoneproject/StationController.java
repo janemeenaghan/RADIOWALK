@@ -258,7 +258,7 @@ public class StationController {
         return (proximityScore(station,location) + likesScore(station) + stationTypeScore(station) + isCurrentStationScore(station,currentStation) + chaosScore(chaosFactor));
     }
     private double proximityScore(Station station, Location location){
-        return 3.0* (1.0 - ((distance(station,location) / (STATION_DETECTION_RADIUS_KILOMETERS*1000))));
+        return 6.0* (1.0 - ((distance(station,location) / (STATION_DETECTION_RADIUS_KILOMETERS*1000))));
     }
     private double distance(Station a, Location b) {
         float[] result = new float[1];
@@ -267,7 +267,7 @@ public class StationController {
     }
     private double likesScore(Station station){
         if (station.getLikes()>=LIKES_CAP_FOR_ALGO){
-            return 2;
+            return 1;
         }
         return (2 * ((double)((int)station.getLikes()))  / LIKES_CAP_FOR_ALGO);
     }
@@ -282,7 +282,7 @@ public class StationController {
             return 0;
         }
         if (station.getObjectId().equals(currentStation.getObjectId())){
-            return 3;
+            return 0;
         }
         return 0;
     }

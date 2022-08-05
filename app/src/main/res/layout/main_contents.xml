@@ -111,6 +111,7 @@
         <RadioButton
             android:id="@+id/radioBoth"
             android:layout_width="wrap_content"
+            android:background="@android:color/transparent"
             app:v_styleId="@array/radio_button"
             android:layout_height="wrap_content"
             android:onClick="onRadioButtonClicked"
